@@ -1,0 +1,5806 @@
+# 📁 PROJECT EXPORT FOR LLMs
+
+## 📊 Project Information
+
+- **Project Name**: `esp32-platform`
+- **Generated On**: 2026-04-20 09:32:43 (Asia/Novosibirsk / GMT+07:00)
+- **Total Files Processed**: 29
+- **Export Tool**: Easy Whole Project to Single Text File for LLMs v1.1.0
+- **Tool Author**: Jota / José Guilherme Pandolfi
+
+### ⚙️ Export Configuration
+
+| Setting | Value |
+|---------|-------|
+| Language | `en` |
+| Max File Size | `1 MB` |
+| Include Hidden Files | `false` |
+| Output Format | `both` |
+
+## 🌳 Project Structure
+
+```
+├── 📁 data/
+│   └── 📄 index.html (10.27 KB)
+├── 📁 src/
+│   ├── 📁 apps/
+│   │   └── 📁 boiler/
+│   │       ├── 📄 BoilerApp.h (3.37 KB)
+│   │       ├── 📄 BoilerAppDevice.cpp (18.48 KB)
+│   │       └── 📄 BoilerAppDevice.h (517 B)
+│   ├── 📁 core/
+│   │   ├── 📄 ConfigManager.cpp (2.31 KB)
+│   │   ├── 📄 ConfigManager.h (442 B)
+│   │   ├── 📄 CoreTypes.h (2.13 KB)
+│   │   ├── 📄 NetworkManager.cpp (3.7 KB)
+│   │   ├── 📄 NetworkManager.h (377 B)
+│   │   ├── 📄 WebHandler.cpp (10.14 KB)
+│   │   └── 📄 WebHandler.h (644 B)
+│   ├── 📁 devices/
+│   │   ├── 📁 boiler/
+│   │   │   ├── 📄 BoilerDevice.cpp (14.85 KB)
+│   │   │   ├── 📄 BoilerDevice.h (621 B)
+│   │   │   └── 📄 BoilerTypes.h (2.42 KB)
+│   │   ├── 📁 boiler-monitor/
+│   │   │   ├── 📄 BMonDevice.cpp (23.35 KB)
+│   │   │   ├── 📄 BMonDevice.h (1012 B)
+│   │   │   └── 📄 BMonTypes.h (5.05 KB)
+│   │   └── 📁 kc868-a16/
+│   │       ├── 📄 A16Device.cpp (20.35 KB)
+│   │       ├── 📄 A16Device.h (1019 B)
+│   │       └── 📄 A16Types.h (3.71 KB)
+│   ├── 📁 modules/
+│   │   ├── 📁 modem/
+│   │   │   ├── 📄 ModemHandler.cpp (36.63 KB)
+│   │   │   └── 📄 ModemHandler.h (2.9 KB)
+│   │   ├── 📁 mqtt/
+│   │   │   ├── 📄 MqttHandler.cpp (5.93 KB)
+│   │   │   └── 📄 MqttHandler.h (992 B)
+│   │   └── 📁 telegram/
+│   │       ├── 📄 TgHandler.cpp (6.78 KB)
+│   │       └── 📄 TgHandler.h (860 B)
+│   └── 📄 main.cpp (7.21 KB)
+├── 📄 platformio.ini (3.26 KB)
+└── 📄 sdkconfig.defaults (192 B)
+```
+
+## 📑 Table of Contents
+
+**Project Files:**
+
+- [📄 data/index.html](#📄-data-index-html)
+- [📄 src/apps/boiler/BoilerApp.h](#📄-src-apps-boiler-boilerapp-h)
+- [📄 src/apps/boiler/BoilerAppDevice.cpp](#📄-src-apps-boiler-boilerappdevice-cpp)
+- [📄 src/apps/boiler/BoilerAppDevice.h](#📄-src-apps-boiler-boilerappdevice-h)
+- [📄 src/core/ConfigManager.cpp](#📄-src-core-configmanager-cpp)
+- [📄 src/core/ConfigManager.h](#📄-src-core-configmanager-h)
+- [📄 src/core/CoreTypes.h](#📄-src-core-coretypes-h)
+- [📄 src/core/NetworkManager.cpp](#📄-src-core-networkmanager-cpp)
+- [📄 src/core/NetworkManager.h](#📄-src-core-networkmanager-h)
+- [📄 src/core/WebHandler.cpp](#📄-src-core-webhandler-cpp)
+- [📄 src/core/WebHandler.h](#📄-src-core-webhandler-h)
+- [📄 src/devices/boiler/BoilerDevice.cpp](#📄-src-devices-boiler-boilerdevice-cpp)
+- [📄 src/devices/boiler/BoilerDevice.h](#📄-src-devices-boiler-boilerdevice-h)
+- [📄 src/devices/boiler/BoilerTypes.h](#📄-src-devices-boiler-boilertypes-h)
+- [📄 src/devices/boiler-monitor/BMonDevice.cpp](#📄-src-devices-boiler-monitor-bmondevice-cpp)
+- [📄 src/devices/boiler-monitor/BMonDevice.h](#📄-src-devices-boiler-monitor-bmondevice-h)
+- [📄 src/devices/boiler-monitor/BMonTypes.h](#📄-src-devices-boiler-monitor-bmontypes-h)
+- [📄 src/devices/kc868-a16/A16Device.cpp](#📄-src-devices-kc868-a16-a16device-cpp)
+- [📄 src/devices/kc868-a16/A16Device.h](#📄-src-devices-kc868-a16-a16device-h)
+- [📄 src/devices/kc868-a16/A16Types.h](#📄-src-devices-kc868-a16-a16types-h)
+- [📄 src/modules/modem/ModemHandler.cpp](#📄-src-modules-modem-modemhandler-cpp)
+- [📄 src/modules/modem/ModemHandler.h](#📄-src-modules-modem-modemhandler-h)
+- [📄 src/modules/mqtt/MqttHandler.cpp](#📄-src-modules-mqtt-mqtthandler-cpp)
+- [📄 src/modules/mqtt/MqttHandler.h](#📄-src-modules-mqtt-mqtthandler-h)
+- [📄 src/modules/telegram/TgHandler.cpp](#📄-src-modules-telegram-tghandler-cpp)
+- [📄 src/modules/telegram/TgHandler.h](#📄-src-modules-telegram-tghandler-h)
+- [📄 src/main.cpp](#📄-src-main-cpp)
+- [📄 platformio.ini](#📄-platformio-ini)
+
+---
+
+## 📈 Project Statistics
+
+| Metric | Count |
+|--------|-------|
+| Total Files | 29 |
+| Total Directories | 13 |
+| Text Files | 28 |
+| Binary Files | 1 |
+| Total Size | 189.37 KB |
+
+### 📄 File Types Distribution
+
+| Extension | Count |
+|-----------|-------|
+| `.h` | 15 |
+| `.cpp` | 11 |
+| `.html` | 1 |
+| `.ini` | 1 |
+| `.defaults` | 1 |
+
+## 💻 File Code Contents
+
+### <a id="📄-data-index-html"></a>📄 `data/index.html`
+
+**File Info:**
+- **Size**: 10.27 KB
+- **Extension**: `.html`
+- **Language**: `html`
+- **Location**: `data/index.html`
+- **Relative Path**: `data`
+- **Created**: 2026-02-18 20:59:52 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-04-20 07:13:56 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `5d993b18d104e30157b3d498272cd271`
+- **SHA256**: `e22104ac444da6b96361e9599e3cb1986a12a0af85ab2c821a062a1162af3094`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ESP32 Platform</title>
+<style>
+:root {
+  --bg:       #1a1c22;
+  --card:     #22252e;
+  --border:   #2e3240;
+  --text:     #d0d4e0;
+  --muted:    #6b7494;
+  --accent:   #f0a500;
+  --hot:      #e05252;
+  --cool:     #5a9fd4;
+  --warm:     #e0a040;
+  --ok:       #3ec97a;
+  --danger:   #e05252;
+  --nav-bg:   #13151a;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; background: var(--bg); color: var(--text);
+  font-family: -apple-system, 'Segoe UI', sans-serif; font-size: 14px; }
+
+/* ─── NAV ─────────────────────────────────────────────────── */
+nav {
+  background: var(--nav-bg);
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+nav::-webkit-scrollbar { display: none; }
+
+.tab-btn {
+  flex: 0 0 auto;
+  width: auto;
+  background: none; border: none;
+  color: var(--muted);
+  padding: 14px 20px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .2s, border-color .2s;
+  white-space: nowrap;
+}
+.tab-btn:hover { color: var(--text); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ─── STATUS BAR ──────────────────────────────────────────── */
+.status-bar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 10px 16px;
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  font-size: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.status-dot { display: flex; align-items: center; gap: 5px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--muted); }
+.dot.on  { background: var(--ok); box-shadow: 0 0 5px var(--ok); }
+.dot.off { background: var(--muted); }
+.status-online { color: var(--ok); font-weight: 700;
+  font-size: 11px; letter-spacing: .08em; }
+
+/* ─── TAB CONTENT ─────────────────────────────────────────── */
+.tab-pane { display: none; padding: 16px; max-width: 560px; margin: 0 auto; }
+.tab-pane.active { display: block; }
+#loading { text-align: center; color: var(--muted); padding: 40px 0; }
+
+/* ─── MONITOR CARDS ───────────────────────────────────────── */
+.monitor-page { display: flex; flex-direction: column; gap: 10px; }
+
+.m-card {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+}
+.m-card-label {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px;
+}
+
+/* Power card */
+.m-power-big {
+  text-align: center;
+  font-size: 52px; font-weight: 800;
+  color: var(--accent); line-height: 1;
+  margin-bottom: 6px;
+}
+.m-power-big .unit { font-size: 22px; font-weight: 600; margin-left: 4px; }
+.m-power-sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 2px; }
+.m-power-sub b { color: var(--text); }
+
+/* Sensors row */
+.m-sensors-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+.m-sensors-row.two { grid-template-columns: repeat(2, 1fr); }
+
+.m-sensor {
+  background: #1a1c22;
+  border-radius: 8px;
+  padding: 12px 10px;
+  text-align: center;
+  border: 1px solid var(--border);
+}
+.m-sensor-label {
+  font-size: 9px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 6px;
+}
+.m-sensor-val {
+  font-size: 24px; font-weight: 800;
+  line-height: 1; margin-bottom: 4px;
+}
+.m-sensor-val.hot    { color: var(--hot); }
+.m-sensor-val.cool   { color: var(--cool); }
+.m-sensor-val.warm   { color: var(--warm); }
+.m-sensor-val.accent { color: var(--accent); }
+.m-sensor-icon { font-size: 12px; color: var(--hot); }
+.m-sensor-icon.cool { color: var(--cool); }
+.m-sensor-sub { font-size: 11px; color: var(--muted); }
+
+canvas#powerChart { width: 100%; display: block; }
+
+/* ─── SETTINGS ────────────────────────────────────────────── */
+.settings-group {
+  background: var(--card);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+.settings-group h3 {
+  font-size: 13px; font-weight: 700;
+  color: var(--text); margin-bottom: 12px;
+}
+.settings-group label {
+  display: block; color: var(--muted);
+  font-size: 12px; margin-bottom: 8px;
+}
+input[type="text"],
+input[type="number"],
+input[type="password"],
+input[type="file"] {
+  width: 100%; padding: 10px 12px;
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text);
+  font-size: 13px; margin-bottom: 8px;
+  outline: none; transition: border-color .2s;
+}
+input:focus { border-color: var(--accent); }
+input[type="checkbox"] { width: auto; margin-right: 6px; }
+
+.toggle-row {
+  display: flex !important; align-items: center;
+  justify-content: space-between;
+  color: var(--text) !important;
+  font-size: 14px !important;
+  margin-bottom: 12px !important;
+}
+
+button {
+  width: 100%; padding: 11px;
+  background: var(--accent); border: none;
+  border-radius: 6px; color: #111;
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; margin-bottom: 8px;
+  transition: opacity .2s;
+}
+button:hover { opacity: .85; }
+button.btn-danger { background: var(--danger); color: #fff; }
+button.btn-secondary { background: var(--border); color: var(--text); }
+
+.info-row { font-size: 12px; color: var(--muted); margin-top: 4px; }
+.muted { color: var(--muted); }
+</style>
+</head>
+<body>
+
+<nav id="navBar">
+  <span class="tab-btn" style="color:var(--muted);padding:14px 16px;font-size:12px">загрузка...</span>
+</nav>
+
+<div class="status-bar" id="statusBar">
+  <div class="status-dot"><div class="dot" id="dot_wifi"></div>Wi-Fi</div>
+  <div class="status-dot"><div class="dot" id="dot_eth"></div>ETH</div>
+  <div class="status-dot"><div class="dot" id="dot_mqtt"></div>MQTT</div>
+  <div class="status-dot"><div class="dot" id="dot_tg"></div>Telegram</div>
+  <div class="status-online" id="status_online">●</div>
+  <div style="font-size:10px;color:var(--muted);margin-left:8px" id="status_build"></div>
+</div>
+
+<div id="tabsContainer">
+  <div id="loading">Загрузка интерфейса...</div>
+</div>
+
+<script>
+let _activeTab = null;
+
+// ── Загрузка nav и первой вкладки ──────────────────────────
+async function initUI() {
+  try {
+    const r = await fetch('/api/nav');
+    const tabs = await r.json();
+    if (!tabs.length) return;
+
+    // Строим nav
+    const nav = document.getElementById('navBar');
+    nav.innerHTML = '';
+    tabs.forEach((t, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn' + (i === 0 ? ' active' : '');
+      btn.textContent = (t.icon ? t.icon + ' ' : '') + t.label;
+      btn.onclick = () => openTab(t.id, btn);
+      nav.appendChild(btn);
+    });
+
+    // Строим пустые panes
+    const container = document.getElementById('tabsContainer');
+    container.innerHTML = '';
+    tabs.forEach((t, i) => {
+      const pane = document.createElement('div');
+      pane.className = 'tab-pane' + (i === 0 ? ' active' : '');
+      pane.id = 'tab_' + t.id;
+      pane.innerHTML = '<div style="color:var(--muted);padding:30px 0;text-align:center">Загрузка...</div>';
+      container.appendChild(pane);
+    });
+
+    // Загружаем первую вкладку
+    await loadTab(tabs[0].id);
+    _activeTab = tabs[0].id;
+  } catch(e) {
+    document.getElementById('tabsContainer').innerHTML =
+      '<div style="color:#e05252;padding:20px">Ошибка загрузки интерфейса</div>';
+  }
+}
+
+// ── Загрузка HTML вкладки ──────────────────────────────────
+async function loadTab(id) {
+  const pane = document.getElementById('tab_' + id);
+  if (!pane || pane.dataset.loaded) return;
+  try {
+    const r = await fetch('/api/tab?id=' + id);
+    pane.innerHTML = await r.text();
+    pane.dataset.loaded = '1';
+    // Запускаем скрипты внутри вкладки
+    pane.querySelectorAll('script').forEach(s => {
+      const ns = document.createElement('script');
+      ns.textContent = s.textContent;
+      document.body.appendChild(ns);
+    });
+  } catch(e) {
+    pane.innerHTML = '<div style="color:var(--muted);padding:20px">Ошибка загрузки вкладки</div>';
+  }
+}
+
+// ── Переключение вкладок ───────────────────────────────────
+async function openTab(id, btn) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab_' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  await loadTab(id);
+  _activeTab = id;
+}
+
+// ── Статус-бар ─────────────────────────────────────────────
+async function updateStatus() {
+  try {
+    const r = await fetch('/api/status');
+    const d = await r.json();
+    const set = (id, on) => {
+      const el = document.getElementById(id);
+      if (el) { el.classList.toggle('on', on); el.classList.toggle('off', !on); }
+    };
+    set('dot_wifi', d.wifi);
+    set('dot_eth',  d.eth);
+    set('dot_mqtt', d.mqtt);
+    set('dot_tg',   d.tg);
+    const online = d.eth || d.wifi;
+    const el = document.getElementById('status_online');
+    if (el) { el.textContent = online ? 'ONLINE' : 'OFFLINE';
+              el.style.color = online ? 'var(--ok)' : 'var(--danger)'; }
+    const bld = document.getElementById('status_build');
+    if (bld && d.build) bld.textContent = 'fw: ' + d.build;
+  } catch(e) {}
+}
+
+initUI();
+updateStatus();
+setInterval(updateStatus, 5000);
+</script>
+</body>
+</html>
+
+```
+
+---
+
+### <a id="📄-src-apps-boiler-boilerapp-h"></a>📄 `src/apps/boiler/BoilerApp.h`
+
+**File Info:**
+- **Size**: 3.37 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/apps/boiler/BoilerApp.h`
+- **Relative Path**: `src/apps/boiler`
+- **Created**: 2026-02-18 04:57:08 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-18 04:57:08 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `5a6f1a1b16eb96059c384df667da24da`
+- **SHA256**: `000d76a5a8e40790a3d2481aaa9abbe58a293e24f38d1676cb59cd01c648836d`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
+
+#include <Arduino.h>
+
+// ============================================================
+//  ПРИВЯЗКА ДАТЧИКОВ К КАНАЛАМ A16
+// ============================================================
+#define BOILER_OW_SUPPLY    0   // HT1 (pin 33) — подача
+#define BOILER_OW_RETURN    1   // HT2 (pin 32) — обратка
+
+#define BOILER_ADC_P1       0   // ADC CH1 (pin 36) — давление подачи 4-20мА
+#define BOILER_ADC_P2       1   // ADC CH2 (pin 39) — давление обратки 4-20мА
+
+#define BOILER_DIN_FLOW1    0   // DIN1 — импульсный расходомер (сухой контакт)
+#define BOILER_DIN_FLOW2    1   // DIN2 — расходомер Холла
+
+// ============================================================
+//  КОНФИГ КОТЛА — сохраняется в /boiler.json
+// ============================================================
+struct BoilerAppConfig {
+    // Уставки температуры
+    float t_max         = 85.0f;   // Аварийное отключение
+    float t_alarm       = 80.0f;   // Порог оповещения
+    float t_hyst        = 2.0f;    // Гистерезис
+    float t_min         = 40.0f;   // Защита от замерзания
+
+    // Калибровка давления (4-20мА → бар)
+    float p_min         = 0.0f;    // 4мА = 0 бар
+    float p_max         = 10.0f;   // 20мА = 10 бар
+
+    // Расходомеры — импульсов на литр (настраивается после замера)
+    float flow1_liter_per_pulse = 1.0f;   // сухой контакт
+    float flow2_liter_per_pulse = 1.0f;   // Холл
+
+    // Интервал публикации MQTT (мс)
+    uint32_t pub_interval = 10000;
+};
+
+// ============================================================
+//  СОСТОЯНИЕ КОТЛА — runtime
+// ============================================================
+#define BOILER_HIST_SIZE 60  // 60 × 10сек = 10 минут
+
+struct BoilerAppState {
+    // Температуры
+    float t_supply  = 0.0f;
+    float t_return  = 0.0f;
+    float t_delta   = 0.0f;
+
+    // Давление
+    float p_supply  = 0.0f;
+    float p_return  = 0.0f;
+    float p_delta   = 0.0f;
+
+    // Расход
+    float flow1_lpm = 0.0f;   // л/мин расходомер 1
+    float flow2_lpm = 0.0f;   // л/мин расходомер 2
+    float flow_lpm  = 0.0f;   // итоговый (среднее или выбранный)
+
+    // Счётчики импульсов (снапшот для расчёта расхода)
+    uint32_t flow1_last = 0;
+    uint32_t flow2_last = 0;
+
+    // Мощность
+    float power_kw  = 0.0f;
+    float energy_kwh = 0.0f;  // суточный накопитель
+
+    // Аварии
+    bool alarm_high   = false;
+    bool alarm_low    = false;
+    bool alarm_sensor = false;
+
+    // История мощности
+    float    hist_power[BOILER_HIST_SIZE] = {};
+    uint8_t  hist_head  = 0;
+    uint8_t  hist_count = 0;
+
+    void pushHistory(float p) {
+        hist_power[hist_head] = p;
+        hist_head = (hist_head + 1) % BOILER_HIST_SIZE;
+        if (hist_count < BOILER_HIST_SIZE) hist_count++;
+    }
+};
+
+extern BoilerAppConfig boilerAppCfg;
+extern BoilerAppState  boilerAppState;
+
+#endif // DEVICE_KC868_A16 && APP_BOILER
+
+```
+
+---
+
+### <a id="📄-src-apps-boiler-boilerappdevice-cpp"></a>📄 `src/apps/boiler/BoilerAppDevice.cpp`
+
+**File Info:**
+- **Size**: 18.48 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/apps/boiler/BoilerAppDevice.cpp`
+- **Relative Path**: `src/apps/boiler`
+- **Created**: 2026-02-18 04:58:28 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-18 04:58:28 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `c2f4c51cabd8083c7ea2fc7ce05da164`
+- **SHA256**: `9091ed31abb5d1e53d06e449760119db32e8c08016955e0388b4fe409627f7c5`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
+#include "BoilerAppDevice.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include "../../devices/kc868-a16/A16Types.h"
+#include "../../devices/kc868-a16/A16Device.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+
+#ifdef MODULE_MQTT
+#include "../../modules/mqtt/MqttHandler.h"
+#endif
+#ifdef MODULE_TELEGRAM
+#include "../../modules/telegram/TgHandler.h"
+#endif
+
+BoilerAppConfig boilerAppCfg;
+BoilerAppState  boilerAppState;
+
+uint32_t BoilerAppDevice::_lastCalc    = 0;
+uint32_t BoilerAppDevice::_lastHistory = 0;
+uint32_t BoilerAppDevice::_lastPub     = 0;
+
+// ============================================================
+//  HTML — вкладка мониторинга (повторяет макет)
+// ============================================================
+static const char BOILER_MON_HTML[] PROGMEM = R"html(
+<div class="monitor-page">
+
+  <div class="m-card">
+    <div class="m-card-label">ПРОИЗВОДИТЕЛЬНОСТЬ</div>
+    <div class="m-power-big"><span id="b_power">--</span><span class="unit">кВт</span></div>
+    <div class="m-power-sub">Σ <span id="b_energy">--</span> кВт·ч <span class="muted">(сутки)</span></div>
+    <div class="m-power-sub">
+      Поток 1: <b id="b_flow1">--</b> л/мин &nbsp;|&nbsp;
+      Поток 2: <b id="b_flow2">--</b> л/мин
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">СИСТЕМА ОТОПЛЕНИЯ</div>
+    <div class="m-sensors-row">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОДАЧА</div>
+        <div class="m-sensor-val hot" id="b_tsup">--°</div>
+        <div class="m-sensor-icon">▲</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ОБРАТКА</div>
+        <div class="m-sensor-val cool" id="b_tret">--°</div>
+        <div class="m-sensor-icon">•</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ДЕЛЬТА Т</div>
+        <div class="m-sensor-val accent" id="b_tdelta">--°</div>
+        <div class="m-sensor-sub muted">расчёт</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ДАВЛЕНИЕ В КОНТУРЕ</div>
+    <div class="m-sensors-row">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОДАЧА P1</div>
+        <div class="m-sensor-val accent" id="b_psup">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ОБРАТКА P2</div>
+        <div class="m-sensor-val accent" id="b_pret">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ДЕЛЬТА Р</div>
+        <div class="m-sensor-val accent" id="b_pdelta">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ИСТОРИЯ МОЩНОСТИ</div>
+    <canvas id="powerChart" height="80"></canvas>
+  </div>
+
+</div>
+
+<script>
+async function updateBoiler() {
+  try {
+    const r = await fetch('/api/boiler/data');
+    const d = await r.json();
+    document.getElementById('b_power').textContent   = d.power_kw.toFixed(1);
+    document.getElementById('b_energy').textContent  = d.energy_kwh.toFixed(1);
+    document.getElementById('b_flow1').textContent   = d.flow1_lpm.toFixed(1);
+    document.getElementById('b_flow2').textContent   = d.flow2_lpm.toFixed(1);
+    document.getElementById('b_tsup').textContent    = d.t_supply.toFixed(1)+'°';
+    document.getElementById('b_tret').textContent    = d.t_return.toFixed(1)+'°';
+    document.getElementById('b_tdelta').textContent  = d.t_delta.toFixed(1)+'°';
+    document.getElementById('b_psup').textContent    = d.p_supply.toFixed(2);
+    document.getElementById('b_pret').textContent    = d.p_return.toFixed(2);
+    document.getElementById('b_pdelta').textContent  = d.p_delta.toFixed(2);
+    drawChart(d.history || []);
+  } catch(e) {}
+}
+
+function drawChart(data) {
+  const canvas = document.getElementById('powerChart');
+  if (!canvas || !data.length) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const max = Math.max(...data, 1);
+  const step = W / (data.length - 1 || 1);
+  ctx.beginPath();
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  data.forEach((v,i) => {
+    const x = i * step;
+    const y = H - (v / max * H * 0.85) - 4;
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+  ctx.fillStyle = 'rgba(240,165,0,0.08)';
+  ctx.fill();
+}
+
+updateBoiler();
+setInterval(updateBoiler, 2000);
+</script>
+)html";
+
+// ============================================================
+//  HTML — вкладка уставок
+// ============================================================
+static const char BOILER_CFG_HTML[] PROGMEM = R"html(
+<div class="settings-group">
+  <h3>🌡 Температурные уставки</h3>
+  <label>Макс. температура (аварийное отключение):
+    <input type="number" id="t_max" step="0.5"> °C
+  </label>
+  <label>Порог оповещения:
+    <input type="number" id="t_alarm" step="0.5"> °C
+  </label>
+  <label>Гистерезис:
+    <input type="number" id="t_hyst" step="0.1"> °C
+  </label>
+  <label>Мин. температура (защита от замерзания):
+    <input type="number" id="t_min" step="0.5"> °C
+  </label>
+</div>
+<div class="settings-group">
+  <h3>💧 Расходомеры</h3>
+  <label>Расходомер 1 (сухой контакт) — литров на импульс:
+    <input type="number" id="flow1_lpp" step="0.01">
+  </label>
+  <label>Расходомер 2 (Холл) — литров на импульс:
+    <input type="number" id="flow2_lpp" step="0.01">
+  </label>
+</div>
+<div class="settings-group">
+  <h3>📊 Давление</h3>
+  <label>Датчик давления: 4мА = <input type="number" id="p_min" step="0.1"> бар</label>
+  <label>Датчик давления: 20мА = <input type="number" id="p_max" step="0.5"> бар</label>
+</div>
+<div class="settings-group">
+  <h3>📡 MQTT</h3>
+  <label>Интервал публикации:
+    <input type="number" id="pub_interval" step="1000"> мс
+  </label>
+</div>
+<button onclick="saveBoilerCfg()">💾 Сохранить уставки</button>
+
+<script>
+async function loadBoilerCfg() {
+  const r = await fetch('/api/boiler/config');
+  const d = await r.json();
+  document.getElementById('t_max').value        = d.t_max;
+  document.getElementById('t_alarm').value      = d.t_alarm;
+  document.getElementById('t_hyst').value       = d.t_hyst;
+  document.getElementById('t_min').value        = d.t_min;
+  document.getElementById('flow1_lpp').value    = d.flow1_liter_per_pulse;
+  document.getElementById('flow2_lpp').value    = d.flow2_liter_per_pulse;
+  document.getElementById('p_min').value        = d.p_min;
+  document.getElementById('p_max').value        = d.p_max;
+  document.getElementById('pub_interval').value = d.pub_interval;
+}
+async function saveBoilerCfg() {
+  const data = {
+    t_max:                +document.getElementById('t_max').value,
+    t_alarm:              +document.getElementById('t_alarm').value,
+    t_hyst:               +document.getElementById('t_hyst').value,
+    t_min:                +document.getElementById('t_min').value,
+    flow1_liter_per_pulse:+document.getElementById('flow1_lpp').value,
+    flow2_liter_per_pulse:+document.getElementById('flow2_lpp').value,
+    p_min:                +document.getElementById('p_min').value,
+    p_max:                +document.getElementById('p_max').value,
+    pub_interval:         +document.getElementById('pub_interval').value,
+  };
+  const r = await fetch('/api/boiler/save', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+  if (r.ok) alert('Уставки сохранены');
+}
+loadBoilerCfg();
+</script>
+)html";
+
+// ============================================================
+//  INIT
+// ============================================================
+void BoilerAppDevice::init() {
+    loadConfig();
+
+    // Регистрируем вкладки — мониторинг первым
+    WebHandler::registerTab({"monitor",   "Мониторинг", "🔥", BOILER_MON_HTML});
+    WebHandler::registerTab({"boiler_cfg","Уставки",    "⚙️",  BOILER_CFG_HTML});
+
+    extern AsyncWebServer server;
+
+    // Данные мониторинга
+    server.on("/api/boiler/data", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["t_supply"]   = boilerAppState.t_supply;
+        doc["t_return"]   = boilerAppState.t_return;
+        doc["t_delta"]    = boilerAppState.t_delta;
+        doc["p_supply"]   = boilerAppState.p_supply;
+        doc["p_return"]   = boilerAppState.p_return;
+        doc["p_delta"]    = boilerAppState.p_delta;
+        doc["flow1_lpm"]  = boilerAppState.flow1_lpm;
+        doc["flow2_lpm"]  = boilerAppState.flow2_lpm;
+        doc["power_kw"]   = boilerAppState.power_kw;
+        doc["energy_kwh"] = boilerAppState.energy_kwh;
+
+        JsonArray hist = doc["history"].to<JsonArray>();
+        uint8_t start = (boilerAppState.hist_head - boilerAppState.hist_count
+                         + BOILER_HIST_SIZE) % BOILER_HIST_SIZE;
+        for (uint8_t i = 0; i < boilerAppState.hist_count; i++)
+            hist.add(boilerAppState.hist_power[(start+i) % BOILER_HIST_SIZE]);
+
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    // Конфиг
+    server.on("/api/boiler/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["t_max"]                = boilerAppCfg.t_max;
+        doc["t_alarm"]              = boilerAppCfg.t_alarm;
+        doc["t_hyst"]               = boilerAppCfg.t_hyst;
+        doc["t_min"]                = boilerAppCfg.t_min;
+        doc["flow1_liter_per_pulse"]= boilerAppCfg.flow1_liter_per_pulse;
+        doc["flow2_liter_per_pulse"]= boilerAppCfg.flow2_liter_per_pulse;
+        doc["p_min"]                = boilerAppCfg.p_min;
+        doc["p_max"]                = boilerAppCfg.p_max;
+        doc["pub_interval"]         = boilerAppCfg.pub_interval;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    auto* h = new AsyncCallbackJsonWebHandler("/api/boiler/save",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject o = json.as<JsonObject>();
+            boilerAppCfg.t_max                 = o["t_max"]                 | 85.0f;
+            boilerAppCfg.t_alarm               = o["t_alarm"]               | 80.0f;
+            boilerAppCfg.t_hyst                = o["t_hyst"]                | 2.0f;
+            boilerAppCfg.t_min                 = o["t_min"]                 | 40.0f;
+            boilerAppCfg.flow1_liter_per_pulse = o["flow1_liter_per_pulse"] | 1.0f;
+            boilerAppCfg.flow2_liter_per_pulse = o["flow2_liter_per_pulse"] | 1.0f;
+            boilerAppCfg.p_min                 = o["p_min"]                 | 0.0f;
+            boilerAppCfg.p_max                 = o["p_max"]                 | 10.0f;
+            boilerAppCfg.pub_interval          = o["pub_interval"]          | 10000;
+            BoilerAppDevice::saveConfig();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(h);
+
+#ifdef MODULE_TELEGRAM
+    TgHandler::onCommand = [](const String& cmd, const String& chat) {
+        if (cmd == "/boiler") {
+            String msg = "🔥 *Котёл*\n";
+            msg += "Подача: "  + String(boilerAppState.t_supply, 1) + "°C\n";
+            msg += "Обратка: " + String(boilerAppState.t_return, 1) + "°C\n";
+            msg += "P1/P2: "   + String(boilerAppState.p_supply, 2)
+                               + "/" + String(boilerAppState.p_return, 2) + " бар\n";
+            msg += "Мощность: "+ String(boilerAppState.power_kw, 1) + " кВт";
+            TgHandler::sendMessage(msg, chat);
+        }
+    };
+#endif
+
+    Serial.println("[BOILER] App init OK");
+}
+
+// ============================================================
+//  LOOP
+// ============================================================
+void BoilerAppDevice::loop() {
+    if (millis() - _lastCalc > 2000) {
+        _lastCalc = millis();
+        updateFromA16();
+        calcPower();
+        checkAlarms();
+    }
+
+    if (millis() - _lastHistory > 10000) {
+        _lastHistory = millis();
+        boilerAppState.pushHistory(boilerAppState.power_kw);
+        boilerAppState.energy_kwh += boilerAppState.power_kw * (10.0f / 3600.0f);
+    }
+
+#ifdef MODULE_MQTT
+    if (millis() - _lastPub > boilerAppCfg.pub_interval) {
+        _lastPub = millis();
+        publishMqtt();
+    }
+#endif
+}
+
+// ============================================================
+//  ДАННЫЕ ИЗ A16
+// ============================================================
+void BoilerAppDevice::updateFromA16() {
+    // Температуры из 1-Wire (читает A16Device)
+    extern A16State a16State;
+    if (a16State.ow_count > BOILER_OW_SUPPLY && a16State.ow_ok[BOILER_OW_SUPPLY])
+        boilerAppState.t_supply = a16State.ow_temp[BOILER_OW_SUPPLY];
+    if (a16State.ow_count > BOILER_OW_RETURN && a16State.ow_ok[BOILER_OW_RETURN])
+        boilerAppState.t_return = a16State.ow_temp[BOILER_OW_RETURN];
+    boilerAppState.t_delta = boilerAppState.t_supply - boilerAppState.t_return;
+
+    // Давление из ADC (уже сконвертировано A16Device в физические единицы)
+    boilerAppState.p_supply = a16State.adc_value[BOILER_ADC_P1];
+    boilerAppState.p_return = a16State.adc_value[BOILER_ADC_P2];
+    boilerAppState.p_delta  = boilerAppState.p_supply - boilerAppState.p_return;
+
+    // Расход из счётчиков импульсов DIN
+    // Расход (л/мин) = (импульсов за интервал) × (л/имп) / (dt в минутах)
+    static uint32_t lastFlowCalc = 0;
+    uint32_t now = millis();
+    float dt_min = (now - lastFlowCalc) / 60000.0f;
+    if (dt_min > 0 && lastFlowCalc > 0) {
+        uint32_t d1 = a16State.din_counter[BOILER_DIN_FLOW1] - boilerAppState.flow1_last;
+        uint32_t d2 = a16State.din_counter[BOILER_DIN_FLOW2] - boilerAppState.flow2_last;
+        boilerAppState.flow1_lpm = (d1 * boilerAppCfg.flow1_liter_per_pulse) / dt_min;
+        boilerAppState.flow2_lpm = (d2 * boilerAppCfg.flow2_liter_per_pulse) / dt_min;
+    }
+    boilerAppState.flow1_last = a16State.din_counter[BOILER_DIN_FLOW1];
+    boilerAppState.flow2_last = a16State.din_counter[BOILER_DIN_FLOW2];
+    lastFlowCalc = now;
+
+    // Итоговый расход — берём больший из двух
+    boilerAppState.flow_lpm = max(boilerAppState.flow1_lpm, boilerAppState.flow2_lpm);
+}
+
+void BoilerAppDevice::calcPower() {
+    // P(кВт) = m_dot(кг/с) × Cp(кДж/кг·К) × ΔT(К)
+    // m_dot = flow_lpm / 60 (л/с = кг/с для воды)
+    float m_dot = boilerAppState.flow_lpm / 60.0f;
+    boilerAppState.power_kw = m_dot * 4.186f * boilerAppState.t_delta;
+    if (boilerAppState.power_kw < 0) boilerAppState.power_kw = 0;
+}
+
+void BoilerAppDevice::checkAlarms() {
+    bool wasHigh = boilerAppState.alarm_high;
+    boilerAppState.alarm_high   = boilerAppState.t_supply > boilerAppCfg.t_max;
+    boilerAppState.alarm_low    = boilerAppState.t_supply < boilerAppCfg.t_min
+                                  && boilerAppState.t_supply > 1.0f;
+    boilerAppState.alarm_sensor = !a16State.ow_ok[BOILER_OW_SUPPLY]
+                                  || !a16State.ow_ok[BOILER_OW_RETURN];
+
+#ifdef MODULE_TELEGRAM
+    if (boilerAppState.alarm_high && !wasHigh) {
+        TgHandler::sendMessage("🚨 *АВАРИЯ*: Температура подачи "
+            + String(boilerAppState.t_supply, 1) + "°C > "
+            + String(boilerAppCfg.t_max, 1) + "°C!");
+    }
+    if (!boilerAppState.alarm_high && wasHigh)
+        TgHandler::sendMessage("✅ Температура в норме");
+#endif
+}
+
+void BoilerAppDevice::publishMqtt() {
+#ifdef MODULE_MQTT
+    String b = String(baseCfg.device_name) + "/boiler/";
+    char buf[16];
+    dtostrf(boilerAppState.t_supply,  1, 1, buf); MqttHandler::publish((b+"t_supply").c_str(),  buf);
+    dtostrf(boilerAppState.t_return,  1, 1, buf); MqttHandler::publish((b+"t_return").c_str(),  buf);
+    dtostrf(boilerAppState.p_supply,  1, 2, buf); MqttHandler::publish((b+"p_supply").c_str(),  buf);
+    dtostrf(boilerAppState.p_return,  1, 2, buf); MqttHandler::publish((b+"p_return").c_str(),  buf);
+    dtostrf(boilerAppState.flow1_lpm, 1, 1, buf); MqttHandler::publish((b+"flow1_lpm").c_str(), buf);
+    dtostrf(boilerAppState.flow2_lpm, 1, 1, buf); MqttHandler::publish((b+"flow2_lpm").c_str(), buf);
+    dtostrf(boilerAppState.power_kw,  1, 2, buf); MqttHandler::publish((b+"power_kw").c_str(),  buf);
+#endif
+}
+
+// ============================================================
+//  CONFIG
+// ============================================================
+bool BoilerAppDevice::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/boiler.json", doc)) return false;
+    boilerAppCfg.t_max                 = doc["t_max"]                 | 85.0f;
+    boilerAppCfg.t_alarm               = doc["t_alarm"]               | 80.0f;
+    boilerAppCfg.t_hyst                = doc["t_hyst"]                | 2.0f;
+    boilerAppCfg.t_min                 = doc["t_min"]                 | 40.0f;
+    boilerAppCfg.flow1_liter_per_pulse = doc["flow1_liter_per_pulse"] | 1.0f;
+    boilerAppCfg.flow2_liter_per_pulse = doc["flow2_liter_per_pulse"] | 1.0f;
+    boilerAppCfg.p_min                 = doc["p_min"]                 | 0.0f;
+    boilerAppCfg.p_max                 = doc["p_max"]                 | 10.0f;
+    boilerAppCfg.pub_interval          = doc["pub_interval"]          | 10000;
+    return true;
+}
+
+bool BoilerAppDevice::saveConfig() {
+    JsonDocument doc;
+    doc["t_max"]                 = boilerAppCfg.t_max;
+    doc["t_alarm"]               = boilerAppCfg.t_alarm;
+    doc["t_hyst"]                = boilerAppCfg.t_hyst;
+    doc["t_min"]                 = boilerAppCfg.t_min;
+    doc["flow1_liter_per_pulse"] = boilerAppCfg.flow1_liter_per_pulse;
+    doc["flow2_liter_per_pulse"] = boilerAppCfg.flow2_liter_per_pulse;
+    doc["p_min"]                 = boilerAppCfg.p_min;
+    doc["p_max"]                 = boilerAppCfg.p_max;
+    doc["pub_interval"]          = boilerAppCfg.pub_interval;
+    return ConfigManager::saveJson("/boiler.json", doc);
+}
+
+#endif
+
+```
+
+---
+
+### <a id="📄-src-apps-boiler-boilerappdevice-h"></a>📄 `src/apps/boiler/BoilerAppDevice.h`
+
+**File Info:**
+- **Size**: 517 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/apps/boiler/BoilerAppDevice.h`
+- **Relative Path**: `src/apps/boiler`
+- **Created**: 2026-02-18 04:57:12 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-18 04:57:12 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `67420ed002706b2f83d2b97f12c7f586`
+- **SHA256**: `8e9ac315bc5a682168892985fefffa41cdde542cbe2a18cf78ee52d4d41aa8ac`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
+
+#include "BoilerApp.h"
+
+class BoilerAppDevice {
+public:
+    static void init();
+    static void loop();
+    static bool loadConfig();
+    static bool saveConfig();
+
+private:
+    static void updateFromA16();   // читает данные из a16State
+    static void calcPower();
+    static void checkAlarms();
+    static void publishMqtt();
+
+    static uint32_t _lastCalc;
+    static uint32_t _lastHistory;
+    static uint32_t _lastPub;
+};
+
+#endif
+
+```
+
+---
+
+### <a id="📄-src-core-configmanager-cpp"></a>📄 `src/core/ConfigManager.cpp`
+
+**File Info:**
+- **Size**: 2.31 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/core/ConfigManager.cpp`
+- **Relative Path**: `src/core`
+- **Created**: 2026-02-17 12:55:32 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:55:32 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `b06a2b68f36164ce6a617bd9d33380d8`
+- **SHA256**: `14de2f4c13e57787a6b0c9c86db5c892102c08d44507e18d6b6f5580a6a87dd9`
+- **Encoding**: ASCII
+
+**File code content:**
+
+```cpp
+#include "ConfigManager.h"
+
+BaseConfig   baseCfg;
+SystemState  sysState;
+SemaphoreHandle_t coreMutex = xSemaphoreCreateMutex();
+
+void ConfigManager::begin() {
+    if (!LittleFS.begin(true)) {
+        Serial.println("[CFG] LittleFS mount failed!");
+        return;
+    }
+    Serial.println("[CFG] LittleFS OK");
+}
+
+bool ConfigManager::loadJson(const char* path, JsonDocument& doc) {
+    if (!LittleFS.exists(path)) return false;
+    File f = LittleFS.open(path, "r");
+    if (!f) return false;
+    DeserializationError err = deserializeJson(doc, f);
+    f.close();
+    return !err;
+}
+
+bool ConfigManager::saveJson(const char* path, JsonDocument& doc) {
+    File f = LittleFS.open(path, "w");
+    if (!f) return false;
+    bool ok = serializeJson(doc, f) > 0;
+    f.close();
+    return ok;
+}
+
+bool ConfigManager::loadBase() {
+    JsonDocument doc;
+    if (!loadJson("/base.json", doc)) return false;
+
+    baseCfg.eth_dhcp = doc["eth_dhcp"] | true;
+    strlcpy(baseCfg.eth_ip,       doc["eth_ip"]   | "192.168.1.100", sizeof(baseCfg.eth_ip));
+    strlcpy(baseCfg.eth_mask,     doc["eth_mask"] | "255.255.255.0", sizeof(baseCfg.eth_mask));
+    strlcpy(baseCfg.eth_gw,       doc["eth_gw"]   | "192.168.1.1",  sizeof(baseCfg.eth_gw));
+    strlcpy(baseCfg.eth_dns,      doc["eth_dns"]  | "8.8.8.8",      sizeof(baseCfg.eth_dns));
+    strlcpy(baseCfg.wifi_ssid,    doc["wifi_ssid"]| "",              sizeof(baseCfg.wifi_ssid));
+    strlcpy(baseCfg.wifi_pass,    doc["wifi_pass"]| "",              sizeof(baseCfg.wifi_pass));
+    strlcpy(baseCfg.web_user,     doc["web_user"] | "admin",         sizeof(baseCfg.web_user));
+    strlcpy(baseCfg.web_pass,     doc["web_pass"] | "",              sizeof(baseCfg.web_pass));
+    strlcpy(baseCfg.device_name,  doc["device_name"] | "esp32-device", sizeof(baseCfg.device_name));
+    return true;
+}
+
+bool ConfigManager::saveBase() {
+    JsonDocument doc;
+    doc["eth_dhcp"]     = baseCfg.eth_dhcp;
+    doc["eth_ip"]       = baseCfg.eth_ip;
+    doc["eth_mask"]     = baseCfg.eth_mask;
+    doc["eth_gw"]       = baseCfg.eth_gw;
+    doc["eth_dns"]      = baseCfg.eth_dns;
+    doc["wifi_ssid"]    = baseCfg.wifi_ssid;
+    doc["wifi_pass"]    = baseCfg.wifi_pass;
+    doc["web_user"]     = baseCfg.web_user;
+    doc["web_pass"]     = baseCfg.web_pass;
+    doc["device_name"]  = baseCfg.device_name;
+    return saveJson("/base.json", doc);
+}
+
+```
+
+---
+
+### <a id="📄-src-core-configmanager-h"></a>📄 `src/core/ConfigManager.h`
+
+**File Info:**
+- **Size**: 442 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/core/ConfigManager.h`
+- **Relative Path**: `src/core`
+- **Created**: 2026-02-17 12:55:16 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:55:16 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `8080f0c3cea4dd179d96516c6688d45c`
+- **SHA256**: `e4a299e12d63d2c60282202af412ae5b95db9f33e138bb1998ca49c4c8b5f937`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#include <LittleFS.h>
+#include <ArduinoJson.h>
+#include "CoreTypes.h"
+
+class ConfigManager {
+public:
+    static void begin();
+
+    // Core сеть
+    static bool loadBase();
+    static bool saveBase();
+
+    // Хелпер: загрузить произвольный JSON-файл в JsonDocument
+    static bool loadJson(const char* path, JsonDocument& doc);
+    static bool saveJson(const char* path, JsonDocument& doc);
+};
+
+```
+
+---
+
+### <a id="📄-src-core-coretypes-h"></a>📄 `src/core/CoreTypes.h`
+
+**File Info:**
+- **Size**: 2.13 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/core/CoreTypes.h`
+- **Relative Path**: `src/core`
+- **Created**: 2026-02-17 12:55:08 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:55:08 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `e3eaedf32b8ea5a2cbf5f8a3362a1b09`
+- **SHA256**: `156cf64315bda5bed0ff44f3ccdc85ac0a0dda8df029dc60755b0206ca0b70c9`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#include <Arduino.h>
+#include <freertos/semphr.h>
+
+// ============================================================
+//  BASE CONFIG — сетевая часть, общая для всех устройств
+// ============================================================
+struct BaseConfig {
+    // Ethernet
+    bool eth_dhcp       = true;
+    char eth_ip[16]     = "192.168.1.100";
+    char eth_mask[16]   = "255.255.255.0";
+    char eth_gw[16]     = "192.168.1.1";
+    char eth_dns[16]    = "8.8.8.8";
+
+    // WiFi
+    char wifi_ssid[32]  = "";
+    char wifi_pass[32]  = "";
+
+    // Web auth
+    char web_user[16]   = "admin";
+    char web_pass[32]   = "";
+
+    // Device name (используется в mDNS, MQTT client ID, AP SSID)
+    char device_name[32] = "esp32-device";
+};
+
+// ============================================================
+//  SYSTEM STATE — runtime, не сохраняется
+// ============================================================
+struct SystemState {
+    // Сеть
+    bool ethConnected   = false;
+    bool wifiConnected  = false;
+    bool apMode         = false;
+
+    // Модули
+    bool mqttConnected  = false;
+    bool tgConnected    = false;
+
+    // Управление
+    bool pendingReboot  = false;
+    uint32_t rebootAt   = 0;
+};
+
+// ============================================================
+//  WEB TAB — регистрация вкладок модулями/устройствами
+// ============================================================
+struct WebTab {
+    const char* id;       // "telegram", "boiler" — уникальный ID
+    const char* label;    // Отображаемое имя
+    const char* icon;     // Эмодзи или пусто
+    const char* html;     // HTML-контент (PROGMEM или статическая строка)
+    // API-маршруты регистрирует сам модуль в своём init()
+};
+
+// ============================================================
+//  GLOBALS
+// ============================================================
+extern BaseConfig       baseCfg;
+extern SystemState      sysState;
+extern SemaphoreHandle_t coreMutex;
+
+```
+
+---
+
+### <a id="📄-src-core-networkmanager-cpp"></a>📄 `src/core/NetworkManager.cpp`
+
+**File Info:**
+- **Size**: 3.7 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/core/NetworkManager.cpp`
+- **Relative Path**: `src/core`
+- **Created**: 2026-02-18 03:18:42 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-03-20 12:31:12 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `eaa1c36a90947bcf5aabf63f9d06bbc3`
+- **SHA256**: `af34c509f5e0365bd14bb8a096bd3f3a19ea51cfc340519aac91fd2f3b3758f3`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#include "NetworkManager.h"
+#ifdef DEVICE_KC868_A16
+#include "../devices/kc868-a16/A16Types.h"
+#endif
+#ifdef DEVICE_BOILER_MONITOR
+#include "../devices/boiler-monitor/BMonTypes.h"
+#endif
+
+DNSServer  NetworkManager::_dns;
+uint32_t   NetworkManager::_lastEthCheck = 0;
+
+void NetworkManager::begin() {
+    WiFi.onEvent(onWiFiEvent);
+
+    // Статический IP для Ethernet если нужен
+    if (!baseCfg.eth_dhcp) {
+        IPAddress ip, mask, gw, dns;
+        if (ip.fromString(baseCfg.eth_ip) && mask.fromString(baseCfg.eth_mask)) {
+            gw.fromString(baseCfg.eth_gw);
+            dns.fromString(baseCfg.eth_dns);
+            ETH.config(ip, gw, mask, dns);
+            Serial.println("[NET] ETH: static IP configured");
+        }
+    }
+
+    // Режим тактирования ETH зависит от платы — каждый device определяет свой
+    #ifdef DEVICE_KC868_A16
+        ETH.begin(A16_ETH_ADDR, A16_ETH_POWER_PIN, A16_ETH_MDC_PIN, A16_ETH_MDIO_PIN,
+                ETH_PHY_LAN8720, A16_ETH_CLK_MODE);
+    #elif defined(DEVICE_BOILER_MONITOR)
+        pinMode(16, OUTPUT);
+        digitalWrite(16, HIGH);
+        delay(500);
+        ETH.begin(BMON_ETH_ADDR, BMON_ETH_POWER_PIN, BMON_ETH_MDC_PIN, BMON_ETH_MDIO_PIN, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
+    #else
+        ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN,
+                ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
+    #endif
+
+    Serial.printf("[NET] Device name: %s\n", baseCfg.device_name);
+}
+
+void NetworkManager::loop() {
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    bool connected      = sysState.ethConnected || sysState.wifiConnected;
+    bool apActive       = sysState.apMode;
+    xSemaphoreGive(coreMutex);
+
+    // Captive portal DNS
+#ifdef MODULE_CAPTIVE_PORTAL
+    if (apActive) _dns.processNextRequest();
+#endif
+
+    // Запуск AP если нет сети 30 сек
+    static uint32_t lastCheck = 0;
+    if (millis() - lastCheck < 2000) return;
+    lastCheck = millis();
+
+    if (!connected && !apActive && (millis() - _lastEthCheck > 30000)) {
+        startAP();
+    }
+}
+
+void NetworkManager::startAP() {
+    Serial.println("[NET] Starting AP...");
+    WiFi.mode(WIFI_AP);
+
+    // SSID = device_name
+    WiFi.softAP(baseCfg.device_name);
+
+#ifdef MODULE_CAPTIVE_PORTAL
+    _dns.start(53, "*", WiFi.softAPIP());
+#endif
+
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    sysState.apMode = true;
+    xSemaphoreGive(coreMutex);
+
+    Serial.printf("[NET] AP started: %s / %s\n",
+                  baseCfg.device_name, WiFi.softAPIP().toString().c_str());
+}
+
+void NetworkManager::onWiFiEvent(WiFiEvent_t event) {
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+
+    switch (event) {
+        case ARDUINO_EVENT_ETH_GOT_IP:
+            Serial.printf("[NET] ETH IP: %s\n", ETH.localIP().toString().c_str());
+            sysState.ethConnected = true;
+            if (WiFi.getMode() & WIFI_MODE_STA) {
+                WiFi.disconnect(true);
+                sysState.wifiConnected = false;
+            }
+            break;
+
+        case ARDUINO_EVENT_ETH_DISCONNECTED:
+            Serial.println("[NET] ETH lost, trying WiFi...");
+            sysState.ethConnected = false;
+            _lastEthCheck = millis();
+            if (strlen(baseCfg.wifi_ssid) > 0)
+                WiFi.begin(baseCfg.wifi_ssid, baseCfg.wifi_pass);
+            break;
+
+        case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+            Serial.printf("[NET] WiFi IP: %s\n", WiFi.localIP().toString().c_str());
+            sysState.wifiConnected = true;
+            sysState.apMode = false;
+            break;
+
+        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+            sysState.wifiConnected = false;
+            break;
+
+        default: break;
+    }
+
+    xSemaphoreGive(coreMutex);
+}
+
+```
+
+---
+
+### <a id="📄-src-core-networkmanager-h"></a>📄 `src/core/NetworkManager.h`
+
+**File Info:**
+- **Size**: 377 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/core/NetworkManager.h`
+- **Relative Path**: `src/core`
+- **Created**: 2026-02-17 12:55:36 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:55:36 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `1312433b079fa80d42ae26570480e96d`
+- **SHA256**: `ddf39c07c2362e0b4c39b09e5c5511b427a10db192bf16a73a77ba1606ca9102`
+- **Encoding**: ASCII
+
+**File code content:**
+
+```text
+#pragma once
+#include <WiFi.h>
+#include <ETH.h>
+#include <ESPmDNS.h>
+#include <DNSServer.h>
+#include "CoreTypes.h"
+#include "ConfigManager.h"
+
+class NetworkManager {
+public:
+    static void begin();
+    static void loop();
+
+private:
+    static void startAP();
+    static void onWiFiEvent(WiFiEvent_t event);
+
+    static DNSServer  _dns;
+    static uint32_t   _lastEthCheck;
+};
+
+```
+
+---
+
+### <a id="📄-src-core-webhandler-cpp"></a>📄 `src/core/WebHandler.cpp`
+
+**File Info:**
+- **Size**: 10.14 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/core/WebHandler.cpp`
+- **Relative Path**: `src/core`
+- **Created**: 2026-02-18 22:12:02 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-04-20 07:13:56 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `4a7e73618966f1c473408399fd1abd6b`
+- **SHA256**: `def3a600ab4b46b49535e39c4cbd776939a09b5bdefe15e9b3b668a52c02c48a`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#include "WebHandler.h"
+#include "ConfigManager.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+
+static const char BUILD_TIME[] = __DATE__ " " __TIME__;
+
+std::vector<WebTab> WebHandler::_tabs;
+
+void WebHandler::registerTab(const WebTab& tab) {
+    _tabs.push_back(tab);
+    Serial.printf("[WEB] Tab registered: %s\n", tab.id);
+}
+
+// Генерирует nav из зарегистрированных вкладок
+String WebHandler::buildNav() {
+    String nav = "";
+    for (size_t i = 0; i < _tabs.size(); i++) {
+        String cls = (i == 0) ? "tab-btn active" : "tab-btn";
+        nav += "<button class=\"" + String(cls) + "\" onclick=\"openTab(event,'";
+        nav += _tabs[i].id;
+        nav += "')\">";
+        if (_tabs[i].icon && strlen(_tabs[i].icon) > 0) {
+            nav += String(_tabs[i].icon) + " ";
+        }
+        nav += _tabs[i].label;
+        nav += "</button>";
+    }
+    return nav;
+}
+
+void WebHandler::init(AsyncWebServer& server) {
+
+    // ── /api/nav — список вкладок для фронтенда ──────────────
+    server.on("/api/nav", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        JsonArray arr = doc.to<JsonArray>();
+        for (size_t i = 0; i < _tabs.size(); i++) {
+            JsonObject t = arr.add<JsonObject>();
+            t["id"]    = _tabs[i].id;
+            t["label"] = _tabs[i].label;
+            t["icon"]  = _tabs[i].icon ? _tabs[i].icon : "";
+        }
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    // ── /api/tab?id=xxx — HTML-контент вкладки ────────────────
+    server.on("/api/tab", HTTP_GET, [](AsyncWebServerRequest* req) {
+        if (!req->hasParam("id")) { req->send(400); return; }
+        String id = req->getParam("id")->value();
+        for (auto& tab : _tabs) {
+            if (id == tab.id) {
+                req->send(200, "text/html", tab.html);
+                return;
+            }
+        }
+        req->send(404, "text/plain", "Tab not found");
+    });
+
+    // ── /api/status — состояние системы ──────────────────────
+    server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        xSemaphoreTake(coreMutex, portMAX_DELAY);
+        doc["eth"]   = sysState.ethConnected;
+        doc["wifi"]  = sysState.wifiConnected;
+        doc["ap"]    = sysState.apMode;
+        doc["mqtt"]  = sysState.mqttConnected;
+        doc["tg"]    = sysState.tgConnected;
+        doc["uptime"] = millis() / 1000;
+        doc["build"] = BUILD_TIME;
+        xSemaphoreGive(coreMutex);
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    server.on("/api/syslog", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        if (LittleFS.exists("/syslog.txt")) {
+            File f = LittleFS.open("/syslog.txt", "r");
+            if (f) { doc["log"] = f.readString(); f.close(); }
+        } else { doc["log"] = ""; }
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    server.on("/api/syslog/clear", HTTP_POST, [](AsyncWebServerRequest* req) {
+        LittleFS.remove("/syslog.txt");
+        req->send(200, "application/json", "{\"status\":\"ok\"}");
+    });
+
+    // ── /api/get-config — текущий base конфиг ────────────────
+    server.on("/api/get-config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        if (!req->authenticate(baseCfg.web_user, baseCfg.web_pass) && strlen(baseCfg.web_pass) > 0)
+            return req->requestAuthentication();
+        if (LittleFS.exists("/base.json"))
+            req->send(LittleFS, "/base.json", "application/json");
+        else
+            req->send(404, "application/json", "{\"error\":\"no_config\"}");
+    });
+
+    // ── /api/save-config — сохранение base конфига ───────────
+    auto* cfgHandler = new AsyncCallbackJsonWebHandler(
+        "/api/save-config",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            if (!req->authenticate(baseCfg.web_user, baseCfg.web_pass) && strlen(baseCfg.web_pass) > 0)
+                return req->requestAuthentication();
+
+            JsonObject obj = json.as<JsonObject>();
+            baseCfg.eth_dhcp = obj["eth_dhcp"] | true;
+            strlcpy(baseCfg.eth_ip,      obj["eth_ip"]      | "", sizeof(baseCfg.eth_ip));
+            strlcpy(baseCfg.eth_mask,    obj["eth_mask"]    | "", sizeof(baseCfg.eth_mask));
+            strlcpy(baseCfg.eth_gw,      obj["eth_gw"]      | "", sizeof(baseCfg.eth_gw));
+            strlcpy(baseCfg.eth_dns,     obj["eth_dns"]     | "", sizeof(baseCfg.eth_dns));
+            strlcpy(baseCfg.wifi_ssid,   obj["wifi_ssid"]   | "", sizeof(baseCfg.wifi_ssid));
+            strlcpy(baseCfg.wifi_pass,   obj["wifi_pass"]   | "", sizeof(baseCfg.wifi_pass));
+            strlcpy(baseCfg.web_user,    obj["web_user"]    | "admin", sizeof(baseCfg.web_user));
+            strlcpy(baseCfg.web_pass,    obj["web_pass"]    | "", sizeof(baseCfg.web_pass));
+            strlcpy(baseCfg.device_name, obj["device_name"] | "esp32-device", sizeof(baseCfg.device_name));
+
+            if (ConfigManager::saveBase())
+                req->send(200, "application/json", "{\"status\":\"ok\"}");
+            else
+                req->send(500, "application/json", "{\"status\":\"error\"}");
+        }
+    );
+    server.addHandler(cfgHandler);
+
+    // ── /api/reboot ───────────────────────────────────────────
+    server.on("/api/reboot", HTTP_GET, [](AsyncWebServerRequest* req) {
+        req->send(200, "text/plain", "Rebooting...");
+        xSemaphoreTake(coreMutex, portMAX_DELAY);
+        sysState.pendingReboot = true;
+        sysState.rebootAt = millis();
+        xSemaphoreGive(coreMutex);
+    });
+
+    server.on("/api/download-config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        if (!LittleFS.exists("/base.json")) { req->send(404); return; }
+        req->send(LittleFS, "/base.json", "application/json");
+    });
+
+    // ── /api/backup — все конфиги в одном файле ───────────────
+    server.on("/api/backup", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        const char* files[] = {"base", "mqtt", "tg", "boiler", "device"};
+        for (auto name : files) {
+            String path = String("/") + name + ".json";
+            JsonDocument part;
+            if (ConfigManager::loadJson(path.c_str(), part))
+                doc[name] = part;
+        }
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    // ── /api/restore — восстановить из backup.json ────────────
+    auto* restoreH = new AsyncCallbackJsonWebHandler("/api/restore",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject obj = json.as<JsonObject>();
+            const char* files[] = {"base", "mqtt", "tg", "boiler", "device"};
+            for (auto name : files) {
+                if (obj[name].is<JsonObject>()) {
+                    JsonDocument part;
+                    part.set(obj[name]);
+                    ConfigManager::saveJson((String("/") + name + ".json").c_str(), part);
+                }
+            }
+            // Перечитываем base сразу
+            ConfigManager::loadBase();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+            xSemaphoreTake(coreMutex, portMAX_DELAY);
+            sysState.pendingReboot = true;
+            sysState.rebootAt = millis() + 1000;
+            xSemaphoreGive(coreMutex);
+        }
+    );
+    server.addHandler(restoreH);
+
+    // ── OTA Update ────────────────────────────────────────────
+#ifdef MODULE_OTA
+    server.on("/update", HTTP_POST,
+        [](AsyncWebServerRequest* req) {
+            bool fail = Update.hasError();
+            auto* resp = req->beginResponse(200, "text/plain", fail ? "FAIL" : "OK");
+            resp->addHeader("Connection", "close");
+            req->send(resp);
+            if (!fail) {
+                xSemaphoreTake(coreMutex, portMAX_DELAY);
+                sysState.pendingReboot = true;
+                sysState.rebootAt = millis();
+                xSemaphoreGive(coreMutex);
+            }
+        },
+        handleOtaUpload
+    );
+#endif
+
+    // ── Captive portal 404 ────────────────────────────────────
+    server.onNotFound([](AsyncWebServerRequest* req) {
+        bool ap = false;
+        xSemaphoreTake(coreMutex, portMAX_DELAY);
+        ap = sysState.apMode;
+        xSemaphoreGive(coreMutex);
+
+        if (ap) req->redirect("http://192.168.4.1");
+        else    req->send(404, "text/plain", "Not Found");
+    });
+
+    // ── Статика (index.html + assets) ─────────────────────────
+    // Фильтр: отдаём статику только если путь НЕ начинается с /api/
+    server.serveStatic("/", LittleFS, "/")
+          .setDefaultFile("index.html")
+          .setFilter([](AsyncWebServerRequest* req) {
+              return !req->url().startsWith("/api/");
+          });
+}
+
+void WebHandler::handleOtaUpload(AsyncWebServerRequest* req, String filename,
+                                  size_t index, uint8_t* data, size_t len, bool final) {
+    if (!index) {
+        int cmd = (filename.indexOf("littlefs") > -1 || filename.indexOf("spiffs") > -1)
+                  ? U_SPIFFS : U_FLASH;
+        Serial.printf("[OTA] Start: %s (%s)\n", filename.c_str(),
+                      cmd == U_FLASH ? "firmware" : "filesystem");
+        if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) Update.printError(Serial);
+    }
+    if (Update.write(data, len) != len) Update.printError(Serial);
+    if (final) {
+        if (Update.end(true)) Serial.printf("[OTA] Done: %u bytes\n", index + len);
+        else Update.printError(Serial);
+    }
+}
+
+```
+
+---
+
+### <a id="📄-src-core-webhandler-h"></a>📄 `src/core/WebHandler.h`
+
+**File Info:**
+- **Size**: 644 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/core/WebHandler.h`
+- **Relative Path**: `src/core`
+- **Created**: 2026-02-17 12:55:58 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:55:58 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `d3f61b65224e94a0539f45d5742fc823`
+- **SHA256**: `a5872b78f6ba9d2182676d0fbf3f4d7adf67e158c83cb31e2c75eca029ffb076`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#include <ESPAsyncWebServer.h>
+#include <LittleFS.h>
+#include <Update.h>
+#include <vector>
+#include "CoreTypes.h"
+
+class WebHandler {
+public:
+    // Вызвать ДО init() — модули регистрируют свои вкладки
+    static void registerTab(const WebTab& tab);
+
+    static void init(AsyncWebServer& server);
+
+private:
+    static std::vector<WebTab> _tabs;
+
+    // Генерация nav-бара из зарегистрированных вкладок
+    static String buildNav();
+
+    // OTA upload
+    static void handleOtaUpload(AsyncWebServerRequest*, String, size_t, uint8_t*, size_t, bool);
+};
+
+```
+
+---
+
+### <a id="📄-src-devices-boiler-boilerdevice-cpp"></a>📄 `src/devices/boiler/BoilerDevice.cpp`
+
+**File Info:**
+- **Size**: 14.85 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/devices/boiler/BoilerDevice.cpp`
+- **Relative Path**: `src/devices/boiler`
+- **Created**: 2026-02-17 12:58:58 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:58:58 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `e2b1df6b8fe8af69f647d8d6f22d2b59`
+- **SHA256**: `74894e2522e6a602eef3e87e64c1170021e75e3e238e16d38f0d39d8af3fbe16`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef DEVICE_BOILER
+#include "BoilerDevice.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+
+#ifdef MODULE_MQTT
+#include "../../modules/mqtt/MqttHandler.h"
+#endif
+#ifdef MODULE_TELEGRAM
+#include "../../modules/telegram/TgHandler.h"
+#endif
+
+BoilerConfig boilerCfg;
+BoilerState  boilerState;
+
+uint32_t BoilerDevice::_lastRead   = 0;
+uint32_t BoilerDevice::_lastPub    = 0;
+uint32_t BoilerDevice::_lastEnergy = 0;
+
+// ============================================================
+//  HTML ВКЛАДОК (PROGMEM)
+// ============================================================
+
+// --- Мониторинг (повторяет макет) ---
+static const char BOILER_MONITOR_HTML[] PROGMEM = R"html(
+<div class="monitor-page">
+
+  <div class="m-card">
+    <div class="m-card-label">ПРОИЗВОДИТЕЛЬНОСТЬ</div>
+    <div class="m-power-big"><span id="b_power">--</span><span class="unit">кВт</span></div>
+    <div class="m-power-sub">Σ <span id="b_energy">--</span> кВт·ч <span class="muted">(сутки)</span></div>
+    <div class="m-power-sub">Поток: <b id="b_flow">--</b> л/мин</div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">СИСТЕМА ОТОПЛЕНИЯ</div>
+    <div class="m-sensors-row">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОДАЧА</div>
+        <div class="m-sensor-val hot" id="b_tsup">--°</div>
+        <div class="m-sensor-icon">▲</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ОБРАТКА</div>
+        <div class="m-sensor-val cool" id="b_tret">--°</div>
+        <div class="m-sensor-icon">•</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ДЕЛЬТА Т</div>
+        <div class="m-sensor-val accent" id="b_tdelta">--°</div>
+        <div class="m-sensor-sub muted">расчёт</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ОКРУЖАЮЩАЯ СРЕДА</div>
+    <div class="m-sensors-row two">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОМЕЩЕНИЕ</div>
+        <div class="m-sensor-val warm" id="b_troom">--°</div>
+        <div class="m-sensor-icon cool">▼</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">УЛИЦА</div>
+        <div class="m-sensor-val cool" id="b_tout">--°</div>
+        <div class="m-sensor-icon cool">▼</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ДАВЛЕНИЕ В КОНТУРЕ</div>
+    <div class="m-sensors-row">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОДАЧА P1</div>
+        <div class="m-sensor-val accent" id="b_psup">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ОБРАТКА P2</div>
+        <div class="m-sensor-val accent" id="b_pret">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ДЕЛЬТА Р</div>
+        <div class="m-sensor-val accent" id="b_pdelta">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ИСТОРИЯ МОЩНОСТИ</div>
+    <canvas id="powerChart" height="80"></canvas>
+  </div>
+
+</div>
+
+<script>
+async function updateBoiler() {
+  try {
+    const r = await fetch('/api/boiler/data');
+    const d = await r.json();
+    document.getElementById('b_power').textContent  = d.power_kw.toFixed(1);
+    document.getElementById('b_energy').textContent = d.energy_kwh.toFixed(1);
+    document.getElementById('b_flow').textContent   = d.flow_lpm.toFixed(1);
+    document.getElementById('b_tsup').textContent   = d.t_supply.toFixed(1)+'°';
+    document.getElementById('b_tret').textContent   = d.t_return.toFixed(1)+'°';
+    document.getElementById('b_tdelta').textContent = d.t_delta.toFixed(1)+'°';
+    document.getElementById('b_troom').textContent  = d.t_room.toFixed(1)+'°';
+    document.getElementById('b_tout').textContent   = d.t_outdoor.toFixed(1)+'°';
+    document.getElementById('b_psup').textContent   = d.p_supply.toFixed(2);
+    document.getElementById('b_pret').textContent   = d.p_return.toFixed(2);
+    document.getElementById('b_pdelta').textContent = d.p_delta.toFixed(2);
+    drawChart(d.history || []);
+  } catch(e) {}
+}
+
+function drawChart(data) {
+  const canvas = document.getElementById('powerChart');
+  if (!canvas || !data.length) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const max = Math.max(...data, 1);
+  const step = W / (data.length - 1 || 1);
+  ctx.beginPath();
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  data.forEach((v,i) => {
+    const x = i * step;
+    const y = H - (v / max * H * 0.85) - 4;
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+
+  // Fill under line
+  ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath();
+  ctx.fillStyle = 'rgba(240,165,0,0.08)';
+  ctx.fill();
+}
+
+updateBoiler();
+setInterval(updateBoiler, 2000);
+</script>
+)html";
+
+// --- Уставки ---
+static const char BOILER_THRESHOLDS_HTML[] PROGMEM = R"html(
+<div class="settings-group">
+  <h3>Пороги срабатывания</h3>
+  <label>Макс. температура (аварийное отключение):
+    <input type="number" id="t_max" step="0.5">°C
+  </label>
+  <label>Порог оповещения:
+    <input type="number" id="t_alarm" step="0.5">°C
+  </label>
+  <label>Гистерезис:
+    <input type="number" id="t_hyst" step="0.1">°C
+  </label>
+  <label>Мин. температура (защита от замерзания):
+    <input type="number" id="t_min" step="0.5">°C
+  </label>
+  <label>Интервал публикации MQTT:
+    <input type="number" id="pub_interval" step="1000"> мс
+  </label>
+  <button onclick="saveThresholds()">💾 Сохранить уставки</button>
+</div>
+<script>
+async function loadThresholds() {
+  const r = await fetch('/api/boiler/config');
+  const d = await r.json();
+  document.getElementById('t_max').value          = d.t_max;
+  document.getElementById('t_alarm').value        = d.t_alarm;
+  document.getElementById('t_hyst').value         = d.t_hyst;
+  document.getElementById('t_min').value          = d.t_min;
+  document.getElementById('pub_interval').value   = d.pub_interval;
+}
+async function saveThresholds() {
+  const data = {
+    t_max:        +document.getElementById('t_max').value,
+    t_alarm:      +document.getElementById('t_alarm').value,
+    t_hyst:       +document.getElementById('t_hyst').value,
+    t_min:        +document.getElementById('t_min').value,
+    pub_interval: +document.getElementById('pub_interval').value,
+  };
+  const r = await fetch('/api/boiler/save', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+  if (r.ok) alert('Уставки сохранены');
+}
+loadThresholds();
+</script>
+)html";
+
+// ============================================================
+//  INIT
+// ============================================================
+void BoilerDevice::init() {
+    loadConfig();
+
+    // Регистрируем вкладки устройства
+    // Мониторинг — первым, чтобы стоял первой вкладкой
+    WebHandler::registerTab({"monitor",    "Мониторинг", "🔥", BOILER_MONITOR_HTML});
+    WebHandler::registerTab({"thresholds", "Уставки",    "⚙️",  BOILER_THRESHOLDS_HTML});
+
+    // API данных
+    extern AsyncWebServer server;
+    server.on("/api/boiler/data", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["t_supply"]   = boilerState.t_supply;
+        doc["t_return"]   = boilerState.t_return;
+        doc["t_delta"]    = boilerState.t_delta;
+        doc["t_room"]     = boilerState.t_room;
+        doc["t_outdoor"]  = boilerState.t_outdoor;
+        doc["p_supply"]   = boilerState.p_supply;
+        doc["p_return"]   = boilerState.p_return;
+        doc["p_delta"]    = boilerState.p_delta;
+        doc["power_kw"]   = boilerState.power_kw;
+        doc["energy_kwh"] = boilerState.energy_kwh;
+        doc["flow_lpm"]   = boilerState.flow_lpm;
+
+        // История мощности — последние N точек в порядке времени
+        JsonArray hist = doc["history"].to<JsonArray>();
+        uint8_t start = (boilerState.hist_head - boilerState.hist_count + TEMP_HISTORY_SIZE) % TEMP_HISTORY_SIZE;
+        for (uint8_t i = 0; i < boilerState.hist_count; i++) {
+            hist.add(boilerState.hist_power[(start + i) % TEMP_HISTORY_SIZE]);
+        }
+
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    server.on("/api/boiler/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["t_max"]        = boilerCfg.t_max;
+        doc["t_alarm"]      = boilerCfg.t_alarm;
+        doc["t_hyst"]       = boilerCfg.t_hyst;
+        doc["t_min"]        = boilerCfg.t_min;
+        doc["pub_interval"] = boilerCfg.pub_interval;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    auto* h = new AsyncCallbackJsonWebHandler("/api/boiler/save",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject obj = json.as<JsonObject>();
+            boilerCfg.t_max        = obj["t_max"]        | 85.0f;
+            boilerCfg.t_alarm      = obj["t_alarm"]      | 80.0f;
+            boilerCfg.t_hyst       = obj["t_hyst"]       | 2.0f;
+            boilerCfg.t_min        = obj["t_min"]        | 40.0f;
+            boilerCfg.pub_interval = obj["pub_interval"] | 10000;
+            BoilerDevice::saveConfig();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(h);
+
+#ifdef MODULE_TELEGRAM
+    // Добавляем команды котла в Telegram
+    TgHandler::onCommand = [](const String& cmd, const String& chat) {
+        if (cmd == "/temp") {
+            String msg = "🌡 Котёл:\n";
+            msg += "Подача: " + String(boilerState.t_supply, 1) + "°C\n";
+            msg += "Обратка: " + String(boilerState.t_return, 1) + "°C\n";
+            msg += "Мощность: " + String(boilerState.power_kw, 1) + " кВт";
+            TgHandler::sendMessage(msg, chat);
+        }
+    };
+#endif
+
+    Serial.println("[BOILER] Device init OK");
+}
+
+// ============================================================
+//  LOOP
+// ============================================================
+void BoilerDevice::loop() {
+    // Опрос датчиков каждые 2 сек
+    if (millis() - _lastRead > 2000) {
+        _lastRead = millis();
+        readSensors();
+        checkAlarms();
+    }
+
+    // История мощности каждые 10 сек
+    if (millis() - _lastEnergy > 10000) {
+        _lastEnergy = millis();
+        boilerState.pushHistory(boilerState.power_kw, millis() / 1000);
+        // Накопление энергии: P(кВт) × dt(ч)
+        boilerState.energy_kwh += boilerState.power_kw * (10.0f / 3600.0f);
+    }
+
+    // MQTT публикация
+#ifdef MODULE_MQTT
+    if (millis() - _lastPub > boilerCfg.pub_interval) {
+        _lastPub = millis();
+        publishMqtt();
+    }
+#endif
+
+    // safe reboot
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    bool reboot = sysState.pendingReboot && (millis() - sysState.rebootAt > 500);
+    xSemaphoreGive(coreMutex);
+    if (reboot) ESP.restart();
+}
+
+void BoilerDevice::readSensors() {
+    // TODO: заменить на реальное чтение датчиков
+    // Пример для DS18B20 на OneWire, NTC, ADS1115 и т.д.
+    // boilerState.t_supply  = ds.getTempCByIndex(0);
+    // boilerState.t_return  = ds.getTempCByIndex(1);
+
+    // Расчёт производных
+    boilerState.t_delta = boilerState.t_supply - boilerState.t_return;
+    boilerState.p_delta = boilerState.p_supply - boilerState.p_return;
+
+    // Расчёт мощности: P = m_dot × Cp × ΔT
+    // m_dot (кг/с) = flow_lpm / 60 * плотность воды (~1 кг/л)
+    // Cp воды = 4.186 кДж/(кг·К)
+    float m_dot = boilerState.flow_lpm / 60.0f;
+    boilerState.power_kw = m_dot * 4.186f * boilerState.t_delta;
+    if (boilerState.power_kw < 0) boilerState.power_kw = 0;
+}
+
+void BoilerDevice::checkAlarms() {
+    bool wasAlarmHigh = boilerState.alarm_high;
+
+    boilerState.alarm_high = boilerState.t_supply > boilerCfg.t_max;
+    boilerState.alarm_low  = boilerState.t_supply < boilerCfg.t_min
+                             && boilerState.t_supply > 1.0f; // 0 = датчик не подключён
+
+    // Оповещение при новой аварии
+#ifdef MODULE_TELEGRAM
+    if (boilerState.alarm_high && !wasAlarmHigh) {
+        TgHandler::sendMessage(
+            "🚨 *АВАРИЯ*: Температура подачи " +
+            String(boilerState.t_supply, 1) + "°C превысила " +
+            String(boilerCfg.t_max, 1) + "°C!"
+        );
+    }
+    if (!boilerState.alarm_high && wasAlarmHigh) {
+        TgHandler::sendMessage("✅ Температура в норме");
+    }
+#endif
+}
+
+void BoilerDevice::publishMqtt() {
+#ifdef MODULE_MQTT
+    String base = String(baseCfg.device_name) + "/";
+    char buf[12];
+
+    dtostrf(boilerState.t_supply,  1, 1, buf); MqttHandler::publish((base+"t_supply").c_str(),  buf);
+    dtostrf(boilerState.t_return,  1, 1, buf); MqttHandler::publish((base+"t_return").c_str(),  buf);
+    dtostrf(boilerState.t_room,    1, 1, buf); MqttHandler::publish((base+"t_room").c_str(),    buf);
+    dtostrf(boilerState.t_outdoor, 1, 1, buf); MqttHandler::publish((base+"t_outdoor").c_str(), buf);
+    dtostrf(boilerState.power_kw,  1, 2, buf); MqttHandler::publish((base+"power_kw").c_str(),  buf);
+    dtostrf(boilerState.p_supply,  1, 2, buf); MqttHandler::publish((base+"p_supply").c_str(),  buf);
+    dtostrf(boilerState.p_return,  1, 2, buf); MqttHandler::publish((base+"p_return").c_str(),  buf);
+#endif
+}
+
+bool BoilerDevice::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/device.json", doc)) return false;
+    boilerCfg.t_max        = doc["t_max"]        | 85.0f;
+    boilerCfg.t_alarm      = doc["t_alarm"]      | 80.0f;
+    boilerCfg.t_hyst       = doc["t_hyst"]       | 2.0f;
+    boilerCfg.t_min        = doc["t_min"]        | 40.0f;
+    boilerCfg.pub_interval = doc["pub_interval"] | 10000;
+    return true;
+}
+
+bool BoilerDevice::saveConfig() {
+    JsonDocument doc;
+    doc["t_max"]        = boilerCfg.t_max;
+    doc["t_alarm"]      = boilerCfg.t_alarm;
+    doc["t_hyst"]       = boilerCfg.t_hyst;
+    doc["t_min"]        = boilerCfg.t_min;
+    doc["pub_interval"] = boilerCfg.pub_interval;
+    return ConfigManager::saveJson("/device.json", doc);
+}
+
+#endif // DEVICE_BOILER
+
+```
+
+---
+
+### <a id="📄-src-devices-boiler-boilerdevice-h"></a>📄 `src/devices/boiler/BoilerDevice.h`
+
+**File Info:**
+- **Size**: 621 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/devices/boiler/BoilerDevice.h`
+- **Relative Path**: `src/devices/boiler`
+- **Created**: 2026-02-17 12:57:58 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:57:58 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `b9351fb6d5d3f9e9f00615c7eb5fdaf6`
+- **SHA256**: `a60e5fd8ce10944a620c461f37edf95d6ff449de1600a86b6fceb2fe02321a5a`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef DEVICE_BOILER
+
+#include "BoilerTypes.h"
+#include "../../core/CoreTypes.h"
+
+class BoilerDevice {
+public:
+    static void init();   // Регистрирует вкладки, API, инициализирует датчики
+    static void loop();   // Опрос датчиков, логика управления
+    static bool loadConfig();
+    static bool saveConfig();
+
+private:
+    static void readSensors();
+    static void checkAlarms();
+    static void publishMqtt();
+
+    static uint32_t _lastRead;
+    static uint32_t _lastPub;
+    static uint32_t _lastEnergy;
+};
+
+#endif // DEVICE_BOILER
+
+```
+
+---
+
+### <a id="📄-src-devices-boiler-boilertypes-h"></a>📄 `src/devices/boiler/BoilerTypes.h`
+
+**File Info:**
+- **Size**: 2.42 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/devices/boiler/BoilerTypes.h`
+- **Relative Path**: `src/devices/boiler`
+- **Created**: 2026-02-17 12:57:52 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:57:52 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `5cd499f27260791077b69f12c06831bb`
+- **SHA256**: `15887e1fa3cc4e047296c6b9138cce9b5700d6916536f48499f6d7000bc62040`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef DEVICE_BOILER
+
+#include <Arduino.h>
+
+// ============================================================
+//  КОНФИГ КОТЛА — уставки, сохраняются в /device.json
+// ============================================================
+struct BoilerConfig {
+    float t_max         = 85.0f;   // Аварийное отключение
+    float t_alarm       = 80.0f;   // Порог оповещения
+    float t_hyst        = 2.0f;    // Гистерезис
+    float t_min         = 40.0f;   // Защита от замерзания
+    uint32_t pub_interval = 10000; // Интервал MQTT публикации (мс)
+};
+
+// ============================================================
+//  СОСТОЯНИЕ КОТЛА — runtime, не сохраняется
+// ============================================================
+
+#define TEMP_HISTORY_SIZE 60  // 60 × 10сек = 10 минут
+
+struct BoilerState {
+    // Температуры
+    float t_supply      = 0.0f;   // Подача
+    float t_return      = 0.0f;   // Обратка
+    float t_room        = 0.0f;   // Помещение
+    float t_outdoor     = 0.0f;   // Улица
+    float t_delta       = 0.0f;   // Дельта (расчёт)
+
+    // Давление
+    float p_supply      = 0.0f;   // Давление подача (бар)
+    float p_return      = 0.0f;   // Давление обратка (бар)
+    float p_delta       = 0.0f;   // Дельта давления
+
+    // Производительность
+    float power_kw      = 0.0f;   // Текущая мощность кВт
+    float energy_kwh    = 0.0f;   // Накопленная энергия за сутки кВт·ч
+    float flow_lpm      = 0.0f;   // Поток л/мин
+
+    // Аварии
+    bool alarm_high     = false;
+    bool alarm_low      = false;
+    bool alarm_sensor   = false;
+
+    // История мощности (кольцевой буфер)
+    float   hist_power[TEMP_HISTORY_SIZE] = {};
+    uint32_t hist_ts[TEMP_HISTORY_SIZE]   = {};
+    uint8_t  hist_head  = 0;
+    uint8_t  hist_count = 0;
+
+    void pushHistory(float power, uint32_t ts) {
+        hist_power[hist_head] = power;
+        hist_ts[hist_head]    = ts;
+        hist_head = (hist_head + 1) % TEMP_HISTORY_SIZE;
+        if (hist_count < TEMP_HISTORY_SIZE) hist_count++;
+    }
+};
+
+extern BoilerConfig boilerCfg;
+extern BoilerState  boilerState;
+
+#endif // DEVICE_BOILER
+
+```
+
+---
+
+### <a id="📄-src-devices-boiler-monitor-bmondevice-cpp"></a>📄 `src/devices/boiler-monitor/BMonDevice.cpp`
+
+**File Info:**
+- **Size**: 23.35 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/devices/boiler-monitor/BMonDevice.cpp`
+- **Relative Path**: `src/devices/boiler-monitor`
+- **Created**: 2026-03-20 07:06:03 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-04-18 10:03:50 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `5a00a0d0c0bd80cb5acb05bd96f04f32`
+- **SHA256**: `1ee8d152662b4ef5caa4be19bd8d93b7c9625600fb543f3394ee7a8a733a5064`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef DEVICE_BOILER_MONITOR
+
+#include "BMonDevice.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+
+#include <Wire.h>
+#include <Adafruit_ADS1X15.h>
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+
+#ifdef MODULE_MQTT
+#include "../../modules/mqtt/MqttHandler.h"
+#endif
+#ifdef MODULE_TELEGRAM
+#include "../../modules/telegram/TgHandler.h"
+#endif
+
+// ============================================================
+//  GLOBALS
+// ============================================================
+BMonConfig bmonCfg;
+BMonState  bmonState;
+
+static Adafruit_ADS1115 ads;
+static bool adsOk = false;
+
+uint32_t BMonDevice::_lastRead    = 0;
+uint32_t BMonDevice::_lastFlow    = 0;
+uint32_t BMonDevice::_lastHistory = 0;
+uint32_t BMonDevice::_lastPub     = 0;
+uint32_t BMonDevice::_pulse1_prev = 0;
+uint32_t BMonDevice::_pulse2_prev = 0;
+
+// ============================================================
+//  ISR — счётчики расходомеров (IRAM)
+// ============================================================
+static void IRAM_ATTR onFlow1() { bmonState.pulse1_count++; }
+static void IRAM_ATTR onFlow2() { bmonState.pulse2_count++; }
+
+// ============================================================
+//  HTML ВКЛАДОК (PROGMEM)
+// ============================================================
+
+static const char BMON_MONITOR_HTML[] PROGMEM = R"html(
+<div class="monitor-page">
+
+  <div class="m-card">
+    <div class="m-card-label">ПРОИЗВОДИТЕЛЬНОСТЬ</div>
+    <div class="m-power-big"><span id="bm_power">--</span><span class="unit">кВт</span></div>
+    <div class="m-power-sub">Σ <span id="bm_energy">--</span> кВт·ч <span class="muted">(сессия)</span></div>
+    <div class="m-power-sub">
+      Поток 1: <b id="bm_flow1">--</b> л/мин &nbsp;|&nbsp;
+      Поток 2: <b id="bm_flow2">--</b> л/мин
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ТЕМПЕРАТУРЫ</div>
+    <div class="m-sensors-row">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОДАЧА</div>
+        <div class="m-sensor-val hot" id="bm_tsup">--°</div>
+        <div class="m-sensor-icon">▲</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ОБРАТКА</div>
+        <div class="m-sensor-val cool" id="bm_tret">--°</div>
+        <div class="m-sensor-icon cool">▼</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ДЕЛЬТА Т</div>
+        <div class="m-sensor-val accent" id="bm_tdelta">--°</div>
+        <div class="m-sensor-sub muted">расчёт</div>
+      </div>
+    </div>
+    <div class="m-sensors-row two" style="margin-top:8px">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОМЕЩЕНИЕ</div>
+        <div class="m-sensor-val warm" id="bm_troom">--°</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">УЛИЦА</div>
+        <div class="m-sensor-val cool" id="bm_tout">--°</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ДАВЛЕНИЕ В КОНТУРЕ</div>
+    <div class="m-sensors-row">
+      <div class="m-sensor">
+        <div class="m-sensor-label">ПОДАЧА P1</div>
+        <div class="m-sensor-val accent" id="bm_psup">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ОБРАТКА P2</div>
+        <div class="m-sensor-val accent" id="bm_pret">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+      <div class="m-sensor">
+        <div class="m-sensor-label">ДЕЛЬТА Р</div>
+        <div class="m-sensor-val accent" id="bm_pdelta">--</div>
+        <div class="m-sensor-sub muted">бар</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="m-card">
+    <div class="m-card-label">ИСТОРИЯ МОЩНОСТИ (10 мин)</div>
+    <canvas id="bmPowerChart" height="80"></canvas>
+  </div>
+
+</div>
+
+<script>
+function fmtT(v) { return (v === null || v === undefined) ? '--°' : v.toFixed(1) + '°'; }
+function fmtP(v) { return (v === null || v === undefined) ? '--'  : v.toFixed(2); }
+function fmtF(v) { return (v === null || v === undefined) ? '--'  : v.toFixed(2); }
+
+async function updateBMon() {
+  try {
+    const r = await fetch('/api/bmon/data');
+    const d = await r.json();
+    document.getElementById('bm_power').textContent  = d.power_kw.toFixed(1);
+    document.getElementById('bm_energy').textContent = d.energy_kwh.toFixed(2);
+    document.getElementById('bm_flow1').textContent  = fmtF(d.flow1_lpm);
+    document.getElementById('bm_flow2').textContent  = fmtF(d.flow2_lpm);
+    document.getElementById('bm_tsup').textContent   = fmtT(d.t_supply);
+    document.getElementById('bm_tret').textContent   = fmtT(d.t_return);
+    document.getElementById('bm_tdelta').textContent = fmtT(d.t_delta);
+    document.getElementById('bm_troom').textContent  = fmtT(d.t_room);
+    document.getElementById('bm_tout').textContent   = fmtT(d.t_outdoor);
+    document.getElementById('bm_psup').textContent   = fmtP(d.p_supply);
+    document.getElementById('bm_pret').textContent   = fmtP(d.p_return);
+    document.getElementById('bm_pdelta').textContent = fmtP(d.p_delta);
+    drawBMChart(d.history || []);
+  } catch(e) {}
+}
+
+function drawBMChart(data) {
+  const canvas = document.getElementById('bmPowerChart');
+  if (!canvas || data.length < 2) return;
+  const ctx = canvas.getContext('2d');
+  canvas.width = canvas.offsetWidth;
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0,0,W,H);
+  const max = Math.max(...data, 1);
+  const step = W / (data.length - 1);
+  ctx.beginPath();
+  ctx.strokeStyle = '#f0a500';
+  ctx.lineWidth = 2;
+  data.forEach((v,i) => {
+    const x = i * step;
+    const y = H - (v / max * H * 0.85) - 4;
+    i === 0 ? ctx.moveTo(x,y) : ctx.lineTo(x,y);
+  });
+  ctx.stroke();
+  ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+  ctx.fillStyle = 'rgba(240,165,0,0.08)';
+  ctx.fill();
+}
+
+updateBMon();
+setInterval(updateBMon, 2000);
+</script>
+)html";
+
+// --- Уставки ---
+static const char BMON_SETTINGS_HTML[] PROGMEM = R"html(
+<div class="settings-group">
+  <h3>🌡 Температурные пороги</h3>
+  <label>Макс. температура подачи (авария):
+    <input type="number" id="bm_t_max" step="0.5">°C
+  </label>
+  <label>Порог оповещения:
+    <input type="number" id="bm_t_alarm" step="0.5">°C
+  </label>
+  <label>Мин. температура улицы (заморозка):
+    <input type="number" id="bm_t_min" step="0.5">°C
+  </label>
+</div>
+
+<div class="settings-group">
+  <h3>💧 Расходомеры</h3>
+  <label>Расходомер 1 — л/имп:
+    <input type="number" id="bm_flow1_lpi" step="0.001" min="0.001">
+  </label>
+  <label>Расходомер 2 — л/имп:
+    <input type="number" id="bm_flow2_lpi" step="0.001" min="0.001">
+  </label>
+</div>
+
+<div class="settings-group">
+  <h3>📡 Публикация</h3>
+  <label>Интервал MQTT (мс):
+    <input type="number" id="bm_pub_interval" step="1000" min="1000">
+  </label>
+  <label>Коэффициент B датчика NTC:
+    <input type="number" id="bm_ntc_b" step="10" min="1000" max="6000">
+  </label>
+</div>
+
+<button onclick="saveBMonCfg()">💾 Сохранить уставки</button>
+
+<script>
+async function loadBMonCfg() {
+  const r = await fetch('/api/bmon/config');
+  const d = await r.json();
+  document.getElementById('bm_t_max').value        = d.t_max;
+  document.getElementById('bm_t_alarm').value      = d.t_alarm;
+  document.getElementById('bm_t_min').value        = d.t_min;
+  document.getElementById('bm_flow1_lpi').value    = d.flow1_lpi;
+  document.getElementById('bm_flow2_lpi').value    = d.flow2_lpi;
+  document.getElementById('bm_pub_interval').value = d.pub_interval;
+  document.getElementById('bm_ntc_b').value        = d.ntc_b;
+}
+async function saveBMonCfg() {
+  const data = {
+    t_max:        +document.getElementById('bm_t_max').value,
+    t_alarm:      +document.getElementById('bm_t_alarm').value,
+    t_min:        +document.getElementById('bm_t_min').value,
+    flow1_lpi:    +document.getElementById('bm_flow1_lpi').value,
+    flow2_lpi:    +document.getElementById('bm_flow2_lpi').value,
+    pub_interval: +document.getElementById('bm_pub_interval').value,
+    ntc_b:        +document.getElementById('bm_ntc_b').value,
+  };
+  const r = await fetch('/api/bmon/save', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+  if (r.ok) alert('Уставки сохранены');
+}
+loadBMonCfg();
+</script>
+)html";
+
+// ============================================================
+//  INIT
+// ============================================================
+void BMonDevice::init() {
+    loadConfig();
+
+    // I2C
+    Wire.begin(BMON_PIN_SDA, BMON_PIN_SCL);
+
+    // ADS1115
+    adsOk = ads.begin(BMON_ADS_ADDR);
+    if (adsOk) {
+        ads.setGain(BMON_ADS_GAIN);
+        Serial.println("[BMON] ADS1115 OK");
+    } else {
+        Serial.println("[BMON] ADS1115 NOT FOUND — check wiring!");
+        bmonState.alarm_sensor = true;
+    }
+
+    // Прерывания расходомеров — FALLING (замыкание контакта / фронт Холла)
+    pinMode(BMON_PIN_FLOW1, INPUT_PULLUP);
+    pinMode(BMON_PIN_FLOW2, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(BMON_PIN_FLOW1), onFlow1, FALLING);
+    attachInterrupt(digitalPinToInterrupt(BMON_PIN_FLOW2), onFlow2, FALLING);
+    Serial.println("[BMON] Flow interrupts attached");
+
+    // Аналоговые входы давления
+    pinMode(BMON_PIN_PRESS1, INPUT);
+    pinMode(BMON_PIN_PRESS2, INPUT);
+    analogReadResolution(12);
+    analogSetAttenuation(ADC_11db);  // 0–3.3V диапазон
+
+    // Регистрируем вкладки UI
+    WebHandler::registerTab({"monitor",  "Мониторинг", "🔥", BMON_MONITOR_HTML});
+    WebHandler::registerTab({"bmon_cfg", "Уставки",    "⚙️",  BMON_SETTINGS_HTML});
+
+    // API
+    extern AsyncWebServer server;
+
+    server.on("/api/bmon/data", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        // Температуры: NaN → null в JSON
+        if (!isnan(bmonState.t_supply))  doc["t_supply"]  = bmonState.t_supply;
+        else                             doc["t_supply"]  = nullptr;
+        if (!isnan(bmonState.t_return))  doc["t_return"]  = bmonState.t_return;
+        else                             doc["t_return"]  = nullptr;
+        if (!isnan(bmonState.t_room))    doc["t_room"]    = bmonState.t_room;
+        else                             doc["t_room"]    = nullptr;
+        if (!isnan(bmonState.t_outdoor)) doc["t_outdoor"] = bmonState.t_outdoor;
+        else                             doc["t_outdoor"] = nullptr;
+        doc["t_delta"]    = bmonState.t_delta;
+        doc["p_supply"]   = bmonState.p_supply;
+        doc["p_return"]   = bmonState.p_return;
+        doc["p_delta"]    = bmonState.p_delta;
+        doc["flow1_lpm"]  = bmonState.flow1_lpm;
+        doc["flow2_lpm"]  = bmonState.flow2_lpm;
+        doc["power_kw"]   = bmonState.power_kw;
+        doc["energy_kwh"] = bmonState.energy_kwh;
+        doc["alarm_high"] = bmonState.alarm_high;
+        doc["alarm_low"]  = bmonState.alarm_low;
+        doc["alarm_sensor"] = bmonState.alarm_sensor;
+
+        JsonArray hist = doc["history"].to<JsonArray>();
+        uint8_t start = (bmonState.hist_head - bmonState.hist_count + BMON_HISTORY_SIZE) % BMON_HISTORY_SIZE;
+        for (uint8_t i = 0; i < bmonState.hist_count; i++)
+            hist.add(bmonState.hist_power[(start + i) % BMON_HISTORY_SIZE]);
+
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    server.on("/api/bmon/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["t_max"]        = bmonCfg.t_max;
+        doc["t_alarm"]      = bmonCfg.t_alarm;
+        doc["t_min"]        = bmonCfg.t_min;
+        doc["flow1_lpi"]    = bmonCfg.flow1_lpi;
+        doc["flow2_lpi"]    = bmonCfg.flow2_lpi;
+        doc["pub_interval"] = bmonCfg.pub_interval;
+        doc["ntc_b"]        = bmonCfg.ntc_b;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    auto* h = new AsyncCallbackJsonWebHandler("/api/bmon/save",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject obj = json.as<JsonObject>();
+            bmonCfg.t_max        = obj["t_max"]        | 85.0f;
+            bmonCfg.t_alarm      = obj["t_alarm"]      | 80.0f;
+            bmonCfg.t_min        = obj["t_min"]        | 5.0f;
+            bmonCfg.flow1_lpi    = obj["flow1_lpi"]    | 1.0f;
+            bmonCfg.flow2_lpi    = obj["flow2_lpi"]    | 1.0f;
+            bmonCfg.pub_interval = obj["pub_interval"] | 10000;
+            bmonCfg.ntc_b        = obj["ntc_b"]        | BMON_NTC_B;
+            BMonDevice::saveConfig();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(h);
+
+#ifdef MODULE_TELEGRAM
+    TgHandler::onCommand = [](const String& cmd, const String& chat) {
+        if (cmd == "/temp") {
+            String msg = "🌡 Котёл:\n";
+            if (!isnan(bmonState.t_supply))
+                msg += "Подача: " + String(bmonState.t_supply, 1) + "°C\n";
+            if (!isnan(bmonState.t_return))
+                msg += "Обратка: " + String(bmonState.t_return, 1) + "°C\n";
+            msg += "Мощность: " + String(bmonState.power_kw, 1) + " кВт\n";
+            msg += "P1: " + String(bmonState.p_supply, 2) + " бар | ";
+            msg += "P2: " + String(bmonState.p_return, 2) + " бар";
+            TgHandler::sendMessage(msg, chat);
+        }
+        if (cmd == "/flow") {
+            String msg = "💧 Расход:\n";
+            msg += "Расходомер 1: " + String(bmonState.flow1_lpm, 2) + " л/мин\n";
+            msg += "Расходомер 2: " + String(bmonState.flow2_lpm, 2) + " л/мин";
+            TgHandler::sendMessage(msg, chat);
+        }
+    };
+#endif
+
+    Serial.println("[BMON] Device init OK");
+}
+
+// ============================================================
+//  LOOP
+// ============================================================
+void BMonDevice::loop() {
+    uint32_t now = millis();
+
+    // Опрос температур и давления каждые 2 сек
+    if (now - _lastRead > 2000) {
+        _lastRead = now;
+        readTemperatures();
+        readPressure();
+        checkAlarms();
+    }
+
+    // Расчёт расхода каждые 5 сек (считаем импульсы за интервал)
+    if (now - _lastFlow > 5000) {
+        calcFlow();
+        _lastFlow = now;
+    }
+
+    // История мощности каждые 10 сек
+    if (now - _lastHistory > 10000) {
+        _lastHistory = now;
+        bmonState.pushHistory(bmonState.power_kw);
+        // Накопление энергии: P(кВт) × dt(ч)
+        bmonState.energy_kwh += bmonState.power_kw * (10.0f / 3600.0f);
+    }
+
+    // MQTT публикация
+#ifdef MODULE_MQTT
+    if (now - _lastPub > bmonCfg.pub_interval) {
+        _lastPub = now;
+        publishMqtt();
+    }
+#endif
+
+    // Перезагрузка
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    bool reboot = sysState.pendingReboot && (now - sysState.rebootAt > 500);
+    xSemaphoreGive(coreMutex);
+    if (reboot) ESP.restart();
+}
+
+// ============================================================
+//  ЧТЕНИЕ NTC ЧЕРЕЗ ADS1115
+//  Схема: VCC — Rref — нода — NTC — GND
+//  Vin на ADS = напряжение на NTC
+//  R_ntc = Rref * Vin / (VCC - Vin)
+//  T = 1 / (1/T0 + ln(R/R0)/B) - 273.15
+// ============================================================
+static float ntcToTemp(int16_t raw, float ntc_b) {
+    if (raw <= 0) return NAN;  // обрыв или КЗ
+    // ADS1115 с GAIN_ONE: 1 LSB = 0.125 мВ, макс 32767 = 4.096V
+    // Но VCC шильда = 3.3V, значит реальный Vin ≤ 3.3V
+    float vin  = raw * 0.000125f;           // вольты
+    if (vin <= 0.05f || vin >= 3.25f) return NAN; // обрыв/КЗ
+    float r_ntc = BMON_NTC_RREF * vin / (3.3f - vin);
+    float lnR   = logf(r_ntc / BMON_NTC_R0);
+    float tempK = 1.0f / (1.0f / BMON_NTC_T0 + lnR / ntc_b);
+    return tempK - 273.15f;
+}
+
+void BMonDevice::readTemperatures() {
+    if (!adsOk) {
+        bmonState.alarm_sensor = true;
+        return;
+    }
+    bmonState.alarm_sensor = false;
+
+    int16_t raw;
+    raw = ads.readADC_SingleEnded(0); bmonState.t_supply  = ntcToTemp(raw, bmonCfg.ntc_b);
+    raw = ads.readADC_SingleEnded(1); bmonState.t_return  = ntcToTemp(raw, bmonCfg.ntc_b);
+    raw = ads.readADC_SingleEnded(2); bmonState.t_room    = ntcToTemp(raw, bmonCfg.ntc_b);
+    raw = ads.readADC_SingleEnded(3); bmonState.t_outdoor = ntcToTemp(raw, bmonCfg.ntc_b);
+
+    // Дельта только если оба датчика живые
+    if (!isnan(bmonState.t_supply) && !isnan(bmonState.t_return))
+        bmonState.t_delta = bmonState.t_supply - bmonState.t_return;
+    else
+        bmonState.t_delta = 0.0f;
+}
+
+// ============================================================
+//  ЧТЕНИЕ ДАВЛЕНИЯ 4-20мА / 150 Ом
+//  U = I × 150; I_min=4мА→0.6V, I_max=20мА→3.0V
+//  P = (U - U_min) / (U_max - U_min) × P_max
+// ============================================================
+static float adcToPressure(int rawAdc) {
+    float u = rawAdc / BMON_ADC_BITS * BMON_ADC_VREF;
+    if (u < BMON_PRESS_U_MIN) return 0.0f;  // ниже 4мА — обрыв или 0
+    float p = (u - BMON_PRESS_U_MIN) / (BMON_PRESS_U_MAX - BMON_PRESS_U_MIN) * BMON_PRESS_BAR_MAX;
+    if (p < 0.0f) p = 0.0f;
+    if (p > BMON_PRESS_BAR_MAX) p = BMON_PRESS_BAR_MAX;
+    return p;
+}
+
+void BMonDevice::readPressure() {
+    // Среднее из нескольких замеров для фильтрации шума АЦП ESP32
+    const int N = 8;
+    int32_t sum1 = 0, sum2 = 0;
+    for (int i = 0; i < N; i++) {
+        sum1 += analogRead(BMON_PIN_PRESS1);
+        sum2 += analogRead(BMON_PIN_PRESS2);
+    }
+    bmonState.p_supply = adcToPressure(sum1 / N);
+    bmonState.p_return = adcToPressure(sum2 / N);
+    bmonState.p_delta  = bmonState.p_supply - bmonState.p_return;
+}
+
+// ============================================================
+//  РАСЧЁТ РАСХОДА
+//  Вызывается каждые 5 сек, считает импульсы за интервал
+// ============================================================
+void BMonDevice::calcFlow() {
+    const float dt_min = 5.0f / 60.0f;  // 5 сек в минутах
+
+    // Атомарно читаем счётчики (ISR пишет volatile)
+    noInterrupts();
+    uint32_t p1 = bmonState.pulse1_count;
+    uint32_t p2 = bmonState.pulse2_count;
+    interrupts();
+
+    uint32_t diff1 = p1 - _pulse1_prev;
+    uint32_t diff2 = p2 - _pulse2_prev;
+    _pulse1_prev = p1;
+    _pulse2_prev = p2;
+
+    // л/мин = (импульсы × л/имп) / dt_мин
+    bmonState.flow1_lpm = (diff1 * bmonCfg.flow1_lpi) / dt_min;
+    bmonState.flow2_lpm = (diff2 * bmonCfg.flow2_lpi) / dt_min;
+
+    // Тепловая мощность по расходомеру 1:
+    // P(кВт) = m_dot(кг/с) × Cp(кДж/кг·К) × ΔT(К)
+    // m_dot = flow_lpm / 60 (кг/с при плотности воды 1 кг/л)
+    float m_dot = bmonState.flow1_lpm / 60.0f;
+    if (!isnan(bmonState.t_delta) && bmonState.t_delta > 0)
+        bmonState.power_kw = m_dot * 4.186f * bmonState.t_delta;
+    else
+        bmonState.power_kw = 0.0f;
+}
+
+// ============================================================
+//  АВАРИИ
+// ============================================================
+void BMonDevice::checkAlarms() {
+    bool wasHigh = bmonState.alarm_high;
+    bool wasLow  = bmonState.alarm_low;
+
+    bmonState.alarm_high = !isnan(bmonState.t_supply) &&
+                            bmonState.t_supply > bmonCfg.t_max;
+
+    bmonState.alarm_low  = !isnan(bmonState.t_outdoor) &&
+                            bmonState.t_outdoor < bmonCfg.t_min;
+
+#ifdef MODULE_TELEGRAM
+    if (bmonState.alarm_high && !wasHigh) {
+        TgHandler::sendMessage(
+            "🚨 *АВАРИЯ*: Температура подачи " +
+            String(bmonState.t_supply, 1) + "°C > " +
+            String(bmonCfg.t_max, 1) + "°C!"
+        );
+    }
+    if (!bmonState.alarm_high && wasHigh) {
+        TgHandler::sendMessage("✅ Температура подачи в норме");
+    }
+    if (bmonState.alarm_low && !wasLow) {
+        TgHandler::sendMessage(
+            "❄️ *ВНИМАНИЕ*: Температура улицы " +
+            String(bmonState.t_outdoor, 1) + "°C — риск замерзания!"
+        );
+    }
+    if (bmonState.alarm_sensor && !wasHigh) {  // используем флаг для дебаунса
+        TgHandler::sendMessage("⚠️ Ошибка ADS1115 — проверьте датчики");
+    }
+#endif
+}
+
+// ============================================================
+//  MQTT
+// ============================================================
+void BMonDevice::publishMqtt() {
+#ifdef MODULE_MQTT
+    String base = String(baseCfg.device_name) + "/";
+    char buf[12];
+
+    auto pub = [&](const char* topic, float val, int dec = 1) {
+        if (!isnan(val)) {
+            dtostrf(val, 1, dec, buf);
+            MqttHandler::publish((base + topic).c_str(), buf);
+        }
+    };
+
+    pub("t_supply",  bmonState.t_supply);
+    pub("t_return",  bmonState.t_return);
+    pub("t_room",    bmonState.t_room);
+    pub("t_outdoor", bmonState.t_outdoor);
+    pub("t_delta",   bmonState.t_delta);
+    pub("p_supply",  bmonState.p_supply, 2);
+    pub("p_return",  bmonState.p_return, 2);
+    pub("flow1_lpm", bmonState.flow1_lpm, 2);
+    pub("flow2_lpm", bmonState.flow2_lpm, 2);
+    pub("power_kw",  bmonState.power_kw, 2);
+#endif
+}
+
+// ============================================================
+//  КОНФИГ
+// ============================================================
+bool BMonDevice::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/device.json", doc)) return false;
+    bmonCfg.t_max        = doc["t_max"]        | 85.0f;
+    bmonCfg.t_alarm      = doc["t_alarm"]      | 80.0f;
+    bmonCfg.t_min        = doc["t_min"]        | 5.0f;
+    bmonCfg.flow1_lpi    = doc["flow1_lpi"]    | 1.0f;
+    bmonCfg.flow2_lpi    = doc["flow2_lpi"]    | 1.0f;
+    bmonCfg.pub_interval = doc["pub_interval"] | 10000;
+    bmonCfg.ntc_b        = doc["ntc_b"]        | BMON_NTC_B;
+    return true;
+}
+
+bool BMonDevice::saveConfig() {
+    JsonDocument doc;
+    doc["t_max"]        = bmonCfg.t_max;
+    doc["t_alarm"]      = bmonCfg.t_alarm;
+    doc["t_min"]        = bmonCfg.t_min;
+    doc["flow1_lpi"]    = bmonCfg.flow1_lpi;
+    doc["flow2_lpi"]    = bmonCfg.flow2_lpi;
+    doc["pub_interval"] = bmonCfg.pub_interval;
+    doc["ntc_b"]        = bmonCfg.ntc_b;
+    return ConfigManager::saveJson("/device.json", doc);
+}
+
+#endif // DEVICE_BOILER_MONITOR
+```
+
+---
+
+### <a id="📄-src-devices-boiler-monitor-bmondevice-h"></a>📄 `src/devices/boiler-monitor/BMonDevice.h`
+
+**File Info:**
+- **Size**: 1012 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/devices/boiler-monitor/BMonDevice.h`
+- **Relative Path**: `src/devices/boiler-monitor`
+- **Created**: 2026-03-20 07:05:55 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-03-20 07:12:23 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `c0a107774e71e3a30230d807c1ea9c37`
+- **SHA256**: `6c06e724a1d3768667f44512f361a1ff6430cbefbcf51caffedce6683441f1c3`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef DEVICE_BOILER_MONITOR
+
+#include "BMonTypes.h"
+#include "../../core/CoreTypes.h"
+
+class BMonDevice {
+public:
+    static void init();
+    static void loop();
+    static bool loadConfig();
+    static bool saveConfig();
+
+private:
+    static void readTemperatures();   // ADS1115 → NTC → °C
+    static void readPressure();       // GPIO36/39 ADC → бар
+    static void calcFlow();           // импульсы → л/мин, мощность
+    static void checkAlarms();
+    static void publishMqtt();
+
+    static uint32_t _lastRead;        // опрос датчиков
+    static uint32_t _lastFlow;        // расчёт расхода
+    static uint32_t _lastHistory;     // запись в историю
+    static uint32_t _lastPub;         // MQTT публикация
+
+    // Снимок счётчиков для расчёта л/мин
+    static uint32_t _pulse1_prev;
+    static uint32_t _pulse2_prev;
+};
+
+#endif // DEVICE_BOILER_MONITOR
+```
+
+---
+
+### <a id="📄-src-devices-boiler-monitor-bmontypes-h"></a>📄 `src/devices/boiler-monitor/BMonTypes.h`
+
+**File Info:**
+- **Size**: 5.05 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/devices/boiler-monitor/BMonTypes.h`
+- **Relative Path**: `src/devices/boiler-monitor`
+- **Created**: 2026-03-20 07:05:48 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-03-20 12:31:12 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `ac4d23ea41c87942007b294eb4ac7678`
+- **SHA256**: `e27baac2360549146c25ead54b119b02a591e7f578f86c969b49f29a7a790a1c`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef DEVICE_BOILER_MONITOR
+
+#include <Arduino.h>
+
+// ============================================================
+//  ПИНЫ ПЛАТЫ WT32-ETH01 + шильд boiler-monitor
+// ============================================================
+#define BMON_PIN_SDA        33
+#define BMON_PIN_SCL        32
+#define BMON_PIN_FLOW1       2   // расходомер 1 (оптопара)
+#define BMON_PIN_FLOW2       4   // расходомер 2 (оптопара)
+#define BMON_PIN_PRESS1     36   // давление P1 4-20мА (input only)
+#define BMON_PIN_PRESS2     39   // давление P2 4-20мА (input only)
+
+// ETH WT32-ETH01
+#define BMON_ETH_ADDR        1
+#define BMON_ETH_POWER_PIN  16
+#define BMON_ETH_MDC_PIN    23
+#define BMON_ETH_MDIO_PIN   18
+
+// ============================================================
+//  ADS1115
+// ============================================================
+#define BMON_ADS_ADDR       0x48  // ADDR → GND
+#define BMON_ADS_GAIN       GAIN_ONE  // ±4.096V — достаточно для 3.3V
+
+// ============================================================
+//  NTC — B-параметрическая модель
+//  R0=10k при T0=25°C, Rref=10k (резистор делителя)
+// ============================================================
+#define BMON_NTC_B          3950.0f
+#define BMON_NTC_R0         10000.0f
+#define BMON_NTC_T0         298.15f   // 25°C в Кельвинах
+#define BMON_NTC_RREF       10000.0f
+#define BMON_ADS_COUNTS     32767.0f  // макс. значение ADS1115 при GAIN_ONE
+
+// ============================================================
+//  Давление 4-20мА / 150 Ом
+//  U_min = 0.004 * 150 = 0.6V
+//  U_max = 0.020 * 150 = 3.0V
+//  Диапазон датчика: 0–10 бар
+// ============================================================
+#define BMON_PRESS_U_MIN    0.6f
+#define BMON_PRESS_U_MAX    3.0f
+#define BMON_PRESS_BAR_MAX  10.0f
+#define BMON_ADC_VREF       3.3f
+#define BMON_ADC_BITS       4095.0f   // ESP32 ADC 12-bit
+
+// ============================================================
+//  КОНФИГ — уставки, сохраняются в /device.json
+// ============================================================
+struct BMonConfig {
+    // Расходомеры: литров на импульс
+    float flow1_lpi     = 1.0f;   // л/имп расходомер 1
+    float flow2_lpi     = 1.0f;   // л/имп расходомер 2
+
+    // Пороги аварий
+    float t_max         = 85.0f;  // аварийное превышение температуры подачи
+    float t_alarm       = 80.0f;  // порог оповещения
+    float t_min         = 5.0f;   // защита от замерзания (улица)
+
+    // Интервал публикации MQTT (мс)
+    uint32_t pub_interval = 10000;
+
+    // Коэффициент B для NTC (можно уточнить под конкретный датчик)
+    float ntc_b         = BMON_NTC_B;
+};
+
+// ============================================================
+//  СОСТОЯНИЕ — runtime, не сохраняется
+// ============================================================
+
+#define BMON_HISTORY_SIZE   60   // 60 × 10 сек = 10 минут
+
+struct BMonState {
+    // Температуры (°C), NaN = датчик не подключён
+    float t_supply      = NAN;   // NTC1 — подача
+    float t_return      = NAN;   // NTC2 — обратка
+    float t_room        = NAN;   // NTC3 — помещение
+    float t_outdoor     = NAN;   // NTC4 — улица
+    float t_delta       = 0.0f;  // подача - обратка
+
+    // Давление (бар)
+    float p_supply      = 0.0f;  // P1
+    float p_return      = 0.0f;  // P2
+    float p_delta       = 0.0f;  // P1 - P2
+
+    // Расход и мощность
+    float flow1_lpm     = 0.0f;  // л/мин расходомер 1
+    float flow2_lpm     = 0.0f;  // л/мин расходомер 2
+    float power_kw      = 0.0f;  // тепловая мощность по расходомеру 1
+    float energy_kwh    = 0.0f;  // накопленная энергия за сессию
+
+    // Аварии
+    bool alarm_high     = false;
+    bool alarm_low      = false;  // защита от замерзания
+    bool alarm_sensor   = false;  // ошибка чтения ADS1115
+
+    // Счётчики импульсов (volatile — из ISR)
+    volatile uint32_t pulse1_count = 0;
+    volatile uint32_t pulse2_count = 0;
+
+    // История мощности (кольцевой буфер)
+    float    hist_power[BMON_HISTORY_SIZE] = {};
+    uint8_t  hist_head  = 0;
+    uint8_t  hist_count = 0;
+
+    void pushHistory(float power) {
+        hist_power[hist_head] = power;
+        hist_head = (hist_head + 1) % BMON_HISTORY_SIZE;
+        if (hist_count < BMON_HISTORY_SIZE) hist_count++;
+    }
+};
+
+extern BMonConfig bmonCfg;
+extern BMonState  bmonState;
+
+#endif // DEVICE_BOILER_MONITOR
+```
+
+---
+
+### <a id="📄-src-devices-kc868-a16-a16device-cpp"></a>📄 `src/devices/kc868-a16/A16Device.cpp`
+
+**File Info:**
+- **Size**: 20.35 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/devices/kc868-a16/A16Device.cpp`
+- **Relative Path**: `src/devices/kc868-a16`
+- **Created**: 2026-02-18 03:18:58 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-18 03:18:58 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `512d0e9b168b70e34c8a528db13990b4`
+- **SHA256**: `0e3e108078a58d551f904f8887bc80d4726c5253ca09a9090616e5579c88d33c`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef DEVICE_KC868_A16
+#include "A16Device.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include <Wire.h>
+#include <OneWire.h>
+#include <DallasTemperature.h>
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+
+#ifdef MODULE_MQTT
+#include "../../modules/mqtt/MqttHandler.h"
+#endif
+
+A16Config a16Cfg;
+A16State  a16State;
+
+uint32_t A16Device::_lastPoll   = 0;
+uint32_t A16Device::_lastOwRead = 0;
+bool     A16Device::_owScanned  = false;
+
+// OneWire на трёх пинах
+static OneWire         ow1(A16_OW_PIN1);
+static OneWire         ow2(A16_OW_PIN2);
+static OneWire         ow3(A16_OW_PIN3);
+static DallasTemperature dt1(&ow1);
+static DallasTemperature dt2(&ow2);
+static DallasTemperature dt3(&ow3);
+
+// ============================================================
+//  HTML ВКЛАДКИ (PROGMEM)
+// ============================================================
+static const char A16_PERIPH_HTML[] PROGMEM = R"html(
+<div class="a16-page">
+
+  <!-- ЦИФРОВЫЕ ВХОДЫ -->
+  <div class="a16-section">
+    <div class="a16-section-title">ЦИФРОВЫЕ ВХОДЫ</div>
+    <div class="a16-grid16" id="din_grid">
+      <!-- генерируется JS -->
+    </div>
+  </div>
+
+  <!-- ЦИФРОВЫЕ ВЫХОДЫ -->
+  <div class="a16-section">
+    <div class="a16-section-title">РЕЛЕ ВЫХОДЫ</div>
+    <div class="a16-grid16" id="dout_grid">
+      <!-- генерируется JS -->
+    </div>
+  </div>
+
+  <!-- АНАЛОГОВЫЕ ВХОДЫ -->
+  <div class="a16-section">
+    <div class="a16-section-title">АНАЛОГОВЫЕ ВХОДЫ</div>
+    <div class="a16-grid4" id="adc_grid">
+      <!-- генерируется JS -->
+    </div>
+  </div>
+
+  <!-- 1-WIRE ДАТЧИКИ -->
+  <div class="a16-section">
+    <div class="a16-section-title">1-WIRE ТЕМПЕРАТУРА</div>
+    <div id="ow_grid">
+      <!-- генерируется JS -->
+    </div>
+    <button class="a16-btn-sm" onclick="owScan()">🔍 Сканировать шину</button>
+  </div>
+
+</div>
+
+<style>
+.a16-page { display:flex; flex-direction:column; gap:12px; }
+.a16-section {
+  background: var(--card);
+  border-radius:10px;
+  padding:14px;
+  border:1px solid var(--border);
+}
+.a16-section-title {
+  font-size:10px; font-weight:700;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:var(--muted); margin-bottom:12px;
+}
+.a16-grid16 {
+  display:grid;
+  grid-template-columns: repeat(8,1fr);
+  gap:6px;
+}
+.a16-grid4 {
+  display:grid;
+  grid-template-columns: repeat(2,1fr);
+  gap:8px;
+}
+@media(max-width:400px) {
+  .a16-grid16 { grid-template-columns: repeat(4,1fr); }
+}
+
+/* Ячейка входа */
+.din-cell {
+  background:#111318;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:6px 4px;
+  text-align:center;
+  cursor:default;
+  transition: border-color .2s;
+}
+.din-cell.on {
+  border-color:var(--ok);
+  background:rgba(62,201,122,.1);
+}
+.din-num { font-size:9px; color:var(--muted); margin-bottom:3px; }
+.din-dot { width:10px; height:10px; border-radius:50%;
+  background:var(--border); margin:0 auto 3px; transition:background .2s; }
+.din-cell.on .din-dot { background:var(--ok); box-shadow:0 0 6px var(--ok); }
+.din-cnt { font-size:9px; color:var(--muted); }
+
+/* Ячейка выхода */
+.dout-cell {
+  background:#111318;
+  border:1px solid var(--border);
+  border-radius:6px;
+  padding:6px 4px;
+  text-align:center;
+  cursor:pointer;
+  transition: all .15s;
+  user-select:none;
+}
+.dout-cell:active { opacity:.7; }
+.dout-cell.on {
+  border-color:var(--accent);
+  background:rgba(240,165,0,.1);
+}
+.dout-num { font-size:9px; color:var(--muted); margin-bottom:3px; }
+.dout-dot { width:10px; height:10px; border-radius:50%;
+  background:var(--border); margin:0 auto 3px; transition:background .2s; }
+.dout-cell.on .dout-dot { background:var(--accent); box-shadow:0 0 6px var(--accent); }
+.dout-lbl { font-size:9px; color:var(--muted); }
+
+/* Аналог */
+.adc-cell {
+  background:#111318;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:12px;
+}
+.adc-lbl { font-size:10px; color:var(--muted); margin-bottom:4px; }
+.adc-val { font-size:22px; font-weight:800; color:var(--accent); }
+.adc-unit { font-size:11px; color:var(--muted); margin-left:2px; }
+.adc-bar { height:4px; background:var(--border); border-radius:2px; margin-top:8px; }
+.adc-bar-fill { height:100%; background:var(--accent);
+  border-radius:2px; transition:width .5s; }
+
+/* 1-Wire */
+.ow-row {
+  display:flex; align-items:center; gap:10px;
+  background:#111318; border:1px solid var(--border);
+  border-radius:6px; padding:10px 12px; margin-bottom:6px;
+}
+.ow-temp { font-size:20px; font-weight:800; color:var(--cool); margin-left:auto; }
+.ow-addr { font-size:10px; color:var(--muted); font-family:monospace; }
+.ow-lbl  { font-size:12px; color:var(--text); }
+
+.a16-btn-sm {
+  width:auto; padding:6px 14px;
+  font-size:12px; margin-top:8px;
+  background:var(--border); color:var(--text);
+}
+</style>
+
+<script>
+let a16Labels = { din:[], dout:[], adc:[], ow:[] };
+
+// Генерация сеток при загрузке
+async function initA16() {
+  const r = await fetch('/api/a16/config');
+  const cfg = await r.json();
+  a16Labels = { din: cfg.din_label, dout: cfg.dout_label,
+                adc: cfg.adc_label, ow:  cfg.ow_label };
+
+  // DIN сетка
+  const dinGrid = document.getElementById('din_grid');
+  dinGrid.innerHTML = '';
+  for (let i=0; i<16; i++) {
+    dinGrid.innerHTML += `
+      <div class="din-cell" id="din_${i}">
+        <div class="din-num">${i+1}</div>
+        <div class="din-dot"></div>
+        <div class="din-cnt" id="cnt_${i}">0</div>
+      </div>`;
+  }
+
+  // DOUT сетка
+  const doutGrid = document.getElementById('dout_grid');
+  doutGrid.innerHTML = '';
+  for (let i=0; i<16; i++) {
+    doutGrid.innerHTML += `
+      <div class="dout-cell" id="dout_${i}" onclick="toggleOut(${i})">
+        <div class="dout-num">${i+1}</div>
+        <div class="dout-dot"></div>
+        <div class="dout-lbl">${cfg.dout_label[i]||''}</div>
+      </div>`;
+  }
+
+  // ADC сетка
+  const adcGrid = document.getElementById('adc_grid');
+  adcGrid.innerHTML = '';
+  for (let i=0; i<4; i++) {
+    adcGrid.innerHTML += `
+      <div class="adc-cell">
+        <div class="adc-lbl">${cfg.adc_label[i]||'АЦП '+(i+1)}</div>
+        <div><span class="adc-val" id="adc_v${i}">--</span>
+             <span class="adc-unit" id="adc_u${i}"></span></div>
+        <div class="adc-bar"><div class="adc-bar-fill" id="adc_b${i}" style="width:0%"></div></div>
+      </div>`;
+  }
+
+  updateA16();
+}
+
+async function updateA16() {
+  try {
+    const r = await fetch('/api/a16/data');
+    const d = await r.json();
+
+    // DIN
+    for (let i=0; i<16; i++) {
+      const cell = document.getElementById('din_'+i);
+      if (!cell) continue;
+      cell.classList.toggle('on', d.din[i]);
+      document.getElementById('cnt_'+i).textContent = d.din_counter[i];
+    }
+
+    // DOUT
+    for (let i=0; i<16; i++) {
+      const cell = document.getElementById('dout_'+i);
+      if (cell) cell.classList.toggle('on', d.dout[i]);
+    }
+
+    // ADC
+    for (let i=0; i<4; i++) {
+      const v = d.adc_value[i];
+      const el = document.getElementById('adc_v'+i);
+      if (el) el.textContent = v.toFixed(2);
+      const pct = Math.min(100, Math.max(0, d.adc_pct[i]));
+      const bar = document.getElementById('adc_b'+i);
+      if (bar) bar.style.width = pct+'%';
+    }
+
+    // 1-Wire
+    const owGrid = document.getElementById('ow_grid');
+    if (d.ow && d.ow.length) {
+      owGrid.innerHTML = d.ow.map((s,i) => `
+        <div class="ow-row">
+          <div>
+            <div class="ow-lbl">${a16Labels.ow[i]||'Датчик '+(i+1)}</div>
+            <div class="ow-addr">${s.addr}</div>
+          </div>
+          <div class="ow-temp">${s.ok ? s.temp.toFixed(1)+'°C' : '—'}</div>
+        </div>`).join('');
+    } else {
+      owGrid.innerHTML = '<div style="color:var(--muted);font-size:12px">Датчики не найдены. Нажмите Сканировать.</div>';
+    }
+  } catch(e) {}
+}
+
+async function toggleOut(ch) {
+  await fetch('/api/a16/toggle', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ch})
+  });
+}
+
+async function owScan() {
+  await fetch('/api/a16/ow-scan', {method:'POST'});
+  setTimeout(updateA16, 3000);
+}
+
+initA16();
+setInterval(updateA16, 1000);
+</script>
+)html";
+
+// ============================================================
+//  INIT
+// ============================================================
+void A16Device::init() {
+    loadConfig();
+
+    Wire.begin(A16_I2C_SDA, A16_I2C_SCL);
+
+    // Все выходы выключены при старте
+    writePCF(A16_PCF_OUT_0, 0xFF);  // PCF8574: лог.1 = реле выключено
+    writePCF(A16_PCF_OUT_1, 0xFF);
+
+    // 1-Wire
+    dt1.begin(); dt2.begin(); dt3.begin();
+    dt1.setWaitForConversion(false);
+    dt2.setWaitForConversion(false);
+    dt3.setWaitForConversion(false);
+
+    // Регистрация вкладки
+    WebHandler::registerTab({"periph", "Периферия", "🔌", A16_PERIPH_HTML});
+
+    // ── API ──────────────────────────────────────────────────
+    extern AsyncWebServer server;
+
+    // Данные
+    server.on("/api/a16/data", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+
+        // DIN
+        JsonArray din = doc["din"].to<JsonArray>();
+        JsonArray cnt = doc["din_counter"].to<JsonArray>();
+        for (int i = 0; i < 16; i++) {
+            din.add(a16State.din[i]);
+            cnt.add(a16State.din_counter[i]);
+        }
+
+        // DOUT
+        JsonArray dout = doc["dout"].to<JsonArray>();
+        for (int i = 0; i < 16; i++) dout.add(a16State.dout[i]);
+
+        // ADC
+        JsonArray adcV = doc["adc_value"].to<JsonArray>();
+        JsonArray adcP = doc["adc_pct"].to<JsonArray>();
+        for (int i = 0; i < 4; i++) {
+            adcV.add(a16State.adc_value[i]);
+            float range = a16Cfg.adc_max[i] - a16Cfg.adc_min[i];
+            float pct = (range > 0)
+                ? (a16State.adc_value[i] - a16Cfg.adc_min[i]) / range * 100.0f
+                : 0;
+            adcP.add(constrain(pct, 0, 100));
+        }
+
+        // 1-Wire
+        JsonArray ow = doc["ow"].to<JsonArray>();
+        for (int i = 0; i < a16State.ow_count; i++) {
+            JsonObject s = ow.add<JsonObject>();
+            char addr[17];
+            snprintf(addr, sizeof(addr), "%016llX", a16State.ow_addr[i]);
+            s["addr"] = addr;
+            s["temp"] = a16State.ow_temp[i];
+            s["ok"]   = a16State.ow_ok[i];
+        }
+
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    // Конфиг (метки)
+    server.on("/api/a16/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        JsonArray dl = doc["din_label"].to<JsonArray>();
+        JsonArray ql = doc["dout_label"].to<JsonArray>();
+        JsonArray al = doc["adc_label"].to<JsonArray>();
+        JsonArray ol = doc["ow_label"].to<JsonArray>();
+        for (int i = 0; i < 16; i++) { dl.add(a16Cfg.din_label[i]); ql.add(a16Cfg.dout_label[i]); }
+        for (int i = 0; i < 4;  i++) al.add(a16Cfg.adc_label[i]);
+        for (int i = 0; i < A16_MAX_OW_SENSORS; i++) ol.add(a16Cfg.ow_label[i]);
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    // Переключение выхода
+    auto* toggleH = new AsyncCallbackJsonWebHandler("/api/a16/toggle",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            int ch = json["ch"] | -1;
+            if (ch >= 0 && ch < 16) A16Device::toggleOutput(ch);
+            req->send(200, "application/json", "{\"ok\":true}");
+        }
+    );
+    server.addHandler(toggleH);
+
+    // Сброс счётчика
+    auto* resetH = new AsyncCallbackJsonWebHandler("/api/a16/reset-counter",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            int ch = json["ch"] | -1;
+            if (ch >= 0 && ch < 16) a16State.din_counter[ch] = 0;
+            req->send(200, "application/json", "{\"ok\":true}");
+        }
+    );
+    server.addHandler(resetH);
+
+    // Сканирование 1-Wire
+    server.on("/api/a16/ow-scan", HTTP_POST, [](AsyncWebServerRequest* req) {
+        A16Device::scanOneWire();
+        req->send(200, "application/json", "{\"ok\":true}");
+    });
+
+    Serial.println("[A16] Device init OK");
+}
+
+// ============================================================
+//  LOOP
+// ============================================================
+void A16Device::loop() {
+    if (millis() - _lastPoll > a16Cfg.poll_interval) {
+        _lastPoll = millis();
+        readDigitalInputs();
+        readAnalog();
+    }
+
+    // 1-Wire: первое сканирование при старте, потом каждые 5 сек
+    if (!_owScanned) { scanOneWire(); _owScanned = true; }
+    if (millis() - _lastOwRead > 5000) {
+        _lastOwRead = millis();
+        readOneWire();
+    }
+
+    // Безопасная перезагрузка
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    bool reboot = sysState.pendingReboot && (millis() - sysState.rebootAt > 500);
+    xSemaphoreGive(coreMutex);
+    if (reboot) ESP.restart();
+}
+
+// ============================================================
+//  ЦИФРОВЫЕ ВХОДЫ
+// ============================================================
+void A16Device::readDigitalInputs() {
+    // Входы читаются через PCF8574, не напрямую с GPIO
+    uint8_t byte0 = readPCF(A16_PCF_DI_0);  // IN1-IN8
+    uint8_t byte1 = readPCF(A16_PCF_DI_1);  // IN9-IN16
+
+    for (int i = 0; i < 8; i++) {
+        // PCF8574: лог.0 = вход активен (оптопара)
+        bool state = !((byte0 >> i) & 1);
+        if (state && !a16State.din_prev[i]) a16State.din_counter[i]++;
+        a16State.din_prev[i] = state;
+        a16State.din[i] = state;
+    }
+    for (int i = 0; i < 8; i++) {
+        bool state = !((byte1 >> i) & 1);
+        if (state && !a16State.din_prev[i+8]) a16State.din_counter[i+8]++;
+        a16State.din_prev[i+8] = state;
+        a16State.din[i+8] = state;
+    }
+}
+
+// ============================================================
+//  АНАЛОГОВЫЕ ВХОДЫ
+// ============================================================
+void A16Device::readAnalog() {
+    const uint8_t pins[4] = {A16_ADC_CH1, A16_ADC_CH2, A16_ADC_CH3, A16_ADC_CH4};
+
+    for (int i = 0; i < 4; i++) {
+        // Среднее из 4 измерений для стабильности
+        int32_t sum = 0;
+        for (int j = 0; j < 4; j++) sum += analogRead(pins[i]);
+        a16State.adc_raw[i] = sum / 4;
+
+        float raw = a16State.adc_raw[i];
+
+        switch (a16Cfg.adc_mode[i]) {
+            case AnalogMode::MODE_4_20MA: {
+                // 4мА = ~820 (1В на АЦП 12бит 3.3В ref), 20мА = ~4095
+                // Через резистор 150Ом: 4мА→0.6В, 20мА→3В
+                float pct = (raw - 820.0f) / (4095.0f - 820.0f);
+                pct = constrain(pct, 0.0f, 1.0f);
+                a16State.adc_value[i] = a16Cfg.adc_min[i] +
+                    pct * (a16Cfg.adc_max[i] - a16Cfg.adc_min[i]);
+                break;
+            }
+            case AnalogMode::MODE_0_5V: {
+                // 0-5В через делитель: Vout = Vin * R2/(R1+R2)
+                // По схеме делитель 510/100 → коэф ~0.164
+                // Но ESP32 ADC до 3.3В, поэтому 5В → 0.82В → ~1020
+                float volt = raw / 4095.0f * 3.3f / 0.164f;
+                a16State.adc_value[i] = constrain(volt, 0.0f, 5.0f);
+                break;
+            }
+            default:
+                a16State.adc_value[i] = raw;
+        }
+    }
+}
+
+// ============================================================
+//  1-WIRE
+// ============================================================
+void A16Device::scanOneWire() {
+    a16State.ow_count = 0;
+    uint8_t addr[8];
+
+    auto scan = [&](OneWire& ow) {
+        ow.reset_search();
+        while (ow.search(addr) && a16State.ow_count < A16_MAX_OW_SENSORS) {
+            if (OneWire::crc8(addr, 7) != addr[7]) continue;
+            uint64_t id = 0;
+            for (int i = 0; i < 8; i++) id = (id << 8) | addr[i];
+            a16State.ow_addr[a16State.ow_count++] = id;
+        }
+    };
+
+    scan(ow1); scan(ow2); scan(ow3);
+    Serial.printf("[A16] 1-Wire: found %d sensors\n", a16State.ow_count);
+}
+
+void A16Device::readOneWire() {
+    if (a16State.ow_count == 0) return;
+
+    dt1.requestTemperatures();
+    dt2.requestTemperatures();
+    dt3.requestTemperatures();
+    delay(100);  // DS18B20 conversion time (async mode)
+
+    for (int i = 0; i < a16State.ow_count; i++) {
+        uint8_t addr[8];
+        for (int b = 7; b >= 0; b--) {
+            addr[7-b] = (a16State.ow_addr[i] >> (b*8)) & 0xFF;
+        }
+        // Пробуем все три шины
+        float t = DEVICE_DISCONNECTED_C;
+        DeviceAddress da; memcpy(da, addr, 8);
+        if (t == DEVICE_DISCONNECTED_C) t = dt1.getTempC(da);
+        if (t == DEVICE_DISCONNECTED_C) t = dt2.getTempC(da);
+        if (t == DEVICE_DISCONNECTED_C) t = dt3.getTempC(da);
+
+        a16State.ow_ok[i]   = (t != DEVICE_DISCONNECTED_C);
+        a16State.ow_temp[i] = a16State.ow_ok[i] ? t : 0.0f;
+    }
+}
+
+// ============================================================
+//  PCF8574 I/O
+// ============================================================
+void A16Device::writePCF(uint8_t addr, uint8_t data) {
+    Wire.beginTransmission(addr);
+    Wire.write(data);
+    Wire.endTransmission();
+}
+
+uint8_t A16Device::readPCF(uint8_t addr) {
+    Wire.requestFrom(addr, (uint8_t)1);
+    return Wire.available() ? Wire.read() : 0xFF;
+}
+
+void A16Device::syncOutputs() {
+    // PCF8574: лог.0 = реле включено, лог.1 = выключено
+    uint8_t byte0 = 0xFF, byte1 = 0xFF;
+    for (int i = 0; i < 8;  i++) if (a16State.dout[i])   byte0 &= ~(1 << i);
+    for (int i = 0; i < 8;  i++) if (a16State.dout[i+8]) byte1 &= ~(1 << i);
+    writePCF(A16_PCF_OUT_0, byte0);
+    writePCF(A16_PCF_OUT_1, byte1);
+}
+
+bool A16Device::setOutput(uint8_t ch, bool state) {
+    if (ch >= 16) return false;
+    a16State.dout[ch] = state;
+    syncOutputs();
+    return true;
+}
+
+bool A16Device::toggleOutput(uint8_t ch) {
+    return setOutput(ch, !a16State.dout[ch]);
+}
+
+void A16Device::setAllOutputs(uint16_t mask) {
+    for (int i = 0; i < 16; i++) a16State.dout[i] = (mask >> i) & 1;
+    syncOutputs();
+}
+
+// ============================================================
+//  CONFIG
+// ============================================================
+bool A16Device::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/device.json", doc)) {
+        // Дефолтные метки
+        for (int i = 0; i < 16; i++) {
+            snprintf(a16Cfg.din_label[i],  20, "IN%d",  i+1);
+            snprintf(a16Cfg.dout_label[i], 20, "OUT%d", i+1);
+        }
+        snprintf(a16Cfg.adc_label[0], 20, "АЦП 1 (4-20мА)");
+        snprintf(a16Cfg.adc_label[1], 20, "АЦП 2 (4-20мА)");
+        snprintf(a16Cfg.adc_label[2], 20, "АЦП 3 (0-5В)");
+        snprintf(a16Cfg.adc_label[3], 20, "АЦП 4 (0-5В)");
+        return false;
+    }
+
+    for (int i = 0; i < 16; i++) {
+        strlcpy(a16Cfg.din_label[i],  doc["din_label"][i]  | "", 20);
+        strlcpy(a16Cfg.dout_label[i], doc["dout_label"][i] | "", 20);
+    }
+    for (int i = 0; i < 4; i++) {
+        strlcpy(a16Cfg.adc_label[i], doc["adc_label"][i] | "", 20);
+        a16Cfg.adc_min[i] = doc["adc_min"][i] | 0.0f;
+        a16Cfg.adc_max[i] = doc["adc_max"][i] | 10.0f;
+    }
+    for (int i = 0; i < A16_MAX_OW_SENSORS; i++)
+        strlcpy(a16Cfg.ow_label[i], doc["ow_label"][i] | "", 20);
+    a16Cfg.poll_interval = doc["poll_interval"] | 1000;
+    return true;
+}
+
+bool A16Device::saveConfig() {
+    JsonDocument doc;
+    JsonArray dl = doc["din_label"].to<JsonArray>();
+    JsonArray ql = doc["dout_label"].to<JsonArray>();
+    JsonArray al = doc["adc_label"].to<JsonArray>();
+    JsonArray mn = doc["adc_min"].to<JsonArray>();
+    JsonArray mx = doc["adc_max"].to<JsonArray>();
+    JsonArray ol = doc["ow_label"].to<JsonArray>();
+    for (int i = 0; i < 16; i++) { dl.add(a16Cfg.din_label[i]); ql.add(a16Cfg.dout_label[i]); }
+    for (int i = 0; i < 4;  i++) { al.add(a16Cfg.adc_label[i]); mn.add(a16Cfg.adc_min[i]); mx.add(a16Cfg.adc_max[i]); }
+    for (int i = 0; i < A16_MAX_OW_SENSORS; i++) ol.add(a16Cfg.ow_label[i]);
+    doc["poll_interval"] = a16Cfg.poll_interval;
+    return ConfigManager::saveJson("/device.json", doc);
+}
+
+#endif // DEVICE_KC868_A16
+
+```
+
+---
+
+### <a id="📄-src-devices-kc868-a16-a16device-h"></a>📄 `src/devices/kc868-a16/A16Device.h`
+
+**File Info:**
+- **Size**: 1019 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/devices/kc868-a16/A16Device.h`
+- **Relative Path**: `src/devices/kc868-a16`
+- **Created**: 2026-02-18 01:32:44 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-18 01:32:44 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `654be0c8c9f1b90da0b536af9618f1b1`
+- **SHA256**: `7bc5878151b9ffd50f5188a52ce65f42f624bc6953c02df4650014fb68c17f12`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef DEVICE_KC868_A16
+
+#include "A16Types.h"
+#include "../../core/CoreTypes.h"
+
+class A16Device {
+public:
+    static void init();
+    static void loop();
+    static bool loadConfig();
+    static bool saveConfig();
+
+    // Управление выходами — можно вызывать из других модулей
+    static bool setOutput(uint8_t ch, bool state);   // ch: 0-15
+    static bool toggleOutput(uint8_t ch);
+    static void setAllOutputs(uint16_t mask);         // битовая маска
+
+private:
+    static void readDigitalInputs();
+    static void readAnalog();
+    static void readOneWire();
+    static void writePCF(uint8_t addr, uint8_t data);
+    static uint8_t readPCF(uint8_t addr);
+    static void syncOutputs();   // применить a16State.dout → PCF8574
+    static void scanOneWire();   // найти датчики на шине
+
+    static uint32_t _lastPoll;
+    static uint32_t _lastOwRead;
+    static bool     _owScanned;
+};
+
+#endif // DEVICE_KC868_A16
+
+```
+
+---
+
+### <a id="📄-src-devices-kc868-a16-a16types-h"></a>📄 `src/devices/kc868-a16/A16Types.h`
+
+**File Info:**
+- **Size**: 3.71 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/devices/kc868-a16/A16Types.h`
+- **Relative Path**: `src/devices/kc868-a16`
+- **Created**: 2026-02-18 03:29:22 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-18 03:29:22 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `099e6c7f9ef6adc95d493c1c3f50da14`
+- **SHA256**: `e567171299e4e535bfd6842f695b9947058dc1277aef7fbc7f0e0b13784fbde2`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef DEVICE_KC868_A16
+
+#include <Arduino.h>
+
+// ============================================================
+//  ПИНЫ KC868-A16
+// ============================================================
+// ============================================================
+//  ПИНЫ KC868-A16 (проверено по реальному проекту)
+// ============================================================
+
+// Ethernet — переопределяем дефолты platformio.ini
+#define A16_ETH_ADDR      0
+#define A16_ETH_POWER_PIN -1                    // PHY питание не управляется
+#define A16_ETH_MDC_PIN   23
+#define A16_ETH_MDIO_PIN  18
+#define A16_ETH_CLK_MODE  ETH_CLOCK_GPIO17_OUT  // важно для Kincony!
+
+// I2C
+#define A16_I2C_SDA     4
+#define A16_I2C_SCL     5    // не 16!
+
+// Аналоговые входы
+#define A16_ADC_CH1     36   // 4-20мА вход 1
+#define A16_ADC_CH2     39   // 4-20мА вход 2
+#define A16_ADC_CH3     34   // 0-5В вход 3
+#define A16_ADC_CH4     35   // 0-5В вход 4
+
+// 1-Wire (DS18B20)
+#define A16_OW_PIN1     33   // HT1
+#define A16_OW_PIN2     32   // HT2
+#define A16_OW_PIN3     14   // HT3
+
+// RS485
+#define A16_RS485_RX    16
+#define A16_RS485_TX    13
+
+// PCF8574 адреса
+#define A16_PCF_DI_0    0x22   // IN1-IN8  (входы)
+#define A16_PCF_DI_1    0x21   // IN9-IN16 (входы)
+#define A16_PCF_OUT_0   0x24   // OT1-OT8  (выходы/реле)
+#define A16_PCF_OUT_1   0x25   // OT9-OT16 (выходы/реле)
+
+// ============================================================
+//  ТИПЫ АНАЛОГОВЫХ ВХОДОВ
+// ============================================================
+enum class AnalogMode : uint8_t {
+    MODE_4_20MA,   // 4-20мА → 0-100%
+    MODE_0_5V,     // 0-5В → сырое значение
+    MODE_RAW       // 0-4095 АЦП без конвертации
+};
+
+// ============================================================
+//  КОНФИГ A16 — сохраняется в /device.json
+// ============================================================
+#define A16_MAX_OW_SENSORS  8
+
+struct A16Config {
+    // Метки входов (для отображения в UI)
+    char din_label[16][20];
+    char dout_label[16][20];
+    char adc_label[4][20];
+    char ow_label[A16_MAX_OW_SENSORS][20];
+
+    // Режимы аналоговых входов
+    AnalogMode adc_mode[4] = {
+        AnalogMode::MODE_4_20MA,
+        AnalogMode::MODE_4_20MA,
+        AnalogMode::MODE_0_5V,
+        AnalogMode::MODE_0_5V
+    };
+
+    // Масштаб аналоговых входов (min/max физической величины)
+    float adc_min[4] = {0, 0, 0, 0};
+    float adc_max[4] = {10, 10, 5, 5};   // бар, бар, В, В
+
+    // Интервал опроса (мс)
+    uint32_t poll_interval = 1000;
+};
+
+// ============================================================
+//  СОСТОЯНИЕ A16 — runtime
+// ============================================================
+struct A16State {
+    // Цифровые входы
+    bool     din[16]          = {};
+    uint32_t din_counter[16]  = {};   // счётчики импульсов
+    bool     din_prev[16]     = {};   // для детекции фронта
+
+    // Цифровые выходы
+    bool dout[16] = {};
+
+    // Аналоговые входы
+    int   adc_raw[4]   = {};
+    float adc_value[4] = {};   // в физических единицах
+
+    // 1-Wire датчики
+    uint8_t  ow_count = 0;
+    uint64_t ow_addr[A16_MAX_OW_SENSORS]  = {};   // 64-бит ROM адрес
+    float    ow_temp[A16_MAX_OW_SENSORS]  = {};
+    bool     ow_ok[A16_MAX_OW_SENSORS]    = {};
+};
+
+extern A16Config a16Cfg;
+extern A16State  a16State;
+
+#endif // DEVICE_KC868_A16
+
+```
+
+---
+
+### <a id="📄-src-modules-modem-modemhandler-cpp"></a>📄 `src/modules/modem/ModemHandler.cpp`
+
+**File Info:**
+- **Size**: 36.63 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/modules/modem/ModemHandler.cpp`
+- **Relative Path**: `src/modules/modem`
+- **Created**: 2026-04-17 05:26:47 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-04-20 09:32:43 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `98de4a6fa338bf5e492427c1e1b485e3`
+- **SHA256**: `80a2d8371dd79700e06a50fcd8d944c40a74898175c4c66f2f2fbc7897f3c57b`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef MODULE_MODEM
+#include "ModemHandler.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+#include <LittleFS.h>
+
+#ifdef MODULE_MQTT
+#include "../mqtt/MqttHandler.h"
+#endif
+#ifdef MODULE_TELEGRAM
+#include "../telegram/TgHandler.h"
+#endif
+
+// ── Статические данные ───────────────────────────────────────────────────────
+ModemConfig modemCfg;
+ModemStatus modemStatus;
+void (*ModemHandler::onDTMFResult)(const char*, const char*) = nullptr;
+
+static HardwareSerial _sim(2);
+
+// ── Состояние звонка ─────────────────────────────────────────────────────────
+enum CallState { CALL_IDLE, CALL_RINGING, CALL_IN_CALL };
+static CallState _callState = CALL_IDLE;
+static String   _lineBuffer = "";
+static String   _modemLog   = "";
+static String   _callerNum  = "";
+static String   _dtmfSeq    = "";
+static uint32_t _callStart  = 0;
+
+// Неблокирующая задержка между ATA и AT+CMUT=1
+static bool     _answerPending    = false;
+static uint32_t _answerAt         = 0;
+
+// Флаг: loop() поймал "Call Ready" во время фазы INIT_RST_HIGH
+static bool     _callReadyReceived = false;
+
+// Флаг ручного ресета из веб-интерфейса
+static bool     _manualRestart = false;
+
+// ── Стейт-машина инициализации ────────────────────────────────────────────────
+//
+//  INIT_RST_LOW  → держим RST=LOW 200 мс
+//  INIT_RST_HIGH → подняли RST, ждём "Call Ready" до 15 сек
+//  INIT_CMD      → шлём команды по одной, ждём 500 мс между ними
+//  INIT_DONE     → инициализация завершена, loop() работает штатно
+//
+enum InitState { INIT_RST_LOW, INIT_RST_HIGH, INIT_CMD, INIT_DONE };
+static InitState _initState = INIT_RST_LOW;
+
+static uint32_t _initTimer   = 0;
+static uint8_t  _initCmdIdx  = 0;
+
+static const char* _initCmds[] = {
+    "AT",
+    "ATE0",
+    "AT+CLIP=1",
+    "AT+DDET=1,0,0",
+    "AT+CREG=2",
+};
+static const uint8_t _initCmdsCount = sizeof(_initCmds) / sizeof(_initCmds[0]);
+
+// ── Состояние опросчика ───────────────────────────────────────────────────────
+enum PollState { POLL_IDLE, POLL_WAIT_CREG, POLL_WAIT_CSQ, POLL_WAIT_CBC, POLL_WAIT_COPS };
+static PollState _pollState = POLL_IDLE;
+
+static uint32_t _pollTimer    = 0;
+static uint32_t _pollCmdTimer = 0;
+static ModemStatus _newStatus;
+
+// ── Вотчдог регистрации ───────────────────────────────────────────────────────
+//
+//  WD_OK   → сеть есть, опрос AT+CREG? раз в 30 сек
+//  WD_WARN → сеть пропала, опрос каждые 10 сек
+//
+//  WD_OK  → WD_WARN: creg=0/3 из опроса или URC из потока
+//  WD_WARN → WD_OK:  creg=1/5
+//  6 плохих ответов подряд → перезагрузка модема
+//
+enum WdState { WD_OK, WD_WARN };
+static WdState  _wdState      = WD_OK;
+static uint32_t _wdTimer      = 0;
+static uint8_t  _wdFailCount  = 0;
+static bool     _wdPollActive  = false;  // true = текущий опрос инициирован вотчдогом
+static bool     _wdEverOnline  = false;  // true = creg=1/5 был хоть раз после старта
+
+#define WD_INTERVAL_OK    30000u   // мс между опросами в норме
+#define WD_INTERVAL_WARN  10000u   // мс между опросами при потере сети
+#define WD_MAX_FAILS      6        // сколько плохих ответов до перезагрузки
+
+// ── HTML ─────────────────────────────────────────────────────────────────────
+static const char MODEM_TAB_HTML[] PROGMEM = R"html(
+<div class="settings-group">
+  <label class="toggle-row">
+    <span>Включить модем</span>
+    <input type="checkbox" id="modem_enabled" onchange="modemToggle()">
+  </label>
+  <div id="modem_fields">
+    <label>GPIO RX (ESP←SIM TX)</label>
+    <input type="number" name="modem_rx_pin" placeholder="4">
+    <label>GPIO TX (ESP→SIM RX)</label>
+    <input type="number" name="modem_tx_pin" placeholder="2">
+    <label>GPIO RST (-1 = не используется)</label>
+    <input type="number" name="modem_rst_pin" placeholder="33">
+    <label>GPIO RI (-1 = не используется)</label>
+    <input type="number" name="modem_ri_pin" placeholder="-1">
+    <label>Baudrate</label>
+    <input type="number" name="modem_baud" placeholder="9600">
+    <label>Таймаут DTMF (сек)</label>
+    <input type="number" name="modem_dtmf_timeout" placeholder="10">
+    <label>Интервал опроса статуса (сек)</label>
+    <input type="number" name="modem_poll_interval" placeholder="60">
+    <button onclick="saveModem()">💾 Сохранить</button>
+  </div>
+</div>
+<div class="settings-group">
+  <h3>📊 Статус модема</h3>
+  <div id="modem_status" style="font-size:12px;color:var(--muted)">загрузка...</div>
+</div>
+<div class="settings-group">
+  <h3>📟 Терминал</h3>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <input type="text" id="at_cmd" placeholder="AT+CREG?" style="margin:0;flex:1">
+    <button onclick="sendAT()" style="width:auto;padding:10px 16px;margin:0">▶ Send</button>
+  </div>
+  <pre id="modem_log" style="font-size:11px;color:var(--muted);height:220px;overflow-y:auto;
+    white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:6px;
+    border:1px solid var(--border)"></pre>
+  <button onclick="clearModemLog()" style="margin-top:6px">🗑 Очистить</button>
+</div>
+<div class="settings-group">
+  <h3>📋 Системный лог</h3>
+  <pre id="sys_log" style="font-size:11px;color:var(--muted);height:160px;overflow-y:auto;
+    white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:6px;
+    border:1px solid var(--border)"></pre>
+  <button onclick="clearSysLog()" style="margin-top:6px">🗑 Очистить</button>
+</div>
+<div class="settings-group">
+  <h3>🔧 Управление модемом</h3>
+  <button onclick="restartModem()" class="btn-danger">🔄 Перезагрузить модем</button>
+</div>
+<script>
+async function loadModem() {
+  const r = await fetch('/api/modem/config');
+  const d = await r.json();
+  document.getElementById('modem_enabled').checked = d.enabled;
+  ['rx_pin','tx_pin','rst_pin','ri_pin','baud','dtmf_timeout','poll_interval'].forEach(k => {
+    const el = document.querySelector('[name="modem_'+k+'"]');
+    if (el) el.value = d[k];
+  });
+  modemToggle();
+}
+function modemToggle() {
+  document.getElementById('modem_fields').style.display =
+    document.getElementById('modem_enabled').checked ? 'block' : 'none';
+}
+async function saveModem() {
+  const d = {
+    enabled:       document.getElementById('modem_enabled').checked,
+    rx_pin:        +document.querySelector('[name="modem_rx_pin"]').value,
+    tx_pin:        +document.querySelector('[name="modem_tx_pin"]').value,
+    rst_pin:       +document.querySelector('[name="modem_rst_pin"]').value,
+    ri_pin:        +document.querySelector('[name="modem_ri_pin"]').value,
+    baud:          +document.querySelector('[name="modem_baud"]').value,
+    dtmf_timeout:  +document.querySelector('[name="modem_dtmf_timeout"]').value,
+    poll_interval: +document.querySelector('[name="modem_poll_interval"]').value,
+  };
+  const r = await fetch('/api/modem/save',
+    {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(d)});
+  if (r.ok) alert('Сохранено, перезагрузите устройство');
+}
+async function sendAT() {
+  const cmd = document.getElementById('at_cmd').value.trim();
+  if (!cmd) return;
+  await fetch('/api/modem/at', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body:JSON.stringify({cmd})});
+  document.getElementById('at_cmd').value = '';
+}
+document.getElementById('at_cmd').addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendAT();
+});
+async function loadModemLog() {
+  const r = await fetch('/api/modem/log');
+  const d = await r.json();
+  const el = document.getElementById('modem_log');
+  const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 5;
+  el.textContent = d.log || '';
+  if (atBottom) el.scrollTop = el.scrollHeight;
+}
+async function loadModemStatus() {
+  const r = await fetch('/api/modem/status');
+  const d = await r.json();
+  const regMap = {'-1':'неизвестно','0':'не зарегистрирован','1':'домашняя сеть',
+    '2':'поиск...','3':'отказ','5':'роуминг'};
+  document.getElementById('modem_status').innerHTML =
+    `<b>Сеть:</b> ${regMap[String(d.creg)] || d.creg} &nbsp;
+     <b>Сигнал:</b> ${d.csq == 99 ? 'нет' : d.csq} &nbsp;
+     <b>Питание:</b> ${d.vbat > 0 ? (d.vbat/1000).toFixed(3)+'V' : '—'} &nbsp;
+     <b>Оператор:</b> ${d.oper || '—'}`;
+}
+async function clearModemLog() {
+  await fetch('/api/modem/log/clear', {method:'POST'});
+  document.getElementById('modem_log').textContent = '';
+}
+async function loadSysLog() {
+  const r = await fetch('/api/syslog');
+  const d = await r.json();
+  const el = document.getElementById('sys_log');
+  const atBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 5;
+  el.textContent = d.log || '';
+  if (atBottom) el.scrollTop = el.scrollHeight;
+}
+async function clearSysLog() {
+  await fetch('/api/syslog/clear', {method:'POST'});
+  document.getElementById('sys_log').textContent = '';
+}
+async function restartModem() {
+  if (!confirm('Перезагрузить модем?')) return;
+  await fetch('/api/modem/restart', {method:'POST'});
+}
+loadModem();
+loadModemLog();
+loadModemStatus();
+loadSysLog();
+setInterval(loadModemLog, 2000);
+setInterval(loadModemStatus, 10000);
+setInterval(loadSysLog, 5000);
+</script>
+)html";
+
+// ── Config ───────────────────────────────────────────────────────────────────
+bool ModemHandler::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/modem.json", doc)) return false;
+    modemCfg.enabled       = doc["enabled"]       | true;
+    modemCfg.rx_pin        = doc["rx_pin"]         | 4;
+    modemCfg.tx_pin        = doc["tx_pin"]         | 2;
+    modemCfg.rst_pin       = doc["rst_pin"]        | 33;
+    modemCfg.ri_pin        = doc["ri_pin"]         | -1;
+    modemCfg.baud          = doc["baud"]           | 9600;
+    modemCfg.dtmf_timeout  = doc["dtmf_timeout"]   | 10;
+    modemCfg.poll_interval = doc["poll_interval"]  | 60;
+    return true;
+}
+
+bool ModemHandler::saveConfig() {
+    JsonDocument doc;
+    doc["enabled"]       = modemCfg.enabled;
+    doc["rx_pin"]        = modemCfg.rx_pin;
+    doc["tx_pin"]        = modemCfg.tx_pin;
+    doc["rst_pin"]       = modemCfg.rst_pin;
+    doc["ri_pin"]        = modemCfg.ri_pin;
+    doc["baud"]          = modemCfg.baud;
+    doc["dtmf_timeout"]  = modemCfg.dtmf_timeout;
+    doc["poll_interval"] = modemCfg.poll_interval;
+    return ConfigManager::saveJson("/modem.json", doc);
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+void ModemHandler::init() {
+    loadConfig();
+    if (!modemCfg.enabled) { Serial.println("[MODEM] Disabled"); return; }
+
+    if (modemCfg.ri_pin >= 0)
+        pinMode(modemCfg.ri_pin, INPUT);
+
+    _sim.begin(modemCfg.baud, SERIAL_8N1, modemCfg.rx_pin, modemCfg.tx_pin);
+
+    WebHandler::registerTab({"modem", "Модем 📞", "📞", MODEM_TAB_HTML});
+
+    extern AsyncWebServer server;
+
+    server.on("/api/modem/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["enabled"]       = modemCfg.enabled;
+        doc["rx_pin"]        = modemCfg.rx_pin;
+        doc["tx_pin"]        = modemCfg.tx_pin;
+        doc["rst_pin"]       = modemCfg.rst_pin;
+        doc["ri_pin"]        = modemCfg.ri_pin;
+        doc["baud"]          = modemCfg.baud;
+        doc["dtmf_timeout"]  = modemCfg.dtmf_timeout;
+        doc["poll_interval"] = modemCfg.poll_interval;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    auto* hSave = new AsyncCallbackJsonWebHandler("/api/modem/save",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject o = json.as<JsonObject>();
+            modemCfg.enabled       = o["enabled"]       | true;
+            modemCfg.rx_pin        = o["rx_pin"]         | 4;
+            modemCfg.tx_pin        = o["tx_pin"]         | 2;
+            modemCfg.rst_pin       = o["rst_pin"]        | 33;
+            modemCfg.ri_pin        = o["ri_pin"]         | -1;
+            modemCfg.baud          = o["baud"]           | 9600;
+            modemCfg.dtmf_timeout  = o["dtmf_timeout"]   | 10;
+            modemCfg.poll_interval = o["poll_interval"]  | 60;
+            ModemHandler::saveConfig();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(hSave);
+
+    auto* hAT = new AsyncCallbackJsonWebHandler("/api/modem/at",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            String cmd = json["cmd"] | "";
+            if (cmd.length() > 0) ModemHandler::sendAT(cmd.c_str());
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(hAT);
+
+    server.on("/api/modem/log", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["log"] = _modemLog;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    server.on("/api/modem/log/clear", HTTP_POST, [](AsyncWebServerRequest* req) {
+        _modemLog = "";
+        req->send(200, "application/json", "{\"status\":\"ok\"}");
+    });
+
+    server.on("/api/modem/status", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["creg"] = modemStatus.creg;
+        doc["csq"]  = modemStatus.csq;
+        doc["vbat"] = modemStatus.vbat;
+        doc["oper"] = modemStatus.oper;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    server.on("/api/modem/restart", HTTP_POST, [](AsyncWebServerRequest* req) {
+        _manualRestart = true;
+        req->send(200, "application/json", "{\"status\":\"ok\"}");
+    });
+
+    // Запускаем стейт-машину инициализации с RST_LOW (или сразу RST_HIGH если
+    // пин не задан)
+    if (modemCfg.rst_pin >= 0) {
+        pinMode(modemCfg.rst_pin, OUTPUT);
+        digitalWrite(modemCfg.rst_pin, LOW);
+        _initState = INIT_RST_LOW;
+        _addLog("Resetting modem...");
+    } else {
+        // RST не используется — сразу ждём Call Ready
+        _initState = INIT_RST_HIGH;
+        _addLog("Waiting for Call Ready...");
+    }
+    _initTimer = millis();
+
+    // Первый опрос запустим после завершения инициализации (_initTick сам
+    // выставит _pollTimer в момент перехода в INIT_DONE)
+    Serial.println("[MODEM] Init started (non-blocking)");
+}
+
+// ── Стейт-машина инициализации ────────────────────────────────────────────────
+void ModemHandler::_initTick() {
+    switch (_initState) {
+
+    case INIT_RST_LOW:
+        // Держим RST=LOW 200 мс, затем поднимаем
+        if (millis() - _initTimer >= 200) {
+            digitalWrite(modemCfg.rst_pin, HIGH);
+            _initState = INIT_RST_HIGH;
+            _initTimer = millis();
+            _addLog("Waiting for Call Ready...");
+        }
+        break;
+
+    case INIT_RST_HIGH:
+        // Ждём "Call Ready" — детект идёт в loop() через _callReadyReceived.
+        // Таймаут 30 сек — SIM800L может стартовать долго.
+        if (_callReadyReceived || millis() - _initTimer >= 30000) {
+            if (_callReadyReceived)
+                _addLog("Call Ready received");
+            else
+                _addLog("Call Ready timeout, proceeding anyway");
+            _callReadyReceived = false;
+            _initCmdIdx = 0;
+            _initState  = INIT_CMD;
+            _initTimer  = millis();
+            sendAT(_initCmds[_initCmdIdx]);
+        }
+        break;
+
+    case INIT_CMD:
+        // Пауза 500 мс после каждой команды, затем следующая
+        if (millis() - _initTimer >= 500) {
+            _initCmdIdx++;
+            if (_initCmdIdx >= _initCmdsCount) {
+                _addLog("Init done");
+                _initState  = INIT_DONE;
+                _pollTimer  = millis();   // первый опрос через poll_interval
+                _wdTimer    = millis();   // первый вотчдог через WD_INTERVAL_OK
+                Serial.println("[MODEM] Ready");
+            } else {
+                sendAT(_initCmds[_initCmdIdx]);
+                _initTimer = millis();
+            }
+        }
+        break;
+
+    case INIT_DONE:
+        // Ничего — обычный loop() работает
+        break;
+    }
+}
+
+// ── Loop ─────────────────────────────────────────────────────────────────────
+void ModemHandler::loop() {
+    if (!modemCfg.enabled) return;
+
+    // Читаем все доступные байты из UART
+    while (_sim.available()) {
+        char c = (char)_sim.read();
+        _modemLog += c;
+        if (_modemLog.length() > 4096)
+            _modemLog = _modemLog.substring(_modemLog.length() - 4096);
+
+        // SIM800L завершает строки через \r\n или только \r
+        // Обрабатываем буфер при любом из них
+        if (c == '\n' || c == '\r') {
+            _lineBuffer.trim();
+            if (_lineBuffer.length() > 0) {
+                // "Call Ready" детектируем всегда — нужен и во время INIT_RST_HIGH
+                if (_lineBuffer == "Call Ready")
+                    _callReadyReceived = true;
+
+                if (_initState == INIT_DONE) {
+                    _processLine(_lineBuffer);
+                    _parsePollResponse(_lineBuffer);
+                }
+            }
+            _lineBuffer = "";
+        } else {
+            _lineBuffer += c;
+        }
+    }
+
+    // Тик инициализации (завершается переходом в INIT_DONE)
+    if (_initState != INIT_DONE) {
+        _initTick();
+        return;   // пока не инициализировались — больше ничего не делаем
+    }
+
+    // Ручной ресет из веб-интерфейса
+    if (_manualRestart) {
+        _manualRestart = false;
+        _sysLog("Manual modem restart requested");
+        _wdRestart();
+        return;
+    }
+
+    // Таймаут poll — проверяем здесь, а не внутри _parsePollResponse,
+    // чтобы он срабатывал даже если модем полностью молчит
+    if (_pollState != POLL_IDLE && millis() - _pollCmdTimer > 15000) {
+        _addLog("Poll timeout");
+        _pollState = POLL_IDLE;
+        _pollTimer = millis();
+    }
+
+    _checkAnswerDelay();
+    _checkTimeout();
+    _wdTick();
+    _pollTick();
+}
+
+// ── AT helper ────────────────────────────────────────────────────────────────
+void ModemHandler::sendAT(const char* cmd) {
+    _sim.println(cmd);
+    _addLog(String(">> ") + cmd);
+}
+
+// ── Парсер входящих строк (звонок) ───────────────────────────────────────────
+void ModemHandler::_processLine(const String& line) {
+    Serial.println("[MODEM] << " + line);
+
+    if (line == "RING") {
+        if (_callState == CALL_IDLE) {
+            _callState = CALL_RINGING;
+            _callerNum = "";
+            _dtmfSeq   = "";
+        }
+        return;
+    }
+    if (line.startsWith("+CLIP:") && _callState == CALL_RINGING) {
+        _onClip(line); return;
+    }
+    if (line.startsWith("+DTMF:") && _callState == CALL_IN_CALL) {
+        String rest = line.substring(6); rest.trim();
+        if (rest.length() > 0) _onDTMF(rest.charAt(0));
+        return;
+    }
+    if (line == "NO CARRIER" || line == "BUSY" || line == "NO ANSWER") {
+        _onNoCarrier(); return;
+    }
+    // URC: модем сам сообщает об изменении регистрации (AT+CREG=2 включён при init)
+    // URC формат: +CREG: <stat>,"<lac>","<ci>"  — stat сразу после пробела, без <n>
+    // Отличие от ответа на запрос: в URC нет числа перед первой запятой (там буква или кавычка)
+    if (line.startsWith("+CREG:") && _pollState == POLL_IDLE) {
+        int sp = line.indexOf(' ');
+        if (sp < 0) return;
+        // stat — первый символ после пробела
+        int stat = line.substring(sp + 1, sp + 2).toInt();
+        _addLog("URC CREG: " + String(stat));
+        _wdHandleCreg(stat);
+        modemStatus.creg = stat;
+        return;
+    }
+}
+
+// ── Парсер ответов опроса ─────────────────────────────────────────────────────
+void ModemHandler::_parsePollResponse(const String& line) {
+    if (line.startsWith("+CREG:") && _pollState == POLL_WAIT_CREG) {
+        // AT+CREG=2 возвращает: +CREG: <n>,<stat>[,<lac>,<ci>[,<AcT>]]
+        // AT+CREG=0 возвращает: +CREG: <stat>
+        // Нам нужен <stat> — второй элемент при наличии запятой, иначе первый
+        int comma = line.indexOf(',');
+        if (comma > 0) {
+            // Берём следующий символ после запятой (stat — одна цифра)
+            _newStatus.creg = line.substring(comma + 1, comma + 2).toInt();
+        } else {
+            // Нет запятой: +CREG: <stat>
+            int space = line.indexOf(' ');
+            _newStatus.creg = (space > 0)
+                ? line.substring(space + 1, space + 2).toInt()
+                : line.substring(7, 8).toInt();
+        }
+        // Сообщаем вотчдогу результат
+        _wdHandleCreg(_newStatus.creg);
+
+        // Если опрос инициирован вотчдогом — только CREG, без CSQ/CBC/COPS
+        if (_wdPollActive) {
+            _wdPollActive = false;
+            modemStatus.creg = _newStatus.creg;
+            _pollState = POLL_IDLE;
+            // Считаем failures только если хоть раз были онлайн
+            // (не трогаем модем пока он первый раз ищет сеть после старта)
+            if (_wdState == WD_WARN && _wdEverOnline) {
+                if (_newStatus.creg != 1 && _newStatus.creg != 5) {
+                    _wdFailCount++;
+                    _addLog("Watchdog: fail " + String(_wdFailCount) + "/" + String(WD_MAX_FAILS));
+                    if (_wdFailCount >= WD_MAX_FAILS)
+                        _wdRestart();
+                }
+            }
+            return;
+        }
+
+        _pollState    = POLL_WAIT_CSQ;
+        _pollCmdTimer = millis();
+        sendAT("AT+CSQ");
+        return;
+    }
+    if (line.startsWith("+CSQ:") && _pollState == POLL_WAIT_CSQ) {
+        int s = line.indexOf(' '), c = line.indexOf(',');
+        if (s > 0 && c > s) _newStatus.csq = line.substring(s + 1, c).toInt();
+        _pollState    = POLL_WAIT_CBC;
+        _pollCmdTimer = millis();
+        sendAT("AT+CBC");
+        return;
+    }
+    if (line.startsWith("+CBC:") && _pollState == POLL_WAIT_CBC) {
+        int c1 = line.indexOf(',');
+        int c2 = (c1 > 0) ? line.indexOf(',', c1 + 1) : -1;
+        if (c2 > 0) _newStatus.vbat = line.substring(c2 + 1).toInt();
+        _pollState    = POLL_WAIT_COPS;
+        _pollCmdTimer = millis();
+        sendAT("AT+COPS?");
+        return;
+    }
+    if (line.startsWith("+COPS:") && _pollState == POLL_WAIT_COPS) {
+        int q1 = line.indexOf('"');
+        int q2 = (q1 >= 0) ? line.indexOf('"', q1 + 1) : -1;
+        if (q2 > q1)
+            strlcpy(_newStatus.oper, line.substring(q1 + 1, q2).c_str(), sizeof(_newStatus.oper));
+        else
+            strlcpy(_newStatus.oper, "", sizeof(_newStatus.oper));
+        _pollState = POLL_IDLE;
+        _pollTimer = millis();
+        _publishStatusIfChanged();
+        return;
+    }
+}
+
+// ── Запуск цикла опроса ───────────────────────────────────────────────────────
+void ModemHandler::_pollTick() {
+    if (_callState != CALL_IDLE)   return;
+    if (_pollState != POLL_IDLE) return;
+    if (millis() - _pollTimer < (uint32_t)modemCfg.poll_interval * 1000) return;
+    _newStatus    = ModemStatus();
+    _pollState    = POLL_WAIT_CREG;
+    _pollCmdTimer = millis();
+    sendAT("AT+CREG?");
+}
+
+// ── Публикация если изменилось ────────────────────────────────────────────────
+void ModemHandler::_publishStatusIfChanged() {
+    bool changed =
+        _newStatus.creg != modemStatus.creg ||
+        _newStatus.csq  != modemStatus.csq  ||
+        abs(_newStatus.vbat - modemStatus.vbat) > 50 ||
+        strcmp(_newStatus.oper, modemStatus.oper) != 0;
+
+    if (!changed) { _addLog("Status poll: no changes"); return; }
+
+    modemStatus = _newStatus;
+
+    JsonDocument doc;
+    doc["creg"] = modemStatus.creg;
+    doc["csq"]  = modemStatus.csq;
+    doc["vbat"] = modemStatus.vbat;
+    doc["oper"] = modemStatus.oper;
+    String payload;
+    serializeJson(doc, payload);
+    _addLog("Status changed: " + payload);
+
+#ifdef MODULE_MQTT
+    String topic = String(baseCfg.device_name) + "/modem/status";
+    MqttHandler::publish(topic.c_str(), payload.c_str(), true);
+#endif
+}
+
+// ── Обработка звонка ─────────────────────────────────────────────────────────
+void ModemHandler::_onClip(const String& line) {
+    int s = line.indexOf('"');
+    int e = (s >= 0) ? line.indexOf('"', s + 1) : -1;
+    _callerNum = (e > s) ? _normalizePhone(line.substring(s + 1, e)) : "unknown";
+    _addLog("Incoming: " + _callerNum);
+
+    // Снимаем трубку, затем AT+CMUT=1 через 500 мс — неблокирующий таймер
+    sendAT("ATA");
+    _answerPending = true;
+    _answerAt      = millis();
+
+    _callStart = millis();
+    _dtmfSeq   = "";
+}
+
+// Вызывается каждый loop() — отправляет AT+CMUT=1 через 500 мс после ATA
+void ModemHandler::_checkAnswerDelay() {
+    if (!_answerPending) return;
+    if (millis() - _answerAt < 300) return;
+
+    sendAT("AT+CMUT=1");
+    _callState     = CALL_IN_CALL;
+    _answerPending = false;
+    _addLog("Answered, waiting DTMF...");
+}
+
+void ModemHandler::_onDTMF(char digit) {
+    _dtmfSeq += digit;
+    _addLog(String("DTMF: ") + digit + " (seq: " + _dtmfSeq + ")");
+}
+
+void ModemHandler::_onNoCarrier() {
+    if (_callState == CALL_IN_CALL && _dtmfSeq.length() > 0) {
+        _addLog("Call ended, result: " + _callerNum + " - " + _dtmfSeq);
+        _notifyResult();
+    } else if (_callState == CALL_IN_CALL) {
+        _addLog("Call ended, no DTMF");
+    }
+    _answerPending = false;
+    _callState     = CALL_IDLE;
+    _callerNum     = "";
+    _dtmfSeq       = "";
+}
+
+void ModemHandler::_checkTimeout() {
+    if (_callState != CALL_IN_CALL) return;
+    if (millis() - _callStart < (uint32_t)modemCfg.dtmf_timeout * 1000) return;
+    _addLog("DTMF timeout");
+    sendAT("ATH");
+    // Уведомляем до сброса состояния, чтобы колбэк видел актуальные данные
+    if (_dtmfSeq.length() > 0) _notifyResult();
+    else _addLog("No DTMF received");
+    _callState = CALL_IDLE;
+    _callerNum = "";
+    _dtmfSeq   = "";
+}
+
+void ModemHandler::_notifyResult() {
+    String msg = _callerNum + " - " + _dtmfSeq;
+    _addLog("Publishing DTMF: " + msg);
+#ifdef MODULE_MQTT
+    String topic = String(baseCfg.device_name) + "/modem/dtmf";
+    MqttHandler::publish(topic.c_str(), msg.c_str());
+#endif
+#ifdef MODULE_TELEGRAM
+    TgHandler::sendMessage("📞 " + msg);
+#endif
+    if (onDTMFResult) onDTMFResult(_callerNum.c_str(), _dtmfSeq.c_str());
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+String ModemHandler::_normalizePhone(const String& phone) {
+    String result;
+    bool leadingPlusDone = false;
+    for (unsigned int i = 0; i < phone.length(); i++) {
+        char c = phone.charAt(i);
+        if (!leadingPlusDone && c == '+') {
+            result += '+';
+            leadingPlusDone = true;
+            continue;
+        }
+        if (isdigit(c)) {
+            result += c;
+            leadingPlusDone = true;   // после первой цифры '+' уже недопустим
+        }
+    }
+    if (result.startsWith("8") && result.length() == 11)
+        result = "+7" + result.substring(1);
+    return result;
+}
+
+// ── Вотчдог: обработка результата creg ───────────────────────────────────────
+// Вызывается из _parsePollResponse и при URC +CREG: в _processLine
+void ModemHandler::_wdHandleCreg(int stat) {
+    bool ok = (stat == 1 || stat == 5);
+
+    if (ok) {
+        if (_wdState == WD_WARN)
+            _addLog("Watchdog: network restored");
+        _wdEverOnline = true;
+        _wdState      = WD_OK;
+        _wdFailCount  = 0;
+        _wdTimer      = millis();
+        return;
+    }
+
+    // stat == 0 — явная потеря сети → входим в режим восстановления
+    // stat == 2 — поиск (временно, ждём) → не трогаем
+    // stat == 3 — отказ регистрации → ждём, модем сам повторит попытку
+    if (_wdState == WD_OK && stat == 0) {
+        _addLog("Watchdog: network lost, entering recovery mode");
+        _wdState     = WD_WARN;
+        _wdFailCount = 0;
+        _wdTimer     = millis();
+    }
+}
+
+// ── Вотчдог: тик (вызывается из loop каждый цикл) ────────────────────────────
+void ModemHandler::_wdTick() {
+    if (_callState != CALL_IDLE) return;    // не трогаем во время звонка
+    if (_pollState != POLL_IDLE) return;    // poll уже идёт — подождём
+
+    uint32_t interval = (_wdState == WD_WARN) ? WD_INTERVAL_WARN : WD_INTERVAL_OK;
+    if (millis() - _wdTimer < interval) return;
+
+    _wdTimer = millis();
+
+    // Отправляем AT+CREG? — ответ придёт через _parsePollResponse
+    // Используем отдельный мини-опрос: только CREG, без CSQ/CBC/COPS
+    _pollState    = POLL_WAIT_CREG;
+    _pollCmdTimer = millis();
+    _newStatus    = modemStatus;   // сохраняем остальные поля как есть
+    _wdPollActive = true;          // этот опрос — только CREG, без CSQ/CBC/COPS
+    sendAT("AT+CREG?");
+}
+
+// ── Перезагрузка модема вотчдогом ────────────────────────────────────────────
+void ModemHandler::_wdRestart() {
+    _addLog("Watchdog: restarting modem after " + String(WD_MAX_FAILS) + " failures");
+
+#ifdef MODULE_MQTT
+    JsonDocument doc;
+    doc["creg"]         = modemStatus.creg;
+    doc["csq"]          = modemStatus.csq;
+    doc["vbat"]         = modemStatus.vbat;
+    doc["oper"]         = modemStatus.oper;
+    doc["reboot_reason"] = "watchdog";
+    String payload;
+    serializeJson(doc, payload);
+    String topic = String(baseCfg.device_name) + "/modem/status";
+    MqttHandler::publish(topic.c_str(), payload.c_str(), true);
+#endif
+
+    // Сбрасываем состояние вотчдога
+    _wdState      = WD_OK;
+    _wdFailCount  = 0;
+    _wdPollActive = false;
+    _wdEverOnline = false;
+    _wdTimer      = millis();
+
+    // Сбрасываем состояние звонка на случай зависшего IN_CALL
+    _callState     = CALL_IDLE;
+    _answerPending = false;
+    _callerNum     = "";
+    _dtmfSeq       = "";
+
+    // Запускаем полный рестарт модема через statemachine
+    if (modemCfg.rst_pin >= 0) {
+        digitalWrite(modemCfg.rst_pin, LOW);
+        _initState = INIT_RST_LOW;
+    } else {
+        _initState = INIT_RST_HIGH;
+    }
+    _initTimer  = millis();
+    _initCmdIdx = 0;
+    _pollState  = POLL_IDLE;
+}
+
+
+// ── Системный лог (важные события → LittleFS /syslog.txt) ──────────────────
+void ModemHandler::_sysLog(const String& msg) {
+    // Формируем строку: uptime + сообщение
+    uint32_t s = millis() / 1000;
+    char ts[16];
+    snprintf(ts, sizeof(ts), "[%02lu:%02lu:%02lu] ", s/3600, (s%3600)/60, s%60);
+    String line = String(ts) + msg + "\n";
+
+    Serial.println("[SYSLOG] " + msg);
+
+    // Дописываем в файл, ротация: если > 8 КБ — обрезаем старое
+    File f = LittleFS.open("/syslog.txt", "a");
+    if (f) {
+        f.print(line);
+        f.close();
+    }
+
+    // Ротация
+    File fr = LittleFS.open("/syslog.txt", "r");
+    if (fr && fr.size() > 8192) {
+        fr.close();
+        // Читаем, отрезаем первую половину
+        File fr2 = LittleFS.open("/syslog.txt", "r");
+        String content = "";
+        if (fr2) {
+            fr2.seek(fr2.size() / 2);
+            // Пропускаем до первого \n чтобы не начинать с середины строки
+            while (fr2.available() && fr2.read() != '\n') {}
+            while (fr2.available()) content += (char)fr2.read();
+            fr2.close();
+        }
+        File fw = LittleFS.open("/syslog.txt", "w");
+        if (fw) { fw.print(content); fw.close(); }
+    } else if (fr) {
+        fr.close();
+    }
+}
+
+void ModemHandler::_addLog(const String& msg) {
+    Serial.println("[MODEM] " + msg);
+    _modemLog += msg + "\n";
+    if (_modemLog.length() > 4096)
+        _modemLog = _modemLog.substring(_modemLog.length() - 4096);
+
+    // Важные события дублируем в системный лог
+    if (msg.startsWith("Watchdog") ||
+        msg.startsWith("Init done") ||
+        msg.startsWith("Call Ready") ||
+        msg.startsWith("Manual") ||
+        msg.startsWith("Incoming") ||
+        msg.startsWith("Publishing DTMF"))
+        _sysLog(msg);
+}
+
+#endif // MODULE_MODEM
+```
+
+---
+
+### <a id="📄-src-modules-modem-modemhandler-h"></a>📄 `src/modules/modem/ModemHandler.h`
+
+**File Info:**
+- **Size**: 2.9 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/modules/modem/ModemHandler.h`
+- **Relative Path**: `src/modules/modem`
+- **Created**: 2026-04-17 05:26:39 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-04-20 07:13:56 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `e077d9e3f485f02eaa323c603c4c5682`
+- **SHA256**: `2d8a9f2fa5bdabe865cee2975c1d0eda22625d7735df76437aef0a07c1548b35`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef MODULE_MODEM
+
+#include <HardwareSerial.h>
+#include "../../core/CoreTypes.h"
+
+// ── Конфиг (сохраняется в /modem.json) ──────────────────────────────────────
+struct ModemConfig {
+    bool    enabled        = true;
+    int     rx_pin         = 4;
+    int     tx_pin         = 2;
+    int     rst_pin        = 33;   // RST модема, -1 = не используется
+    int     ri_pin         = -1;   // RI,  -1 = не используется
+    int     baud           = 9600;
+    int     dtmf_timeout   = 10;
+    int     poll_interval  = 60;
+};
+
+extern ModemConfig modemCfg;
+
+// ── Последнее известное состояние модема ─────────────────────────────────────
+struct ModemStatus {
+    int     creg     = -1;
+    int     csq      = -1;
+    int     vbat     = -1;
+    char    oper[32] = "";
+};
+
+extern ModemStatus modemStatus;
+
+class ModemHandler {
+public:
+    static void init();
+    static void loop();
+    static void sendAT(const char* cmd);
+    static void (*onDTMFResult)(const char* callerNum, const char* dtmf);
+    static bool loadConfig();
+    static bool saveConfig();
+
+private:
+    // ── Стейт-машина инициализации ────────────────────────────────────────────
+    static void _initTick();
+
+    // ── Обработка звонка ──────────────────────────────────────────────────────
+    static void _processLine(const String& line);
+    static void _onClip(const String& line);
+    static void _onDTMF(char digit);
+    static void _onNoCarrier();
+    static void _checkTimeout();
+    static void _checkAnswerDelay();    // неблокирующая задержка после ATA
+    static void _notifyResult();
+
+    // ── Опрос статуса ─────────────────────────────────────────────────────────
+    static void _pollTick();
+    static void _wdTick();
+    static void _wdHandleCreg(int stat);
+    static void _wdRestart();
+    static void _parsePollResponse(const String& line);
+    static void _publishStatusIfChanged();
+
+    // ── Вспомогательные ──────────────────────────────────────────────────────
+    static void _addLog(const String& msg);
+    static void _sysLog(const String& msg);
+    static String _normalizePhone(const String& phone);
+};
+
+#endif // MODULE_MODEM
+```
+
+---
+
+### <a id="📄-src-modules-mqtt-mqtthandler-cpp"></a>📄 `src/modules/mqtt/MqttHandler.cpp`
+
+**File Info:**
+- **Size**: 5.93 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/modules/mqtt/MqttHandler.cpp`
+- **Relative Path**: `src/modules/mqtt`
+- **Created**: 2026-02-17 12:57:02 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:57:02 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `77a78342da0e82fe46b608d9e81346d9`
+- **SHA256**: `4afe0862e07a53d2867aca2baf1d3c04bcf50a035ef962f6ad1674d4514f4fe1`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef MODULE_MQTT
+#include "MqttHandler.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+
+MqttConfig mqttCfg;
+
+void (*MqttHandler::onMessage)(const char*, const char*, unsigned int) = nullptr;
+
+static WiFiClient    _espClient;
+static PubSubClient  _client(_espClient);
+static uint32_t      _lastRetry = 0;
+
+// HTML вкладки настроек MQTT (PROGMEM)
+static const char MQTT_TAB_HTML[] PROGMEM = R"html(
+<div class="settings-group">
+  <label class="toggle-row">
+    <span>Включить MQTT</span>
+    <input type="checkbox" id="mqtt_enabled" onchange="mqttToggle()">
+  </label>
+  <div id="mqtt_fields">
+    <input type="text"     name="mqtt_server" placeholder="Broker (broker.emqx.io)">
+    <input type="number"   name="mqtt_port"   placeholder="Port" value="1883">
+    <input type="text"     name="mqtt_user"   placeholder="User (опционально)">
+    <input type="password" name="mqtt_pass"   placeholder="Password (опционально)">
+    <button onclick="saveMqtt()">💾 Сохранить MQTT</button>
+  </div>
+</div>
+<script>
+async function loadMqtt() {
+  const r = await fetch('/api/mqtt/config');
+  const d = await r.json();
+  document.getElementById('mqtt_enabled').checked = d.enabled;
+  Object.keys(d).forEach(k => {
+    const el = document.querySelector('[name="mqtt_'+k+'"]');
+    if (el) el.value = d[k];
+  });
+  mqttToggle();
+}
+function mqttToggle() {
+  document.getElementById('mqtt_fields').style.display =
+    document.getElementById('mqtt_enabled').checked ? 'block' : 'none';
+}
+async function saveMqtt() {
+  const data = {
+    enabled: document.getElementById('mqtt_enabled').checked,
+    server:  document.querySelector('[name="mqtt_server"]').value,
+    port:    +document.querySelector('[name="mqtt_port"]').value,
+    user:    document.querySelector('[name="mqtt_user"]').value,
+    pass:    document.querySelector('[name="mqtt_pass"]').value,
+  };
+  const r = await fetch('/api/mqtt/save', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+  if (r.ok) alert('MQTT сохранён');
+}
+loadMqtt();
+</script>
+)html";
+
+bool MqttHandler::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/mqtt.json", doc)) return false;
+    mqttCfg.enabled = doc["enabled"] | true;
+    strlcpy(mqttCfg.server, doc["server"] | "", sizeof(mqttCfg.server));
+    mqttCfg.port = doc["port"] | 1883;
+    strlcpy(mqttCfg.user, doc["user"] | "", sizeof(mqttCfg.user));
+    strlcpy(mqttCfg.pass, doc["pass"] | "", sizeof(mqttCfg.pass));
+    return true;
+}
+
+bool MqttHandler::saveConfig() {
+    JsonDocument doc;
+    doc["enabled"] = mqttCfg.enabled;
+    doc["server"]  = mqttCfg.server;
+    doc["port"]    = mqttCfg.port;
+    doc["user"]    = mqttCfg.user;
+    doc["pass"]    = mqttCfg.pass;
+    return ConfigManager::saveJson("/mqtt.json", doc);
+}
+
+void MqttHandler::init() {
+    loadConfig();
+
+    // Регистрируем вкладку настроек
+    WebHandler::registerTab({"mqtt", "MQTT", "📊", MQTT_TAB_HTML});
+
+    // API
+    extern AsyncWebServer server; // объявлен в main.cpp
+    server.on("/api/mqtt/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["enabled"] = mqttCfg.enabled;
+        doc["server"]  = mqttCfg.server;
+        doc["port"]    = mqttCfg.port;
+        doc["user"]    = mqttCfg.user;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    auto* h = new AsyncCallbackJsonWebHandler("/api/mqtt/save",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject obj = json.as<JsonObject>();
+            mqttCfg.enabled = obj["enabled"] | true;
+            strlcpy(mqttCfg.server, obj["server"] | "", sizeof(mqttCfg.server));
+            mqttCfg.port = obj["port"] | 1883;
+            strlcpy(mqttCfg.user, obj["user"] | "", sizeof(mqttCfg.user));
+            strlcpy(mqttCfg.pass, obj["pass"] | "", sizeof(mqttCfg.pass));
+            MqttHandler::saveConfig();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(h);
+
+    if (strlen(mqttCfg.server) > 0 && mqttCfg.enabled) {
+        _client.setServer(mqttCfg.server, mqttCfg.port);
+        _client.setCallback(_defaultCallback);
+    }
+
+    Serial.println("[MQTT] Init OK");
+}
+
+void MqttHandler::reconnect() {
+    if (millis() - _lastRetry < 5000) return;
+    _lastRetry = millis();
+
+    String clientId = String(baseCfg.device_name) + "-" + String(WiFi.macAddress());
+    bool ok = (strlen(mqttCfg.user) > 0)
+              ? _client.connect(clientId.c_str(), mqttCfg.user, mqttCfg.pass)
+              : _client.connect(clientId.c_str());
+
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    sysState.mqttConnected = ok;
+    xSemaphoreGive(coreMutex);
+
+    if (ok) {
+        Serial.println("[MQTT] Connected");
+        String sub = String(baseCfg.device_name) + "/set/#";
+        _client.subscribe(sub.c_str());
+    } else {
+        Serial.printf("[MQTT] Failed rc=%d\n", _client.state());
+    }
+}
+
+void MqttHandler::loop() {
+    if (!mqttCfg.enabled || strlen(mqttCfg.server) == 0) return;
+
+    bool hasNet = false;
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    hasNet = sysState.ethConnected || sysState.wifiConnected;
+    xSemaphoreGive(coreMutex);
+    if (!hasNet) return;
+
+    if (!_client.connected()) {
+        xSemaphoreTake(coreMutex, portMAX_DELAY);
+        sysState.mqttConnected = false;
+        xSemaphoreGive(coreMutex);
+        reconnect();
+    } else {
+        _client.loop();
+    }
+}
+
+void MqttHandler::publish(const char* topic, const char* payload, bool retained) {
+    if (_client.connected()) _client.publish(topic, payload, retained);
+}
+
+void MqttHandler::_defaultCallback(char* topic, byte* payload, unsigned int length) {
+    if (onMessage) {
+        char buf[length + 1];
+        memcpy(buf, payload, length);
+        buf[length] = '\0';
+        onMessage(topic, buf, length);
+    }
+}
+
+#endif // MODULE_MQTT
+
+```
+
+---
+
+### <a id="📄-src-modules-mqtt-mqtthandler-h"></a>📄 `src/modules/mqtt/MqttHandler.h`
+
+**File Info:**
+- **Size**: 992 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/modules/mqtt/MqttHandler.h`
+- **Relative Path**: `src/modules/mqtt`
+- **Created**: 2026-02-17 12:56:36 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:56:36 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `24692f63d150d60ed8ecf27849e0852f`
+- **SHA256**: `648b425aaccb48b131911dd29fea9ccf51750c3189905d098b81092d64af5e74`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef MODULE_MQTT
+
+#include <PubSubClient.h>
+#include <WiFi.h>
+#include "../core/CoreTypes.h"
+
+// Конфиг MQTT — сохраняется в /mqtt.json
+struct MqttConfig {
+    char server[64] = "";
+    int  port       = 1883;
+    char user[32]   = "";
+    char pass[32]   = "";
+    bool enabled    = true;
+};
+
+extern MqttConfig mqttCfg;
+
+class MqttHandler {
+public:
+    static void init();   // Вызвать после WebHandler::init()
+    static void loop();
+    static void publish(const char* topic, const char* payload, bool retained = false);
+    static bool loadConfig();
+    static bool saveConfig();
+
+    // Callback для входящих сообщений — устройство может переопределить
+    static void (*onMessage)(const char* topic, const char* payload, unsigned int len);
+
+private:
+    static void reconnect();
+    static void _defaultCallback(char* topic, byte* payload, unsigned int length);
+};
+
+#endif // MODULE_MQTT
+
+```
+
+---
+
+### <a id="📄-src-modules-telegram-tghandler-cpp"></a>📄 `src/modules/telegram/TgHandler.cpp`
+
+**File Info:**
+- **Size**: 6.78 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/modules/telegram/TgHandler.cpp`
+- **Relative Path**: `src/modules/telegram`
+- **Created**: 2026-02-17 12:57:38 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:57:38 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `3f2ee1a84c43aa8eae4532b139f99443`
+- **SHA256**: `52e6823235ff0ef263b901b1d9dbd804cf4c77d33620d3ed29024da5db9f3612`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef MODULE_TELEGRAM
+#include "TgHandler.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+
+TgConfig tgCfg;
+void (*TgHandler::onCommand)(const String&, const String&) = nullptr;
+
+static WiFiClientSecure _secClient;
+static UniversalTelegramBot _bot("", _secClient);
+static uint32_t _lastCheck = 0;
+
+static const char TG_TAB_HTML[] PROGMEM = R"html(
+<div class="settings-group">
+  <label class="toggle-row">
+    <span>Включить Telegram</span>
+    <input type="checkbox" id="tg_enabled" onchange="tgToggle()">
+  </label>
+  <div id="tg_fields">
+    <input type="text" name="tg_token"  placeholder="Bot Token">
+    <input type="text" name="tg_group"  placeholder="Group Chat ID (для алертов)">
+    <input type="text" name="tg_admin"  placeholder="Admin User ID (для команд)">
+    <button onclick="saveTg()">💾 Сохранить</button>
+  </div>
+  <div class="info-row" id="tg_status">...</div>
+</div>
+<script>
+async function loadTg() {
+  const r = await fetch('/api/tg/config');
+  const d = await r.json();
+  document.getElementById('tg_enabled').checked = d.enabled;
+  ['token','group','admin'].forEach(k => {
+    const el = document.querySelector('[name="tg_'+k+'"]');
+    if (el) el.value = d[k] || '';
+  });
+  tgToggle();
+}
+function tgToggle() {
+  document.getElementById('tg_fields').style.display =
+    document.getElementById('tg_enabled').checked ? 'block' : 'none';
+}
+async function saveTg() {
+  const data = {
+    enabled: document.getElementById('tg_enabled').checked,
+    token:   document.querySelector('[name="tg_token"]').value,
+    group:   document.querySelector('[name="tg_group"]').value,
+    admin:   document.querySelector('[name="tg_admin"]').value,
+  };
+  const r = await fetch('/api/tg/save', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+  if (r.ok) alert('Telegram сохранён. Перезагрузите устройство.');
+}
+loadTg();
+</script>
+)html";
+
+bool TgHandler::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/tg.json", doc)) return false;
+    tgCfg.enabled = doc["enabled"] | false;
+    strlcpy(tgCfg.token, doc["token"] | "", sizeof(tgCfg.token));
+    strlcpy(tgCfg.group, doc["group"] | "", sizeof(tgCfg.group));
+    strlcpy(tgCfg.admin, doc["admin"] | "", sizeof(tgCfg.admin));
+    return true;
+}
+
+bool TgHandler::saveConfig() {
+    JsonDocument doc;
+    doc["enabled"] = tgCfg.enabled;
+    doc["token"]   = tgCfg.token;
+    doc["group"]   = tgCfg.group;
+    doc["admin"]   = tgCfg.admin;
+    return ConfigManager::saveJson("/tg.json", doc);
+}
+
+void TgHandler::init() {
+    loadConfig();
+
+    WebHandler::registerTab({"telegram", "Telegram", "🤖", TG_TAB_HTML});
+
+    extern AsyncWebServer server;
+    server.on("/api/tg/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["enabled"] = tgCfg.enabled;
+        doc["token"]   = tgCfg.token;
+        doc["group"]   = tgCfg.group;
+        doc["admin"]   = tgCfg.admin;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    auto* h = new AsyncCallbackJsonWebHandler("/api/tg/save",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject obj = json.as<JsonObject>();
+            tgCfg.enabled = obj["enabled"] | false;
+            strlcpy(tgCfg.token, obj["token"] | "", sizeof(tgCfg.token));
+            strlcpy(tgCfg.group, obj["group"] | "", sizeof(tgCfg.group));
+            strlcpy(tgCfg.admin, obj["admin"] | "", sizeof(tgCfg.admin));
+            TgHandler::saveConfig();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(h);
+
+    if (!tgCfg.enabled || strlen(tgCfg.token) == 0) {
+        Serial.println("[TG] Disabled or no token");
+        return;
+    }
+
+    _secClient.setInsecure();
+    _bot.updateToken(tgCfg.token);
+    _secClient.setHandshakeTimeout(10000);
+    _bot.getUpdates(_bot.last_message_received + 1);
+    Serial.println("[TG] Init OK");
+}
+
+void TgHandler::sendMessage(const String& msg, const String& chatId) {
+    if (!tgCfg.enabled || strlen(tgCfg.token) == 0) return;
+    String target = (chatId == "") ? String(tgCfg.group) : chatId;
+    if (target.length() > 0) _bot.sendMessage(target, msg, "");
+}
+
+void TgHandler::handleMessages(int count) {
+    static long lastId = 0;
+    for (int i = 0; i < count; i++) {
+        long uid = _bot.messages[i].update_id;
+        if (uid <= lastId && lastId != 0) continue;
+
+        String chat = _bot.messages[i].chat_id;
+        String text = _bot.messages[i].text;
+
+        // Проверка прав
+        if (chat != String(tgCfg.admin)) {
+            _bot.sendMessage(chat, "⛔ Доступ запрещён. Ваш ID: " + chat, "");
+            lastId = uid;
+            continue;
+        }
+
+        // Базовые команды платформы
+        if (text == "/start" || text == "/help") {
+            String help = "📟 *" + String(baseCfg.device_name) + "*\n";
+            help += "/status — состояние системы\n";
+            help += "/reboot — перезагрузка\n";
+            _bot.sendMessage(chat, help, "Markdown");
+        } else if (text == "/status") {
+            String s = "📟 *" + String(baseCfg.device_name) + "*\n";
+            s += "Сеть: " + String(sysState.ethConnected ? "ETH ✅" : sysState.wifiConnected ? "WiFi ✅" : "❌") + "\n";
+            s += "MQTT: " + String(sysState.mqttConnected ? "✅" : "❌") + "\n";
+            s += "Uptime: " + String(millis() / 1000) + "с";
+            _bot.sendMessage(chat, s, "Markdown");
+        } else if (text == "/reboot") {
+            _bot.sendMessage(chat, "🔄 Перезагружаюсь...", "");
+            xSemaphoreTake(coreMutex, portMAX_DELAY);
+            sysState.pendingReboot = true;
+            sysState.rebootAt = millis();
+            xSemaphoreGive(coreMutex);
+        } else if (onCommand) {
+            // Передаём устройству неизвестные команды
+            onCommand(text, chat);
+        }
+
+        lastId = uid;
+        _bot.last_message_received = uid;
+    }
+}
+
+void TgHandler::loop() {
+    if (!tgCfg.enabled || strlen(tgCfg.token) < 10) return;
+
+    bool hasNet = false;
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    hasNet = sysState.ethConnected || sysState.wifiConnected;
+    xSemaphoreGive(coreMutex);
+    if (!hasNet) return;
+
+    if (millis() - _lastCheck > 5000) {
+        int n = _bot.getUpdates(_bot.last_message_received + 1);
+        if (n > 0) handleMessages(n);
+        _lastCheck = millis();
+        _secClient.stop(); // освобождаем TCP соединение
+    }
+
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    sysState.tgConnected = tgCfg.enabled;
+    xSemaphoreGive(coreMutex);
+}
+
+#endif // MODULE_TELEGRAM
+
+```
+
+---
+
+### <a id="📄-src-modules-telegram-tghandler-h"></a>📄 `src/modules/telegram/TgHandler.h`
+
+**File Info:**
+- **Size**: 860 B
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/modules/telegram/TgHandler.h`
+- **Relative Path**: `src/modules/telegram`
+- **Created**: 2026-02-17 12:57:12 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-02-17 12:57:12 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `7186520b7162ce044a83c843da6df46e`
+- **SHA256**: `83116fe0d909a59f840d2dfdfd64bf12eb61af57dfbc22309bc13b72d31872cb`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef MODULE_TELEGRAM
+
+#include <WiFiClientSecure.h>
+#include <UniversalTelegramBot.h>
+#include "../core/CoreTypes.h"
+
+struct TgConfig {
+    char token[64]  = "";
+    char group[32]  = "";   // Группа/канал для алертов
+    char admin[32]  = "";   // ID администратора (управление командами)
+    bool enabled    = false;
+};
+
+extern TgConfig tgCfg;
+
+class TgHandler {
+public:
+    static void init();
+    static void loop();
+    static void sendMessage(const String& msg, const String& chatId = "");
+    static bool loadConfig();
+    static bool saveConfig();
+
+    // Устройство может добавить свои команды
+    static void (*onCommand)(const String& cmd, const String& chatId);
+
+private:
+    static void handleMessages(int count);
+};
+
+#endif // MODULE_TELEGRAM
+
+```
+
+---
+
+### <a id="📄-src-main-cpp"></a>📄 `src/main.cpp`
+
+**File Info:**
+- **Size**: 7.21 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/main.cpp`
+- **Relative Path**: `src`
+- **Created**: 2026-02-18 22:12:18 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-04-17 05:30:05 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `6aadbb6d80b556ae0ac090c7a13be12c`
+- **SHA256**: `89d958117dd8e16c519a1b20f92ef1e03e42edb00e4fd7bd79a4be9cec5224fc`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#include <Arduino.h>
+#include <ESPAsyncWebServer.h>
+#include <ESPmDNS.h>
+#include <ArduinoOTA.h>
+
+#include "core/CoreTypes.h"
+#include "core/ConfigManager.h"
+#include "core/NetworkManager.h"
+#include "core/WebHandler.h"
+
+#ifdef MODULE_MQTT
+#include "modules/mqtt/MqttHandler.h"
+#endif
+#ifdef MODULE_TELEGRAM
+#include "modules/telegram/TgHandler.h"
+#endif
+#ifdef DEVICE_BOILER
+#include "devices/boiler/BoilerDevice.h"
+#endif
+#ifdef DEVICE_KC868_A16
+#include "devices/kc868-a16/A16Device.h"
+#endif
+#ifdef DEVICE_BOILER_MONITOR
+#include "devices/boiler-monitor/BMonDevice.h"
+#endif
+#if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
+#include "apps/boiler/BoilerAppDevice.h"
+#endif
+
+#ifdef MODULE_MODEM
+#include "modules/modem/ModemHandler.h"
+#endif
+
+AsyncWebServer server(80);
+
+void setup() {
+    Serial.begin(115200);
+    Serial.println("\n[BOOT] esp32-platform starting...");
+
+    // 1. Файловая система и конфиги
+    ConfigManager::begin();
+    ConfigManager::loadBase();
+
+    // 2. Сеть
+    NetworkManager::begin();
+
+    // 3. Регистрация вкладок (ПОРЯДОК = порядок в nav)
+    //    Устройство регистрирует свои вкладки первыми (Мониторинг, Уставки)
+    //    Затем модули добавляют свои (MQTT, Telegram)
+    //    Последней — вкладка Настройки (core)
+
+    #ifdef DEVICE_BOILER_MONITOR
+    BMonDevice::init();
+    #endif
+
+    #ifdef DEVICE_BOILER
+    BoilerDevice::init();
+    #endif
+
+    #ifdef DEVICE_KC868_A16
+    A16Device::init();
+    #endif
+
+    #if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
+    BoilerAppDevice::init();
+    #endif
+
+    #ifdef MODULE_MQTT
+    MqttHandler::init();
+    #endif
+
+    #ifdef MODULE_TELEGRAM
+    TgHandler::init();
+    #endif
+
+    #ifdef MODULE_MODEM
+    ModemHandler::init();
+    #endif
+
+    // Вкладка настроек сети — всегда последняя
+    static const char SETTINGS_HTML[] = R"html(
+<div class="settings-group">
+  <h3>🌐 Сеть</h3>
+  <label><input type="checkbox" id="eth_dhcp" onchange="toggleEth()"> DHCP (Ethernet)</label>
+  <div id="eth_static" style="display:none">
+    <input type="text" name="eth_ip"   placeholder="IP: 192.168.1.100">
+    <input type="text" name="eth_mask" placeholder="Маска: 255.255.255.0">
+    <input type="text" name="eth_gw"   placeholder="Шлюз: 192.168.1.1">
+    <input type="text" name="eth_dns"  placeholder="DNS: 8.8.8.8">
+  </div>
+  <input type="text"     name="wifi_ssid"   placeholder="WiFi SSID">
+  <input type="password" name="wifi_pass"   placeholder="WiFi Password">
+  <input type="text"     name="device_name" placeholder="Имя устройства">
+</div>
+<div class="settings-group">
+  <h3>🔒 Веб-интерфейс</h3>
+  <input type="text"     name="web_user" placeholder="Пользователь">
+  <input type="password" name="web_pass" placeholder="Пароль">
+</div>
+<button onclick="saveSettings()">💾 Сохранить настройки</button>
+<div class="settings-group" style="margin-top:12px">
+  <h3>📂 Резервное копирование</h3>
+  <a href="/api/backup" download="backup.json">
+    <button type="button">📥 Скачать backup (всё)</button>
+  </a>
+  <a href="/api/download-config" download="base.json">
+    <button type="button" class="btn-secondary">📥 Только сетевые настройки</button>
+  </a>
+  <label style="margin-top:8px">Восстановить из backup.json:</label>
+  <input type="file" id="configUpload" accept=".json">
+  <button onclick="uploadConfig()">📤 Восстановить</button>
+</div>
+<div class="settings-group">
+  <h3>⚙️ Системные действия</h3>
+  <label>Прошивка или файловая система (.bin):</label>
+  <form method="POST" action="/update" enctype="multipart/form-data">
+    <input type="file" name="update">
+    <button type="submit">🚀 Обновить ПО</button>
+  </form>
+  <button onclick="fetch('/api/reboot').then(()=>alert('Перезагружаюсь...'))" class="btn-danger">
+    🔄 Перезагрузка
+  </button>
+</div>
+<script>
+let _currentCfg = {};
+
+async function loadSettings() {
+  const r = await fetch('/api/get-config');
+  if (!r.ok) return;
+  _currentCfg = await r.json();
+  document.getElementById('eth_dhcp').checked = _currentCfg.eth_dhcp;
+  Object.keys(_currentCfg).forEach(k => {
+    const el = document.querySelector('[name="'+k+'"]');
+    if (el) el.value = _currentCfg[k];
+  });
+  toggleEth();
+}
+function toggleEth() {
+  document.getElementById('eth_static').style.display =
+    document.getElementById('eth_dhcp').checked ? 'none' : 'block';
+}
+async function saveSettings() {
+  // Берём текущий конфиг как базу, поверх него — только непустые поля
+  const data = Object.assign({}, _currentCfg);
+  data.eth_dhcp = document.getElementById('eth_dhcp').checked;
+  const fields = ['eth_ip','eth_mask','eth_gw','eth_dns',
+                  'wifi_ssid','wifi_pass','device_name','web_user','web_pass'];
+  fields.forEach(k => {
+    const el = document.querySelector('[name="'+k+'"]');
+    if (el && el.value.trim() !== '') data[k] = el.value.trim();
+  });
+  const r = await fetch('/api/save-config', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+  if (r.ok) alert('Настройки сохранены');
+}
+async function uploadConfig() {
+  const file = document.getElementById('configUpload').files[0];
+  if (!file) return alert('Выберите файл!');
+  const text = await file.text();
+  let data;
+  try { data = JSON.parse(text); } catch(e) { return alert('Неверный JSON'); }
+  const r = await fetch('/api/restore', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+  if (r.ok) alert('Восстановлено. Перезагрузка...');
+}
+loadSettings();
+</script>
+)html";
+    WebHandler::registerTab({"settings", "Настройки", "⚙️", SETTINGS_HTML});
+
+    // 4. Запуск веб-сервера
+    WebHandler::init(server);
+    server.begin();
+
+    // 5. OTA ArduinoOTA
+    #ifdef MODULE_OTA
+    ArduinoOTA.setHostname(baseCfg.device_name);
+    ArduinoOTA.onStart([]() { Serial.println("[OTA] Start"); });
+    ArduinoOTA.onError([](ota_error_t e) { Serial.printf("[OTA] Error: %u\n", e); });
+    ArduinoOTA.begin();
+    #endif
+
+    // 6. mDNS: http://<device_name>.local
+    MDNS.begin(baseCfg.device_name);
+    Serial.printf("[BOOT] Ready at http://%s.local\n", baseCfg.device_name);
+
+    #ifdef MODULE_TELEGRAM
+    TgHandler::sendMessage("🟢 " + String(baseCfg.device_name) + " запущен");
+    #endif
+}
+
+void loop() {
+    #ifdef MODULE_OTA
+    ArduinoOTA.handle();
+    #endif
+
+    NetworkManager::loop();
+
+    #ifdef MODULE_MQTT
+    MqttHandler::loop();
+    #endif
+
+    #ifdef MODULE_TELEGRAM
+    TgHandler::loop();
+    #endif
+
+    #ifdef DEVICE_BOILER
+    BoilerDevice::loop();
+    #endif
+
+    #ifdef DEVICE_KC868_A16
+    A16Device::loop();
+    #endif
+
+    #ifdef DEVICE_BOILER_MONITOR
+    BMonDevice::loop();
+    #endif
+
+    #if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
+    BoilerAppDevice::loop();
+    #endif
+
+    #ifdef MODULE_MODEM
+    ModemHandler::loop();
+    #endif
+}
+
+```
+
+---
+
+### <a id="📄-platformio-ini"></a>📄 `platformio.ini`
+
+**File Info:**
+- **Size**: 3.26 KB
+- **Extension**: `.ini`
+- **Language**: `text`
+- **Location**: `platformio.ini`
+- **Relative Path**: `root`
+- **Created**: 2026-02-18 04:58:44 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-04-18 10:13:05 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `2c86fb5e86d42c764aa8a7be00968b39`
+- **SHA256**: `6f0bfe87d8af9e630e4660c9b23f892052424b6aed8de2c911db25149874e0fa`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+[env:wt32-eth01]
+platform = espressif32
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+upload_speed = 921600
+
+board_build.partitions = min_spiffs.csv
+board_build.filesystem = littlefs
+
+lib_deps =
+    ottowinter/ESPAsyncWebServer-esphome @ ^3.1.0
+    esphome/AsyncTCP-esphome @ ^2.1.1
+    bblanchon/ArduinoJson @ ^7.0.0
+    knolleary/PubSubClient @ ^2.8
+    witnessmenow/UniversalTelegramBot @ ^1.3.0
+    paulstoffregen/OneWire @ ^2.3.8
+    milesburton/DallasTemperature @ ^3.11.0
+
+build_flags =
+    -D CORE_DEBUG_LEVEL=3
+    ; ---------- Модули (закомментируй чтобы отключить) ----------
+    -D MODULE_TELEGRAM
+    -D MODULE_MQTT
+    -D MODULE_OTA
+    -D MODULE_CAPTIVE_PORTAL
+    ; ---------- Устройство (только одно!) ----------------------
+    ; -D DEVICE_BOILER
+    -D DEVICE_KC868_A16
+    ; ---------- Железо -----------------------------------------
+    -D ETH_ADDR=1
+    -D ETH_POWER_PIN=16
+    -D ETH_MDC_PIN=23
+    -D ETH_MDIO_PIN=18
+    ; ---------- Приложения (поверх device) --------------------
+    -D APP_BOILER
+    ; ---------- Include paths ----------------------------------
+    -I src/core
+    -I src/modules/mqtt
+    -I src/modules/telegram
+    -I src/devices/boiler
+    -I src/devices/kc868-a16
+    -I src/apps/boiler
+
+[env:modem-device]
+platform = espressif32
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+upload_speed = 115200
+upload_protocol = espota
+upload_port = 192.168.1.89
+
+board_build.partitions = min_spiffs.csv
+board_build.filesystem = littlefs
+
+lib_deps =
+    ottowinter/ESPAsyncWebServer-esphome @ ^3.1.0
+    esphome/AsyncTCP-esphome @ ^2.1.1
+    bblanchon/ArduinoJson @ ^7.0.0
+    knolleary/PubSubClient @ ^2.8
+    witnessmenow/UniversalTelegramBot @ ^1.3.0
+
+build_flags =
+    -D CORE_DEBUG_LEVEL=3
+    ; ---------- Модули ------------------------------------------
+    -D MODULE_TELEGRAM
+    -D MODULE_MQTT
+    -D MODULE_OTA
+    -D MODULE_CAPTIVE_PORTAL
+    -D MODULE_MODEM
+    ; ---------- Железо -----------------------------------------
+    -D ETH_ADDR=1
+    -D ETH_POWER_PIN=16
+    -D ETH_MDC_PIN=23
+    -D ETH_MDIO_PIN=18
+    ; ---------- Include paths ----------------------------------
+    -I src/core
+    -I src/modules/mqtt
+    -I src/modules/telegram
+    -I src/modules/modem
+
+[env:boiler-monitor]
+platform = espressif32@6.9.0
+board = wt32-eth01
+framework = arduino
+monitor_speed = 115200
+upload_speed = 115200
+upload_protocol = espota
+upload_port = 192.168.1.89
+
+board_build.partitions = min_spiffs.csv
+board_build.filesystem = littlefs
+
+lib_deps =
+    ottowinter/ESPAsyncWebServer-esphome @ ^3.1.0
+    esphome/AsyncTCP-esphome @ ^2.1.1
+    bblanchon/ArduinoJson @ ^7.0.0
+    knolleary/PubSubClient @ ^2.8
+    witnessmenow/UniversalTelegramBot @ ^1.3.0
+    adafruit/Adafruit ADS1X15 @ ^2.5.0
+    adafruit/Adafruit BusIO @ ^1.16.1
+
+build_flags =
+    -D CORE_DEBUG_LEVEL=3
+    ; ---------- Модули ------------------------------------------
+    -D MODULE_TELEGRAM
+    -D MODULE_MQTT
+    -D MODULE_OTA
+    ; ---------- Устройство --------------------------------------
+    -D DEVICE_BOILER_MONITOR
+    ; ---------- Include paths -----------------------------------
+    -I src/core
+    -I src/modules/mqtt
+    -I src/modules/telegram
+    -I src/devices/boiler-monitor
+```
+
+---
+
+## 🚫 Binary/Excluded Files
+
+The following files were not included in the text content:
+
+- `sdkconfig.defaults`
+

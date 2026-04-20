@@ -223,4 +223,10 @@ void loop() {
     #ifdef MODULE_MODEM
     ModemHandler::loop();
     #endif
+
+    // Перезагрузка по запросу из веб-интерфейса
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    bool reboot = sysState.pendingReboot && (millis() - sysState.rebootAt > 500);
+    xSemaphoreGive(coreMutex);
+    if (reboot) ESP.restart();
 }

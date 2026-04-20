@@ -3,7 +3,7 @@
 ## 📊 Project Information
 
 - **Project Name**: `esp32-platform`
-- **Generated On**: 2026-04-20 09:32:43 (Asia/Novosibirsk / GMT+07:00)
+- **Generated On**: 2026-04-20 12:36:36 (Asia/Novosibirsk / GMT+07:00)
 - **Total Files Processed**: 29
 - **Export Tool**: Easy Whole Project to Single Text File for LLMs v1.1.0
 - **Tool Author**: Jota / José Guilherme Pandolfi
@@ -54,12 +54,12 @@
 │   │   │   ├── 📄 ModemHandler.cpp (36.63 KB)
 │   │   │   └── 📄 ModemHandler.h (2.9 KB)
 │   │   ├── 📁 mqtt/
-│   │   │   ├── 📄 MqttHandler.cpp (5.93 KB)
+│   │   │   ├── 📄 MqttHandler.cpp (6.13 KB)
 │   │   │   └── 📄 MqttHandler.h (992 B)
 │   │   └── 📁 telegram/
 │   │       ├── 📄 TgHandler.cpp (6.78 KB)
 │   │       └── 📄 TgHandler.h (860 B)
-│   └── 📄 main.cpp (7.21 KB)
+│   └── 📄 main.cpp (7.48 KB)
 ├── 📄 platformio.ini (3.26 KB)
 └── 📄 sdkconfig.defaults (192 B)
 ```
@@ -107,7 +107,7 @@
 | Total Directories | 13 |
 | Text Files | 28 |
 | Binary Files | 1 |
-| Total Size | 189.37 KB |
+| Total Size | 189.85 KB |
 
 ### 📄 File Types Distribution
 
@@ -4894,15 +4894,15 @@ private:
 ### <a id="📄-src-modules-mqtt-mqtthandler-cpp"></a>📄 `src/modules/mqtt/MqttHandler.cpp`
 
 **File Info:**
-- **Size**: 5.93 KB
+- **Size**: 6.13 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/modules/mqtt/MqttHandler.cpp`
 - **Relative Path**: `src/modules/mqtt`
 - **Created**: 2026-02-17 12:57:02 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-17 12:57:02 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `77a78342da0e82fe46b608d9e81346d9`
-- **SHA256**: `4afe0862e07a53d2867aca2baf1d3c04bcf50a035ef962f6ad1674d4514f4fe1`
+- **Modified**: 2026-04-20 12:36:32 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `3be31fb5193fc8a1e45a9bc4e93001ee`
+- **SHA256**: `3b68257427484f92ea2ce292c01ada693b453dceffd5785cf497d917d9666d01`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -4963,7 +4963,7 @@ async function saveMqtt() {
   };
   const r = await fetch('/api/mqtt/save', {method:'POST',
     headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-  if (r.ok) alert('MQTT сохранён');
+  if (r.ok) alert('MQTT сохранён, перезагружаюсь...');
 }
 loadMqtt();
 </script>
@@ -5018,6 +5018,10 @@ void MqttHandler::init() {
             strlcpy(mqttCfg.pass, obj["pass"] | "", sizeof(mqttCfg.pass));
             MqttHandler::saveConfig();
             req->send(200, "application/json", "{\"status\":\"ok\"}");
+            xSemaphoreTake(coreMutex, portMAX_DELAY);
+            sysState.pendingReboot = true;
+            sysState.rebootAt = millis();
+            xSemaphoreGive(coreMutex);
         }
     );
     server.addHandler(h);
@@ -5416,15 +5420,15 @@ private:
 ### <a id="📄-src-main-cpp"></a>📄 `src/main.cpp`
 
 **File Info:**
-- **Size**: 7.21 KB
+- **Size**: 7.48 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/main.cpp`
 - **Relative Path**: `src`
 - **Created**: 2026-02-18 22:12:18 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-04-17 05:30:05 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `6aadbb6d80b556ae0ac090c7a13be12c`
-- **SHA256**: `89d958117dd8e16c519a1b20f92ef1e03e42edb00e4fd7bd79a4be9cec5224fc`
+- **Modified**: 2026-04-20 12:36:32 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `f14c3d4dc258021676131f8ad752037b`
+- **SHA256**: `5557b058cc10785a4380231ee349d25a4ce07f68db031cbe5ab0cc6bd38bbedc`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -5655,6 +5659,12 @@ void loop() {
     #ifdef MODULE_MODEM
     ModemHandler::loop();
     #endif
+
+    // Перезагрузка по запросу из веб-интерфейса
+    xSemaphoreTake(coreMutex, portMAX_DELAY);
+    bool reboot = sysState.pendingReboot && (millis() - sysState.rebootAt > 500);
+    xSemaphoreGive(coreMutex);
+    if (reboot) ESP.restart();
 }
 
 ```

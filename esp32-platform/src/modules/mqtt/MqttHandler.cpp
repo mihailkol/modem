@@ -53,7 +53,7 @@ async function saveMqtt() {
   };
   const r = await fetch('/api/mqtt/save', {method:'POST',
     headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-  if (r.ok) alert('MQTT сохранён');
+  if (r.ok) alert('MQTT сохранён, перезагружаюсь...');
 }
 loadMqtt();
 </script>
@@ -108,6 +108,10 @@ void MqttHandler::init() {
             strlcpy(mqttCfg.pass, obj["pass"] | "", sizeof(mqttCfg.pass));
             MqttHandler::saveConfig();
             req->send(200, "application/json", "{\"status\":\"ok\"}");
+            xSemaphoreTake(coreMutex, portMAX_DELAY);
+            sysState.pendingReboot = true;
+            sysState.rebootAt = millis();
+            xSemaphoreGive(coreMutex);
         }
     );
     server.addHandler(h);

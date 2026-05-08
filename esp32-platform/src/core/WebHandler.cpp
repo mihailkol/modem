@@ -3,6 +3,11 @@
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
 
+#ifdef MODULE_MODEM
+extern int  _modemCreg;
+extern bool _modemEnabled;
+#endif
+
 static const char BUILD_TIME[] = __DATE__ " " __TIME__;
 
 std::vector<WebTab> WebHandler::_tabs;
@@ -70,8 +75,14 @@ void WebHandler::init(AsyncWebServer& server) {
         doc["uptime"] = millis() / 1000;
         doc["build"] = BUILD_TIME;
         xSemaphoreGive(coreMutex);
+        #ifdef MODULE_MODEM
+        doc["modem_enabled"] = _modemEnabled;
+        doc["modem_creg"]    = _modemCreg;
+        #endif
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
+
+
     });
 
     server.on("/api/syslog", HTTP_GET, [](AsyncWebServerRequest* req) {

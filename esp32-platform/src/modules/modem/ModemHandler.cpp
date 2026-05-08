@@ -16,6 +16,11 @@
 // ── Статические данные ───────────────────────────────────────────────────────
 ModemConfig modemCfg;
 ModemStatus modemStatus;
+
+// Глобальные переменные для доступа из других модулей без include
+int  _modemCreg    = -1;
+bool _modemEnabled = false;
+
 void (*ModemHandler::onDTMFResult)(const char*, const char*) = nullptr;
 
 static HardwareSerial _sim(2);
@@ -28,6 +33,13 @@ static String   _modemLog   = "";
 static String   _callerNum  = "";
 static String   _dtmfSeq    = "";
 static uint32_t _callStart  = 0;
+static String   _callLogBuffer = "";
+
+// SMS
+static bool   _smsNextLine  = false;  // ждём тело SMS после заголовка +CMT:
+static String _smsSender    = "";
+static String _smsInbox[10];          // кольцевой буфер последних 10 SMS
+static uint8_t _smsInboxIdx = 0;
 
 // Неблокирующая задержка между ATA и AT+CMUT=1
 static bool     _answerPending    = false;
@@ -48,6 +60,7 @@ static bool     _manualRestart = false;
 //
 enum InitState { INIT_RST_LOW, INIT_RST_HIGH, INIT_CMD, INIT_DONE };
 static InitState _initState = INIT_RST_LOW;
+static bool _simCmdsAllowed = false;  // разрешено отправлять SIM команды
 
 static uint32_t _initTimer   = 0;
 static uint8_t  _initCmdIdx  = 0;
@@ -55,10 +68,11 @@ static uint8_t  _initCmdIdx  = 0;
 static const char* _initCmds[] = {
     "AT",
     "ATE0",
-    "AT+CLIP=1",
-    "AT+DDET=1,0,0",
+    "AT+CLTS=1",
+    "AT&W",
     "AT+CREG=2",
 };
+
 static const uint8_t _initCmdsCount = sizeof(_initCmds) / sizeof(_initCmds[0]);
 
 // ── Состояние опросчика ───────────────────────────────────────────────────────
@@ -83,52 +97,60 @@ static WdState  _wdState      = WD_OK;
 static uint32_t _wdTimer      = 0;
 static uint8_t  _wdFailCount  = 0;
 static bool     _wdPollActive  = false;  // true = текущий опрос инициирован вотчдогом
-static bool     _wdEverOnline  = false;  // true = creg=1/5 был хоть раз после старта
+static bool     _wdStartupGrace = true;   // true = ждём после старта
+
+static bool    _simInitDone  = false;  // команды требующие SIM уже отправлены
+static uint8_t _simCmdIdx    = 0;
+static uint32_t _simCmdTimer = 0;
+
+static const char* _simCmds[] = {
+    "AT+CLIP=1",
+    "AT+DDET=1,0,0",
+    "AT+CMGF=0",
+    "AT+CNMI=2,2,0,0,0",
+};
+static const uint8_t _simCmdsCount = sizeof(_simCmds) / sizeof(_simCmds[0]);
+
+static uint32_t _wdGraceTimer   = 0;
+static bool _timeSync = false;
+
+static bool     _smsSending    = false;
+static bool _smsCmgfDone = false;  // AT+CMGF=0 отправлен и получен OK
+static uint32_t _smsCmdTimer   = 0;
+static String   _smsPduPending = "";
+
+static bool   _smsPendingFlag = false;
+static String _smsPendingTo   = "";
+static String _smsPendingText = "";
 
 #define WD_INTERVAL_OK    30000u   // мс между опросами в норме
 #define WD_INTERVAL_WARN  10000u   // мс между опросами при потере сети
-#define WD_MAX_FAILS      6        // сколько плохих ответов до перезагрузки
+#define WD_MAX_FAILS      12        // сколько плохих ответов до перезагрузки
+
 
 // ── HTML ─────────────────────────────────────────────────────────────────────
+
 static const char MODEM_TAB_HTML[] PROGMEM = R"html(
-<div class="settings-group">
-  <label class="toggle-row">
-    <span>Включить модем</span>
-    <input type="checkbox" id="modem_enabled" onchange="modemToggle()">
-  </label>
-  <div id="modem_fields">
-    <label>GPIO RX (ESP←SIM TX)</label>
-    <input type="number" name="modem_rx_pin" placeholder="4">
-    <label>GPIO TX (ESP→SIM RX)</label>
-    <input type="number" name="modem_tx_pin" placeholder="2">
-    <label>GPIO RST (-1 = не используется)</label>
-    <input type="number" name="modem_rst_pin" placeholder="33">
-    <label>GPIO RI (-1 = не используется)</label>
-    <input type="number" name="modem_ri_pin" placeholder="-1">
-    <label>Baudrate</label>
-    <input type="number" name="modem_baud" placeholder="9600">
-    <label>Таймаут DTMF (сек)</label>
-    <input type="number" name="modem_dtmf_timeout" placeholder="10">
-    <label>Интервал опроса статуса (сек)</label>
-    <input type="number" name="modem_poll_interval" placeholder="60">
-    <button onclick="saveModem()">💾 Сохранить</button>
-  </div>
-</div>
 <div class="settings-group">
   <h3>📊 Статус модема</h3>
   <div id="modem_status" style="font-size:12px;color:var(--muted)">загрузка...</div>
 </div>
+
 <div class="settings-group">
-  <h3>📟 Терминал</h3>
+  <h3>✉️ SMS</h3>
   <div style="display:flex;gap:8px;margin-bottom:8px">
-    <input type="text" id="at_cmd" placeholder="AT+CREG?" style="margin:0;flex:1">
-    <button onclick="sendAT()" style="width:auto;padding:10px 16px;margin:0">▶ Send</button>
+    <input type="text" id="sms_to" placeholder="+79139158466" style="margin:0;flex:1">
+    <button onclick="sendSmsWeb()" style="width:auto;padding:10px 16px;margin:0">📤 Отправить</button>
   </div>
-  <pre id="modem_log" style="font-size:11px;color:var(--muted);height:220px;overflow-y:auto;
-    white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:6px;
-    border:1px solid var(--border)"></pre>
-  <button onclick="clearModemLog()" style="margin-top:6px">🗑 Очистить</button>
+  <textarea id="sms_text" rows="3" placeholder="Текст сообщения" style="width:100%;
+    box-sizing:border-box;padding:8px;border-radius:6px;border:1px solid var(--border);
+    background:var(--bg);color:var(--text);resize:vertical;margin-bottom:8px"></textarea>
+  <h4 style="margin:8px 0 4px">📥 Входящие</h4>
+  <pre id="sms_inbox" style="font-size:11px;color:var(--muted);height:120px;
+    overflow-y:auto;white-space:pre-wrap;background:var(--bg);padding:8px;
+    border-radius:6px;border:1px solid var(--border)">загрузка...</pre>
 </div>
+
 <div class="settings-group">
   <h3>📋 Системный лог</h3>
   <pre id="sys_log" style="font-size:11px;color:var(--muted);height:160px;overflow-y:auto;
@@ -136,16 +158,84 @@ static const char MODEM_TAB_HTML[] PROGMEM = R"html(
     border:1px solid var(--border)"></pre>
   <button onclick="clearSysLog()" style="margin-top:6px">🗑 Очистить</button>
 </div>
+
 <div class="settings-group">
-  <h3>🔧 Управление модемом</h3>
-  <button onclick="restartModem()" class="btn-danger">🔄 Перезагрузить модем</button>
+  <h3>📟 Терминал</h3>
+  <div style="display:flex;gap:8px;margin-bottom:8px">
+    <select id="at_preset" onchange="atPresetSelect()" style="margin:0;padding:10px 8px;
+      border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text)">
+      <option value="AT">AT — проверка связи</option>
+      <option value="AT+CREG?">AT+CREG? — регистрация</option>
+      <option value="AT+CSQ">AT+CSQ — уровень сигнала</option>
+      <option value="AT+CBC">AT+CBC — напряжение</option>
+      <option value="AT+COPS?">AT+COPS? — оператор</option>
+      <option value="AT+CCLK?">AT+CCLK? — время</option>
+      <option value="AT+CMGF?">AT+CMGF? — режим SMS</option>
+      <option value="AT+CNMI?">AT+CNMI? — уведомления SMS</option>
+      <option value="AT+CLTS?">AT+CLTS? — синхронизация времени</option>
+      <option value="AT+GMR">AT+GMR — версия прошивки</option>
+      <option value="AT+CMGDA=&quot;DEL ALL&quot;">AT+CMGDA — удалить все SMS</option>
+    </select>
+    <input type="text" id="at_cmd" placeholder="команда" style="margin:0;flex:1">
+    <button onclick="sendAT()" style="width:auto;padding:10px 16px;margin:0">▶</button>
+  </div>
+  <pre id="modem_log" style="font-size:11px;color:var(--muted);height:220px;overflow-y:auto;
+    white-space:pre-wrap;background:var(--bg);padding:8px;border-radius:6px;
+    border:1px solid var(--border)"></pre>
+  <button onclick="clearModemLog()" style="margin-top:6px">🗑 Очистить</button>
 </div>
+
+<div class="settings-group">
+  <h3>⚙️ Настройки</h3>
+  <label class="toggle-row">
+    <span>Включить модем</span>
+    <input type="checkbox" id="modem_enabled" onchange="modemToggle()">
+  </label>
+  <div id="modem_fields">
+    <label>Таймаут DTMF (сек)</label>
+    <input type="number" name="modem_dtmf_timeout" placeholder="10">
+    <label>Интервал опроса статуса (сек)</label>
+    <input type="number" name="modem_poll_interval" placeholder="60">
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button onclick="saveModem()" style="flex:1">💾 Сохранить</button>
+      <button onclick="restartModem()" class="btn-danger" style="flex:1">🔄 Перезагрузить модем</button>
+    </div>
+  </div>
+</div>
+
 <script>
+function atPresetSelect() {
+  const v = document.getElementById('at_preset').value;
+  if (v) document.getElementById('at_cmd').value = v;
+}
+function signalBars(csq) {
+  if (csq == 99 || csq < 0) {
+    return '<span style="letter-spacing:2px;font-weight:bold;color:var(--muted)">||||||||</span>';
+  }
+  // CSQ 0-31: 0-4 низкий, 5-14 средний, 15-31 хороший
+  // Переводим в 0-8 делений
+  const level = Math.round((Math.min(csq, 31) / 31) * 8);
+  let bars = '';
+  for (let i = 1; i <= 8; i++) {
+    let color;
+    if (i > level) {
+      color = 'var(--muted)';
+    } else if (level <= 2) {
+      color = '#e74c3c';  // красный
+    } else if (level <= 4) {
+      color = '#f39c12';  // жёлтый
+    } else {
+      color = '#2ecc71';  // зелёный
+    }
+    bars += `<span style="color:${color}">|</span>`;
+  }
+  return `<span style="letter-spacing:2px;font-weight:bold">${bars}</span>`;
+}
 async function loadModem() {
   const r = await fetch('/api/modem/config');
   const d = await r.json();
   document.getElementById('modem_enabled').checked = d.enabled;
-  ['rx_pin','tx_pin','rst_pin','ri_pin','baud','dtmf_timeout','poll_interval'].forEach(k => {
+  ['dtmf_timeout','poll_interval'].forEach(k => {
     const el = document.querySelector('[name="modem_'+k+'"]');
     if (el) el.value = d[k];
   });
@@ -158,11 +248,6 @@ function modemToggle() {
 async function saveModem() {
   const d = {
     enabled:       document.getElementById('modem_enabled').checked,
-    rx_pin:        +document.querySelector('[name="modem_rx_pin"]').value,
-    tx_pin:        +document.querySelector('[name="modem_tx_pin"]').value,
-    rst_pin:       +document.querySelector('[name="modem_rst_pin"]').value,
-    ri_pin:        +document.querySelector('[name="modem_ri_pin"]').value,
-    baud:          +document.querySelector('[name="modem_baud"]').value,
     dtmf_timeout:  +document.querySelector('[name="modem_dtmf_timeout"]').value,
     poll_interval: +document.querySelector('[name="modem_poll_interval"]').value,
   };
@@ -195,7 +280,7 @@ async function loadModemStatus() {
     '2':'поиск...','3':'отказ','5':'роуминг'};
   document.getElementById('modem_status').innerHTML =
     `<b>Сеть:</b> ${regMap[String(d.creg)] || d.creg} &nbsp;
-     <b>Сигнал:</b> ${d.csq == 99 ? 'нет' : d.csq} &nbsp;
+     <b>Сигнал:</b> ${signalBars(d.csq)} &nbsp;
      <b>Питание:</b> ${d.vbat > 0 ? (d.vbat/1000).toFixed(3)+'V' : '—'} &nbsp;
      <b>Оператор:</b> ${d.oper || '—'}`;
 }
@@ -219,13 +304,32 @@ async function restartModem() {
   if (!confirm('Перезагрузить модем?')) return;
   await fetch('/api/modem/restart', {method:'POST'});
 }
+async function sendSmsWeb() {
+  const to   = document.getElementById('sms_to').value.trim();
+  const text = document.getElementById('sms_text').value.trim();
+  if (!to || !text) return;
+  const r = await fetch('/api/modem/sms/send', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({to, text})
+  });
+  if (r.ok) { alert('SMS отправлена'); document.getElementById('sms_text').value = ''; }
+}
+async function loadSmsInbox() {
+  const r = await fetch('/api/modem/sms/inbox');
+  const d = await r.json();
+  document.getElementById('sms_inbox').textContent =
+    (d.messages || []).map(m => m).join('\n') || 'нет сообщений';
+}
 loadModem();
 loadModemLog();
 loadModemStatus();
+loadSmsInbox();
 loadSysLog();
 setInterval(loadModemLog, 2000);
 setInterval(loadModemStatus, 10000);
 setInterval(loadSysLog, 5000);
+setInterval(loadSmsInbox, 10000);
 </script>
 )html";
 
@@ -234,13 +338,15 @@ bool ModemHandler::loadConfig() {
     JsonDocument doc;
     if (!ConfigManager::loadJson("/modem.json", doc)) return false;
     modemCfg.enabled       = doc["enabled"]       | true;
-    modemCfg.rx_pin        = doc["rx_pin"]         | 4;
-    modemCfg.tx_pin        = doc["tx_pin"]         | 2;
+    modemCfg.rx_pin        = doc["rx_pin"]         | 2;
+    modemCfg.tx_pin        = doc["tx_pin"]         | 4;
     modemCfg.rst_pin       = doc["rst_pin"]        | 33;
     modemCfg.ri_pin        = doc["ri_pin"]         | -1;
     modemCfg.baud          = doc["baud"]           | 9600;
     modemCfg.dtmf_timeout  = doc["dtmf_timeout"]   | 10;
     modemCfg.poll_interval = doc["poll_interval"]  | 60;
+    _modemCreg    = modemStatus.creg;
+    _modemEnabled = modemCfg.enabled;
     return true;
 }
 
@@ -338,6 +444,30 @@ void ModemHandler::init() {
         req->send(200, "application/json", "{\"status\":\"ok\"}");
     });
 
+    auto* hSms = new AsyncCallbackJsonWebHandler("/api/modem/sms/send",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            String to   = json["to"]   | "";
+            String text = json["text"] | "";
+            if (to.length() > 0 && text.length() > 0)
+                _smsPendingTo   = json["to"]   | "";
+                _smsPendingText = json["text"] | "";
+                _smsPendingFlag = true;
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(hSms);
+
+    server.on("/api/modem/sms/inbox", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        JsonArray arr = doc["messages"].to<JsonArray>();
+        for (int i = 0; i < 10; i++) {
+            if (_smsInbox[i].length() > 0)
+                arr.add(_smsInbox[i]);
+        }
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
     // Запускаем стейт-машину инициализации с RST_LOW (или сразу RST_HIGH если
     // пин не задан)
     if (modemCfg.rst_pin >= 0) {
@@ -395,7 +525,8 @@ void ModemHandler::_initTick() {
                 _addLog("Init done");
                 _initState  = INIT_DONE;
                 _pollTimer  = millis();   // первый опрос через poll_interval
-                _wdTimer    = millis();   // первый вотчдог через WD_INTERVAL_OK
+                _wdStartupGrace = true;
+                _wdGraceTimer   = millis();
                 Serial.println("[MODEM] Ready");
             } else {
                 sendAT(_initCmds[_initCmdIdx]);
@@ -418,6 +549,15 @@ void ModemHandler::loop() {
     while (_sim.available()) {
         char c = (char)_sim.read();
         _modemLog += c;
+        if (c == '>' && _smsSending && _smsCmgfDone) {
+            _sim.read(); // съедаем пробел после '>'
+            _sim.print(_smsPduPending);
+            _sim.write(0x1A);
+            _smsSending    = false;
+            _smsPduPending = "";
+            _addLog("SMS PDU sent");
+            continue;
+        }
         if (_modemLog.length() > 4096)
             _modemLog = _modemLog.substring(_modemLog.length() - 4096);
 
@@ -463,9 +603,23 @@ void ModemHandler::loop() {
         _pollTimer = millis();
     }
 
+    if (_smsSending && millis() - _smsCmdTimer > 30000) {
+        _addLog("SMS send timeout");
+        _sim.write(0x1B); // ESC — отменяем отправку
+        _smsSending    = false;
+        _smsPduPending = "";
+    }
+        
+    // Отложенная отправка SMS — ждём POLL_IDLE
+    if (_smsPendingFlag && _pollState == POLL_IDLE && !_smsSending) {
+        _smsPendingFlag = false;
+        ModemHandler::sendSms(_smsPendingTo, _smsPendingText);
+    }
+
     _checkAnswerDelay();
     _checkTimeout();
     _wdTick();
+    _simInitTick();
     _pollTick();
 }
 
@@ -477,6 +631,7 @@ void ModemHandler::sendAT(const char* cmd) {
 
 // ── Парсер входящих строк (звонок) ───────────────────────────────────────────
 void ModemHandler::_processLine(const String& line) {
+    _addLog("LINE:[" + line + "]"); 
     Serial.println("[MODEM] << " + line);
 
     if (line == "RING") {
@@ -511,6 +666,72 @@ void ModemHandler::_processLine(const String& line) {
         modemStatus.creg = stat;
         return;
     }
+
+    if (line.startsWith("+CCLK:")) {
+        _parseTime(line);
+        return;
+    }
+
+    // Входящее SMS — две строки: заголовок и PDU
+    _addLog("GOT > at " + String(millis()) + " sending=" + String(_smsSending));
+
+    if (line == ">" && _smsSending && _smsCmgfDone) {
+        _sim.print(_smsPduPending);
+        _sim.write(0x1A);
+        _smsSending    = false;
+        _smsPduPending = "";
+        _addLog("SMS PDU sent");
+        return;
+    }
+    // OK на AT+CMGF=0 — теперь отправляем AT+CMGS
+    if (line == "OK" && _smsSending && !_smsCmgfDone) {
+        _smsCmgfDone  = true;
+        _smsCmdTimer  = millis();
+        // Длина PDU = (длина hex строки / 2) - 1 (без SMSC байта)
+        int pduLen = (_smsPduPending.length() / 2) - 1;
+        sendAT(("AT+CMGS=" + String(pduLen)).c_str());
+        return;
+    }
+
+    if (_smsNextLine) {
+        _smsNextLine = false;
+        _onSmsReceived(_smsSender, line);
+        return;
+    }
+    if (line.startsWith("+CMT:")) {
+        // +CMT: "",<len>  — в PDU режиме номер в самом PDU
+        _smsSender   = "";
+        _smsNextLine = true;
+        return;
+    }
+}
+
+void ModemHandler::_parseTime(const String& line) {
+    // Формат: +CCLK: "26/04/21,14:30:00+12"
+    int q1 = line.indexOf('"');
+    int q2 = line.indexOf('"', q1 + 1);
+    if (q1 < 0 || q2 < 0) return;
+    String t = line.substring(q1 + 1, q2);
+    // yy/MM/dd,hh:mm:ss±zz
+    int year  = t.substring(0, 2).toInt() + 2000;
+    int month = t.substring(3, 5).toInt();
+    int day   = t.substring(6, 8).toInt();
+    int hour  = t.substring(9, 11).toInt();
+    int min   = t.substring(12, 14).toInt();
+    int sec   = t.substring(15, 17).toInt();
+    if (year < 2024) { _addLog("CCLK: invalid time"); return; }
+    struct tm tm = {};
+    tm.tm_year = year - 1900;
+    tm.tm_mon  = month - 1;
+    tm.tm_mday = day;
+    tm.tm_hour = hour;
+    tm.tm_min  = min;
+    tm.tm_sec  = sec;
+    time_t t_unix = mktime(&tm);
+    struct timeval tv = { t_unix, 0 };
+    settimeofday(&tv, nullptr);
+    _timeSync = true;
+    _addLog("Time synced: " + t);
 }
 
 // ── Парсер ответов опроса ─────────────────────────────────────────────────────
@@ -538,9 +759,8 @@ void ModemHandler::_parsePollResponse(const String& line) {
             _wdPollActive = false;
             modemStatus.creg = _newStatus.creg;
             _pollState = POLL_IDLE;
-            // Считаем failures только если хоть раз были онлайн
-            // (не трогаем модем пока он первый раз ищет сеть после старта)
-            if (_wdState == WD_WARN && _wdEverOnline) {
+            // При WD_WARN считаем failures
+            if (_wdState == WD_WARN && !_wdStartupGrace) {
                 if (_newStatus.creg != 1 && _newStatus.creg != 5) {
                     _wdFailCount++;
                     _addLog("Watchdog: fail " + String(_wdFailCount) + "/" + String(WD_MAX_FAILS));
@@ -549,6 +769,16 @@ void ModemHandler::_parsePollResponse(const String& line) {
                 }
             }
             return;
+        }
+
+        // Опрос инициирован pollTick — тоже считаем failures при WD_WARN
+        if (_wdState == WD_WARN) {
+            if (_newStatus.creg != 1 && _newStatus.creg != 5) {
+                _wdFailCount++;
+                _addLog("Watchdog: fail " + String(_wdFailCount) + "/" + String(WD_MAX_FAILS));
+                if (_wdFailCount >= WD_MAX_FAILS)
+                    _wdRestart();
+            }
         }
 
         _pollState    = POLL_WAIT_CSQ;
@@ -589,6 +819,7 @@ void ModemHandler::_parsePollResponse(const String& line) {
 
 // ── Запуск цикла опроса ───────────────────────────────────────────────────────
 void ModemHandler::_pollTick() {
+    if (_smsSending) return;
     if (_callState != CALL_IDLE)   return;
     if (_pollState != POLL_IDLE) return;
     if (millis() - _pollTimer < (uint32_t)modemCfg.poll_interval * 1000) return;
@@ -644,7 +875,7 @@ void ModemHandler::_onClip(const String& line) {
 // Вызывается каждый loop() — отправляет AT+CMUT=1 через 500 мс после ATA
 void ModemHandler::_checkAnswerDelay() {
     if (!_answerPending) return;
-    if (millis() - _answerAt < 300) return;
+    if (millis() - _answerAt < 400) return;
 
     sendAT("AT+CMUT=1");
     _callState     = CALL_IN_CALL;
@@ -658,6 +889,10 @@ void ModemHandler::_onDTMF(char digit) {
 }
 
 void ModemHandler::_onNoCarrier() {
+    if (_callLogBuffer.length() > 0) {
+        _sysLog("=== Call " + _callerNum + " (no DTMF) ===\n" + _callLogBuffer);
+        _callLogBuffer = "";
+    }
     if (_callState == CALL_IN_CALL && _dtmfSeq.length() > 0) {
         _addLog("Call ended, result: " + _callerNum + " - " + _dtmfSeq);
         _notifyResult();
@@ -675,6 +910,10 @@ void ModemHandler::_checkTimeout() {
     if (millis() - _callStart < (uint32_t)modemCfg.dtmf_timeout * 1000) return;
     _addLog("DTMF timeout");
     sendAT("ATH");
+    if (_callLogBuffer.length() > 0) {
+        _sysLog("=== Call " + _callerNum + " (timeout) ===\n" + _callLogBuffer);
+        _callLogBuffer = "";
+    }
     // Уведомляем до сброса состояния, чтобы колбэк видел актуальные данные
     if (_dtmfSeq.length() > 0) _notifyResult();
     else _addLog("No DTMF received");
@@ -684,6 +923,10 @@ void ModemHandler::_checkTimeout() {
 }
 
 void ModemHandler::_notifyResult() {
+    if (_callLogBuffer.length() > 0) {
+        _sysLog("=== Call " + _callerNum + " ===\n" + _callLogBuffer);
+        _callLogBuffer = "";
+    }
     String msg = _callerNum + " - " + _dtmfSeq;
     _addLog("Publishing DTMF: " + msg);
 #ifdef MODULE_MQTT
@@ -723,19 +966,33 @@ void ModemHandler::_wdHandleCreg(int stat) {
     bool ok = (stat == 1 || stat == 5);
 
     if (ok) {
+        _modemCreg    = modemStatus.creg;
+        _modemEnabled = modemCfg.enabled;
+        if (!_simInitDone) {
+            _simCmdsAllowed = true;  // ← вместо _simInitDone = false
+            _simCmdIdx      = 0;
+            _simCmdTimer    = millis() - 500;
+        }
         if (_wdState == WD_WARN)
             _addLog("Watchdog: network restored");
-        _wdEverOnline = true;
         _wdState      = WD_OK;
         _wdFailCount  = 0;
         _wdTimer      = millis();
+        // Запускаем команды требующие SIM если ещё не отправляли
+        if (!_simInitDone) {
+            _simInitDone = false;  // будет выставлен после последней команды
+            _simCmdIdx   = 0;
+            _simCmdTimer = millis() - 500;  // чтобы первая команда ушла сразу
+        }
+        // Синхронизируем время при восстановлении сети
+        sendAT("AT+CCLK?");
         return;
     }
 
     // stat == 0 — явная потеря сети → входим в режим восстановления
     // stat == 2 — поиск (временно, ждём) → не трогаем
     // stat == 3 — отказ регистрации → ждём, модем сам повторит попытку
-    if (_wdState == WD_OK && stat == 0) {
+    if (_wdState == WD_OK && stat == 0 && !_wdStartupGrace) {
         _addLog("Watchdog: network lost, entering recovery mode");
         _wdState     = WD_WARN;
         _wdFailCount = 0;
@@ -745,8 +1002,16 @@ void ModemHandler::_wdHandleCreg(int stat) {
 
 // ── Вотчдог: тик (вызывается из loop каждый цикл) ────────────────────────────
 void ModemHandler::_wdTick() {
+    if (_smsSending) return;
     if (_callState != CALL_IDLE) return;    // не трогаем во время звонка
     if (_pollState != POLL_IDLE) return;    // poll уже идёт — подождём
+
+    if (_wdStartupGrace) {
+        if (millis() - _wdGraceTimer < 120000) return;
+        _wdStartupGrace = false;
+        _wdTimer = millis();
+        _addLog("Watchdog: active");
+    }
 
     uint32_t interval = (_wdState == WD_WARN) ? WD_INTERVAL_WARN : WD_INTERVAL_OK;
     if (millis() - _wdTimer < interval) return;
@@ -765,6 +1030,10 @@ void ModemHandler::_wdTick() {
 // ── Перезагрузка модема вотчдогом ────────────────────────────────────────────
 void ModemHandler::_wdRestart() {
     _addLog("Watchdog: restarting modem after " + String(WD_MAX_FAILS) + " failures");
+    _smsCmgfDone = false;
+    _simInitDone = false;
+    _simCmdsAllowed = false;
+    _simCmdIdx   = 0;
 
 #ifdef MODULE_MQTT
     JsonDocument doc;
@@ -783,8 +1052,9 @@ void ModemHandler::_wdRestart() {
     _wdState      = WD_OK;
     _wdFailCount  = 0;
     _wdPollActive = false;
-    _wdEverOnline = false;
     _wdTimer      = millis();
+    _wdStartupGrace = true;
+    _wdGraceTimer   = millis();
 
     // Сбрасываем состояние звонка на случай зависшего IN_CALL
     _callState     = CALL_IDLE;
@@ -809,10 +1079,20 @@ void ModemHandler::_wdRestart() {
 void ModemHandler::_sysLog(const String& msg) {
     // Формируем строку: uptime + сообщение
     uint32_t s = millis() / 1000;
-    char ts[16];
-    snprintf(ts, sizeof(ts), "[%02lu:%02lu:%02lu] ", s/3600, (s%3600)/60, s%60);
-    String line = String(ts) + msg + "\n";
-
+    String ts;
+    if (_timeSync) {
+        time_t now = time(nullptr);
+        struct tm* tm = localtime(&now);
+        char buf[32];
+        strftime(buf, sizeof(buf), "[%d.%m.%Y %H:%M:%S] ", tm);
+        ts = String(buf);
+    } else {
+        uint32_t s = millis() / 1000;
+        char buf[16];
+        snprintf(buf, sizeof(buf), "[%02lu:%02lu:%02lu] ", s/3600, (s%3600)/60, s%60);
+        ts = String(buf);
+    }
+    String line = ts + msg + "\n";
     Serial.println("[SYSLOG] " + msg);
 
     // Дописываем в файл, ротация: если > 8 КБ — обрезаем старое
@@ -843,20 +1123,142 @@ void ModemHandler::_sysLog(const String& msg) {
     }
 }
 
+// ── SMS ──────────────────────────────────────────────────────────────────────
+void ModemHandler::_onSmsReceived(const String& sender, const String& pdu) {
+    _addLog("SMS received, PDU len: " + String(pdu.length()));
+    // Сохраняем в кольцевой буфер для веб-интерфейса
+    _smsInbox[_smsInboxIdx] = pdu;
+    _smsInboxIdx = (_smsInboxIdx + 1) % 10;
+    _publishSms(sender, pdu);
+    _sysLog("SMS received: " + pdu.substring(0, 40));
+}
+
+void ModemHandler::_publishSms(const String& sender, const String& pdu) {
+#ifdef MODULE_MQTT
+    JsonDocument doc;
+    doc["pdu"] = pdu;
+    String payload;
+    serializeJson(doc, payload);
+    String topic = String(baseCfg.device_name) + "/modem/sms/inbox";
+    MqttHandler::publish(topic.c_str(), payload.c_str());
+#endif
+}
+
+// UTF-8 → UCS2 hex для отправки SMS с кириллицей
+String ModemHandler::_utf8ToUcs2Hex(const String& text) {
+    String result = "";
+    char buf[5];
+    int i = 0;
+    while (i < (int)text.length()) {
+        uint8_t c = (uint8_t)text[i];
+        uint32_t cp;
+        if (c < 0x80) {
+            cp = c; i++;
+        } else if ((c & 0xE0) == 0xC0) {
+            cp = (c & 0x1F) << 6 | ((uint8_t)text[i+1] & 0x3F);
+            i += 2;
+        } else if ((c & 0xF0) == 0xE0) {
+            cp = (c & 0x0F) << 12 | ((uint8_t)text[i+1] & 0x3F) << 6
+                                   | ((uint8_t)text[i+2] & 0x3F);
+            i += 3;
+        } else { i++; continue; }
+        snprintf(buf, sizeof(buf), "%04X", (unsigned)cp);
+        result += buf;
+    }
+    return result;
+}
+
+void ModemHandler::sendSms(const String& to, const String& text) {
+    String ucs2 = _utf8ToUcs2Hex(text);
+    // Формируем минимальный PDU: нет SMSC + TP-MTI/VPF + номер + UCS2 + текст
+    // Длина текста в символах UCS2 (каждый символ = 2 байта = 4 hex символа)
+    int charCount = ucs2.length() / 4;
+
+    // Нормализуем номер
+    String phone = _normalizePhone(to);
+    if (phone.startsWith("+")) phone = phone.substring(1);
+
+    // Тип номера: 91 = international, 81 = unknown
+    String toa = phone.startsWith("7") ? "91" : "81";
+
+    // Padding номера до чётной длины
+    String phoneHex = "";
+    String p = phone;
+    if (p.length() % 2) p += "F";
+    for (int i = 0; i < (int)p.length(); i += 2) {
+        phoneHex += p[i+1];
+        phoneHex += p[i];
+    }
+    // Собираем PDU
+    // 00 - нет SMSC
+    // 11 - TP-MTI=SMS-SUBMIT, TP-VPF=relative
+    // 00 - TP-MR
+    // <len> - длина номера в цифрах
+    // <toa> - тип номера
+    // <phone> - номер
+    // 00 - TP-PID
+    // 08 - TP-DCS = UCS2
+    // AA - TP-VP = 4 дня
+    // <len> - длина текста в октетах (charCount * 2)
+    // <ucs2> - текст
+    String lenPhone = String(phone.length(), HEX);
+    if (lenPhone.length() < 2) lenPhone = "0" + lenPhone;
+    lenPhone.toUpperCase();
+
+    String lenText = String(charCount * 2, HEX);
+    if (lenText.length() < 2) lenText = "0" + lenText;
+    lenText.toUpperCase();
+
+    String pdu = "001100" + lenPhone + toa + phoneHex + "0008AA" + lenText + ucs2;    pdu.toUpperCase();
+
+    // PDU длина без SMSC октета (всё кроме первых двух символов "00")
+    int pduLen = (pdu.length() / 2) - 1;
+
+    _addLog("Sending SMS to " + to + ", PDU len: " + String(pduLen));
+    _smsPduPending = pdu;
+    _smsSending    = true;
+    _smsCmgfDone   = false;
+    _smsCmdTimer   = millis();
+    _pollState     = POLL_IDLE;
+    _pollTimer     = millis();
+    sendAT("AT+CMGF=0");
+}
+
 void ModemHandler::_addLog(const String& msg) {
     Serial.println("[MODEM] " + msg);
     _modemLog += msg + "\n";
     if (_modemLog.length() > 4096)
         _modemLog = _modemLog.substring(_modemLog.length() - 4096);
 
-    // Важные события дублируем в системный лог
+    // Во время звонка буферизуем всё
+    if (_callState != CALL_IDLE || _answerPending) {
+        _callLogBuffer += msg + "\n";
+        return;
+    }
+
+    // Вне звонка — только важные события в syslog
     if (msg.startsWith("Watchdog") ||
         msg.startsWith("Init done") ||
         msg.startsWith("Call Ready") ||
         msg.startsWith("Manual") ||
-        msg.startsWith("Incoming") ||
-        msg.startsWith("Publishing DTMF"))
+        msg.startsWith("Incoming"))
         _sysLog(msg);
+}
+
+void ModemHandler::_simInitTick() {
+    if (_simInitDone) return;
+    if (!_simCmdsAllowed) return;
+    if (_pollState != POLL_IDLE) return;
+    if (_smsSending) return;
+    if (millis() - _simCmdTimer < 500) return;
+
+    sendAT(_simCmds[_simCmdIdx]);
+    _simCmdTimer = millis();
+    _simCmdIdx++;
+    if (_simCmdIdx >= _simCmdsCount) {
+        _simInitDone = true;
+        _addLog("SIM init done");
+    }
 }
 
 #endif // MODULE_MODEM

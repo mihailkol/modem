@@ -197,6 +197,7 @@ button.btn-secondary { background: var(--border); color: var(--text); }
   <div class="status-dot"><div class="dot" id="dot_eth"></div>ETH</div>
   <div class="status-dot"><div class="dot" id="dot_mqtt"></div>MQTT</div>
   <div class="status-dot"><div class="dot" id="dot_tg"></div>Telegram</div>
+  <div class="status-dot"><div class="dot" id="dot_modem"></div>Модем</div>
   <div class="status-online" id="status_online">●</div>
   <div style="font-size:10px;color:var(--muted);margin-left:8px" id="status_build"></div>
 </div>
@@ -288,6 +289,16 @@ async function updateStatus() {
     set('dot_eth',  d.eth);
     set('dot_mqtt', d.mqtt);
     set('dot_tg',   d.tg);
+    const dotModem = document.getElementById('dot_modem');
+    if (dotModem) {
+      if (!d.modem_enabled) {
+        dotModem.classList.remove('on', 'off');  // серый — дефолт
+      } else {
+        const reg = d.modem_creg == 1 || d.modem_creg == 5;
+        dotModem.classList.toggle('on', reg);
+        dotModem.classList.toggle('off', !reg);
+      }
+    }
     const online = d.eth || d.wifi;
     const el = document.getElementById('status_online');
     if (el) { el.textContent = online ? 'ONLINE' : 'OFFLINE';

@@ -262,6 +262,7 @@ void BMonDevice::init() {
     attachInterrupt(digitalPinToInterrupt(BMON_PIN_FLOW1), onFlow1, FALLING);
     attachInterrupt(digitalPinToInterrupt(BMON_PIN_FLOW2), onFlow2, FALLING);
     Serial.println("[BMON] Flow interrupts attached");
+    Serial.printf("[BMON] GPIO2=%d GPIO4=%d\n", digitalRead(BMON_PIN_FLOW1), digitalRead(BMON_PIN_FLOW2));
 
     // Аналоговые входы давления
     pinMode(BMON_PIN_PRESS1, INPUT);
@@ -298,6 +299,8 @@ void BMonDevice::init() {
         doc["alarm_high"] = bmonState.alarm_high;
         doc["alarm_low"]  = bmonState.alarm_low;
         doc["alarm_sensor"] = bmonState.alarm_sensor;
+        doc["pulse1_count"] = bmonState.pulse1_count;
+        doc["pulse2_count"] = bmonState.pulse2_count;
 
         JsonArray hist = doc["history"].to<JsonArray>();
         uint8_t start = (bmonState.hist_head - bmonState.hist_count + BMON_HISTORY_SIZE) % BMON_HISTORY_SIZE;
@@ -368,6 +371,13 @@ void BMonDevice::init() {
 void BMonDevice::loop() {
     uint32_t now = millis();
 
+    static uint32_t lastDbg = 0;
+    if (millis() - lastDbg > 2000) {
+        lastDbg = millis();
+        Serial.printf("[BMON] GPIO2=%d GPIO4=%d\n", 
+            digitalRead(BMON_PIN_FLOW1), digitalRead(BMON_PIN_FLOW2));
+    }
+
     // Опрос температур и давления каждые 2 сек
     if (now - _lastRead > 2000) {
         _lastRead = now;
@@ -432,11 +442,11 @@ void BMonDevice::readTemperatures() {
     bmonState.alarm_sensor = false;
 
     int16_t raw;
-    raw = ads.readADC_SingleEnded(0); bmonState.t_supply  = ntcToTemp(raw, bmonCfg.ntc_b);
-    raw = ads.readADC_SingleEnded(1); bmonState.t_return  = ntcToTemp(raw, bmonCfg.ntc_b);
-    raw = ads.readADC_SingleEnded(2); bmonState.t_room    = ntcToTemp(raw, bmonCfg.ntc_b);
-    raw = ads.readADC_SingleEnded(3); bmonState.t_outdoor = ntcToTemp(raw, bmonCfg.ntc_b);
-
+    raw = ads.readADC_SingleEnded(3); bmonState.t_supply  = ntcToTemp(raw, bmonCfg.ntc_b); // NTC1
+    raw = ads.readADC_SingleEnded(2); bmonState.t_return  = ntcToTemp(raw, bmonCfg.ntc_b); // NTC2
+    raw = ads.readADC_SingleEnded(1); bmonState.t_room    = ntcToTemp(raw, bmonCfg.ntc_b); // NTC3
+    raw = ads.readADC_SingleEnded(0); bmonState.t_outdoor = ntcToTemp(raw, bmonCfg.ntc_b); // NTC4
+      
     // Дельта только если оба датчика живые
     if (!isnan(bmonState.t_supply) && !isnan(bmonState.t_return))
         bmonState.t_delta = bmonState.t_supply - bmonState.t_return;

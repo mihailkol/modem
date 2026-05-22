@@ -14,7 +14,7 @@ public:
 private:
     static void startAP();
     static void onWiFiEvent(WiFiEvent_t event);
-
+    static void _ethPhyReset();
     static DNSServer  _dns;
     static uint32_t   _lastEthCheck;
 };

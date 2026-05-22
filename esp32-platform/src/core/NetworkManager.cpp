@@ -6,8 +6,14 @@
 #include "../devices/boiler-monitor/BMonTypes.h"
 #endif
 
+RTC_DATA_ATTR static uint8_t _ethRebootCount = 0;
+
 DNSServer  NetworkManager::_dns;
 uint32_t   NetworkManager::_lastEthCheck = 0;
+// ETH watchdog
+static bool     _ethWdArmed   = true;
+static uint8_t  _ethWdPhySt   = 0;      // 0=idle, 1=phy low, 2=phy high
+static uint32_t _ethWdTimer   = 0;
 
 void NetworkManager::begin() {
     WiFi.onEvent(onWiFiEvent);
@@ -40,11 +46,49 @@ void NetworkManager::begin() {
     Serial.printf("[NET] Device name: %s\n", baseCfg.device_name);
 }
 
+void NetworkManager::_ethPhyReset() {
+    Serial.println("[NET] ETH watchdog: resetting PHY");
+    #ifdef ETH_POWER_PIN
+    digitalWrite(ETH_POWER_PIN, LOW);
+    #endif
+}
+
 void NetworkManager::loop() {
     xSemaphoreTake(coreMutex, portMAX_DELAY);
     bool connected      = sysState.ethConnected || sysState.wifiConnected;
     bool apActive       = sysState.apMode;
     xSemaphoreGive(coreMutex);
+
+    // ETH watchdog
+    if (_ethWdArmed) {
+        if (sysState.ethConnected) {
+            _ethWdArmed    = false;
+            _ethRebootCount = 0;
+        } else if (_ethWdPhySt == 0 && millis() - _ethWdTimer > 30000) {
+            if (_ethRebootCount < 3) {
+                _ethPhyReset();
+                _ethWdPhySt = 1;
+                _ethWdTimer = millis();
+            } else {
+                Serial.println("[NET] ETH watchdog: giving up after 3 attempts");
+                _ethWdArmed = false;
+                // AP поднимется штатно через существующую логику
+            }
+        } else if (_ethWdPhySt == 1 && millis() - _ethWdTimer > 200) {
+            // PHY был LOW 200мс — поднимаем
+            #ifdef ETH_POWER_PIN
+            digitalWrite(ETH_POWER_PIN, HIGH);
+            #endif
+            _ethWdPhySt = 2;
+            _ethWdTimer = millis();
+        } else if (_ethWdPhySt == 2 && millis() - _ethWdTimer > 30000) {
+            // Ждали 30 сек после PHY reset — не помогло
+            _ethRebootCount++;
+            _ethWdPhySt = 0;
+            _ethWdTimer = millis();
+            Serial.printf("[NET] ETH watchdog: PHY reset attempt %d failed\n", _ethRebootCount);
+        }
+    }
 
     // Captive portal DNS
 #ifdef MODULE_CAPTIVE_PORTAL
@@ -91,6 +135,8 @@ void NetworkManager::onWiFiEvent(WiFiEvent_t event) {
                 WiFi.disconnect(true);
                 sysState.wifiConnected = false;
             }
+            _ethRebootCount = 0;
+            _ethWdArmed     = false;
             break;
 
         case ARDUINO_EVENT_ETH_DISCONNECTED:

@@ -2,6 +2,8 @@
 #include "ConfigManager.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <ETH.h>
+#include <WiFi.h>
 
 #ifdef MODULE_MODEM
 extern int  _modemCreg;
@@ -56,7 +58,9 @@ void WebHandler::init(AsyncWebServer& server) {
         String id = req->getParam("id")->value();
         for (auto& tab : _tabs) {
             if (id == tab.id) {
-                req->send(200, "text/html", tab.html);
+                AsyncWebServerResponse* resp = req->beginResponse(200, "text/html", tab.html);
+                resp->addHeader("Cache-Control", "no-store");
+                req->send(resp);
                 return;
             }
         }
@@ -68,6 +72,7 @@ void WebHandler::init(AsyncWebServer& server) {
         JsonDocument doc;
         xSemaphoreTake(coreMutex, portMAX_DELAY);
         doc["eth"]   = sysState.ethConnected;
+        doc["eth_ip"] = sysState.ethConnected ? ETH.localIP().toString() : "";
         doc["wifi"]  = sysState.wifiConnected;
         doc["ap"]    = sysState.apMode;
         doc["mqtt"]  = sysState.mqttConnected;
@@ -81,8 +86,34 @@ void WebHandler::init(AsyncWebServer& server) {
         #endif
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
+    });
 
+    server.on("/api/net-status", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["eth_connected"]  = sysState.ethConnected;
+        doc["wifi_connected"] = sysState.wifiConnected;
+        doc["ap_mode"]        = sysState.apMode;
+        doc["eth_ip"]         = sysState.ethConnected ? ETH.localIP().toString() : "";
+        doc["wifi_ip"]        = sysState.wifiConnected ? WiFi.localIP().toString() : "";
+        doc["ap_ip"]          = sysState.apMode ? WiFi.softAPIP().toString() : "";
+        doc["wifi_rssi"]      = sysState.wifiConnected ? WiFi.RSSI() : 0;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
 
+    server.on("/api/wifi-scan", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        JsonArray arr = doc["networks"].to<JsonArray>();
+        int n = WiFi.scanNetworks();
+        for (int i = 0; i < n; i++) {
+            JsonObject net = arr.add<JsonObject>();
+            net["ssid"] = WiFi.SSID(i);
+            net["rssi"] = WiFi.RSSI(i);
+            net["enc"]  = WiFi.encryptionType(i) != WIFI_AUTH_OPEN;
+        }
+        WiFi.scanDelete();
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
     });
 
     server.on("/api/syslog", HTTP_GET, [](AsyncWebServerRequest* req) {

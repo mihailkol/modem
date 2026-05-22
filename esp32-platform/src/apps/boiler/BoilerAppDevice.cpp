@@ -14,6 +14,10 @@
 #include "../../modules/telegram/TgHandler.h"
 #endif
 
+#ifdef DEVICE_EKONOM
+#include "../../devices/ekonom/EkoNomDevice.h"
+#endif
+
 BoilerAppConfig boilerAppCfg;
 BoilerAppState  boilerAppState;
 
@@ -78,6 +82,54 @@ static const char BOILER_MON_HTML[] PROGMEM = R"html(
       </div>
     </div>
   </div>
+
+  <div class="card" style="margin-top:10px">
+  <div class="section-label">АНАЛИТИКА (последний час)</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_avg">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Ср. мощность кВт</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_peak">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Пик мощности кВт</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_dt">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Ср. ΔT °C</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_duty">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Duty cycle %</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_cyc">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Включений</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_run">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Работа мин</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_idle">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Простой мин</div>
+    </div>
+  </div>
+
+  <div style="margin-top:8px;padding:8px 10px;background:#111318;border-radius:8px;
+              display:flex;align-items:center;gap:8px;font-size:13px">
+    <span id="a_burner_led" style="width:10px;height:10px;border-radius:50%;
+          background:var(--muted);flex-shrink:0"></span>
+    <span id="a_burner_txt">—</span>
+    <span style="margin-left:auto;color:var(--muted);font-size:11px">
+      Текущий цикл: <b id="a_cycdur">—</b> мин
+    </span>
+  </div>
+</div>
 
   <div class="m-card">
     <div class="m-card-label">ИСТОРИЯ МОЩНОСТИ</div>
@@ -187,7 +239,25 @@ async function loadBoilerCfg() {
   document.getElementById('p_min').value        = d.p_min;
   document.getElementById('p_max').value        = d.p_max;
   document.getElementById('pub_interval').value = d.pub_interval;
-}
+
+
+  if (d.power_avg_1h  !== undefined) {
+    document.getElementById('a_avg').textContent    = d.power_avg_1h.toFixed(1);
+    document.getElementById('a_peak').textContent   = d.power_peak_1h.toFixed(1);
+    document.getElementById('a_dt').textContent     = d.delta_avg_1h.toFixed(1);
+    document.getElementById('a_duty').textContent   = d.duty_pct + '%';
+    document.getElementById('a_cyc').textContent    = d.cycles_1h;
+    document.getElementById('a_run').textContent    = d.runtime_min;
+    document.getElementById('a_idle').textContent   = d.idle_min;
+    document.getElementById('a_cycdur').textContent = d.cycle_dur_min;
+    const led = document.getElementById('a_burner_led');
+    led.style.background = d.burner_on ? 'var(--ok)' : 'var(--muted)';
+    led.style.boxShadow  = d.burner_on ? '0 0 6px var(--ok)' : 'none';
+    document.getElementById('a_burner_txt').textContent =
+      d.burner_on ? 'Горелка работает' : 'Горелка выключена';
+  }
+
+  }
 async function saveBoilerCfg() {
   const data = {
     t_max:                +document.getElementById('t_max').value,
@@ -234,6 +304,18 @@ void BoilerAppDevice::init() {
         doc["power_kw"]   = boilerAppState.power_kw;
         doc["energy_kwh"] = boilerAppState.energy_kwh;
 
+        
+        // Аналитика
+        doc["power_avg_1h"]  = boilerAppState.power_avg_1h;
+        doc["power_peak_1h"] = boilerAppState.power_peak_1h;
+        doc["delta_avg_1h"]  = boilerAppState.delta_avg_1h;
+        doc["cycles_1h"]     = boilerAppState.cycles_1h;
+        doc["runtime_min"]   = boilerAppState.runtime_min;
+        doc["idle_min"]      = boilerAppState.idle_min;
+        doc["duty_pct"]      = boilerAppState.duty_pct;
+        doc["cycle_dur_min"] = boilerAppState.cycle_dur_min;
+        doc["burner_on"]     = boilerAppState.burner_on;
+    
         JsonArray hist = doc["history"].to<JsonArray>();
         uint8_t start = (boilerAppState.hist_head - boilerAppState.hist_count
                          + BOILER_HIST_SIZE) % BOILER_HIST_SIZE;
@@ -295,6 +377,63 @@ void BoilerAppDevice::init() {
     Serial.println("[BOILER] App init OK");
 }
 
+void BoilerAppDevice::_updateAnalytics() {
+    auto& s = boilerAppState;
+ 
+    // 1. Записать в часовой буфер
+    s.pushHistory1h(s.power_kw, s.t_delta);
+ 
+    // 2. Подсчёт показателей по буферу
+    float sum_p = 0, peak_p = 0, sum_dt = 0;
+    uint16_t on_ticks = 0;  // тиков (по 10 сек) когда котёл работал
+    uint16_t prev_on = 0;
+    uint16_t cyc = 0;
+    uint16_t n = s.hist1h_count;
+ 
+    for (uint16_t i = 0; i < n; i++) {
+        // Идём от старых к новым
+        uint16_t idx = (s.hist1h_head - n + i + BOILER_HIST1H_SIZE) % BOILER_HIST1H_SIZE;
+        float p  = s.hist1h_power[idx];
+        float dt = s.hist1h_delta[idx];
+ 
+        sum_p  += p;
+        sum_dt += dt;
+        if (p > peak_p) peak_p = p;
+ 
+        bool on = (p >= BOILER_POWER_ON_KW);
+        if (on) on_ticks++;
+        // Считаем включения: переход 0→1
+        if (on && !prev_on) cyc++;
+        prev_on = on;
+    }
+ 
+    if (n > 0) {
+        s.power_avg_1h  = sum_p  / n;
+        s.delta_avg_1h  = sum_dt / n;
+        s.power_peak_1h = peak_p;
+        s.cycles_1h     = cyc;
+        // on_ticks × 10 сек → минуты
+        s.runtime_min   = (on_ticks * 10) / 60;
+        s.idle_min       = ((n - on_ticks) * 10) / 60;
+        s.duty_pct      = (uint8_t)((on_ticks * 100) / n);
+    }
+ 
+    // 3. Текущий цикл
+    bool now_on = (s.power_kw >= BOILER_POWER_ON_KW);
+    if (now_on && !s.burner_on) {
+        // Включился
+        s.burner_on      = true;
+        s.cycle_start_ms = millis();
+    } else if (!now_on && s.burner_on) {
+        // Выключился
+        s.burner_on = false;
+        s.cycle_start_ms = millis();
+    }
+    if (s.cycle_start_ms > 0) {
+        s.cycle_dur_min = (uint16_t)((millis() - s.cycle_start_ms) / 60000);
+    }
+}
+
 // ============================================================
 //  LOOP
 // ============================================================
@@ -309,15 +448,20 @@ void BoilerAppDevice::loop() {
     if (millis() - _lastHistory > 10000) {
         _lastHistory = millis();
         boilerAppState.pushHistory(boilerAppState.power_kw);
+        _updateAnalytics(); 
         boilerAppState.energy_kwh += boilerAppState.power_kw * (10.0f / 3600.0f);
     }
 
-#ifdef MODULE_MQTT
-    if (millis() - _lastPub > boilerAppCfg.pub_interval) {
-        _lastPub = millis();
-        publishMqtt();
-    }
-#endif
+    #ifdef MODULE_MQTT
+        if (millis() - _lastPub > boilerAppCfg.pub_interval) {
+            _lastPub = millis();
+            publishMqtt();
+        }
+    #endif
+
+    #ifdef DEVICE_EKONOM
+        updateFromEkoNom();
+    #endif
 }
 
 // ============================================================
@@ -355,6 +499,20 @@ void BoilerAppDevice::updateFromA16() {
     // Итоговый расход — берём больший из двух
     boilerAppState.flow_lpm = max(boilerAppState.flow1_lpm, boilerAppState.flow2_lpm);
 }
+
+#ifdef DEVICE_EKONOM
+void BoilerAppDevice::updateFromEkoNom() {
+    if (!ekoNomData.valid) return;
+    boilerAppState.t_supply  = ekoNomData.t_supply;
+    boilerAppState.t_return  = ekoNomData.t_return;
+    boilerAppState.t_delta   = ekoNomData.t_delta;
+    float lpm = ekoNomData.flow_m3h * 1000.0f / 60.0f;
+    boilerAppState.flow1_lpm = lpm;   // отображается в UI
+    boilerAppState.flow2_lpm = 0.0f;  // второго расходомера нет
+    boilerAppState.flow_lpm  = lpm;   // используется для расчёта мощности 
+    boilerAppState.power_kw  = ekoNomData.power_kw;
+}
+#endif
 
 void BoilerAppDevice::calcPower() {
     // P(кВт) = m_dot(кг/с) × Cp(кДж/кг·К) × ΔT(К)

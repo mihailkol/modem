@@ -41,6 +41,8 @@ struct BoilerAppConfig {
 //  СОСТОЯНИЕ КОТЛА — runtime
 // ============================================================
 #define BOILER_HIST_SIZE 60  // 60 × 10сек = 10 минут
+#define BOILER_HIST1H_SIZE 360  // 360 × 10сек = 1 час
+#define BOILER_POWER_ON_KW 0.5f // порог "котёл работает", кВт
 
 struct BoilerAppState {
     // Температуры
@@ -75,6 +77,32 @@ struct BoilerAppState {
     float    hist_power[BOILER_HIST_SIZE] = {};
     uint8_t  hist_head  = 0;
     uint8_t  hist_count = 0;
+
+    
+    // Аналитика за последний час
+    float    hist1h_power[BOILER_HIST1H_SIZE] = {};  // мощность, кВт
+    float    hist1h_delta[BOILER_HIST1H_SIZE] = {};  // дельта T, °C
+    uint16_t hist1h_head  = 0;
+    uint16_t hist1h_count = 0;
+ 
+    // Расчётные показатели (обновляются каждые 10 сек)
+    float    power_avg_1h    = 0.0f;  // средняя мощность за час, кВт
+    float    power_peak_1h   = 0.0f;  // пиковая мощность за час, кВт
+    float    delta_avg_1h    = 0.0f;  // средняя дельта T за час, °C
+    uint16_t cycles_1h       = 0;     // количество включений за час
+    uint16_t runtime_min     = 0;     // время работы за час, мин
+    uint16_t idle_min        = 0;     // время простоя за час, мин
+    uint8_t  duty_pct        = 0;     // duty cycle, %
+    uint16_t cycle_dur_min   = 0;     // длительность текущего цикла, мин
+    bool     burner_on       = false; // котёл сейчас работает
+    uint32_t cycle_start_ms  = 0;     // millis() начала текущего цикла
+ 
+    void pushHistory1h(float p, float dt) {
+        hist1h_power[hist1h_head] = p;
+        hist1h_delta[hist1h_head] = dt;
+        hist1h_head = (hist1h_head + 1) % BOILER_HIST1H_SIZE;
+        if (hist1h_count < BOILER_HIST1H_SIZE) hist1h_count++;
+    }
 
     void pushHistory(float p) {
         hist_power[hist_head] = p;

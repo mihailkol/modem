@@ -19,6 +19,12 @@ private:
     static uint32_t _lastCalc;
     static uint32_t _lastHistory;
     static uint32_t _lastPub;
+
+    static void _updateAnalytics();
+
+    #ifdef DEVICE_EKONOM
+        static void updateFromEkoNom();
+    #endif
 };
 
 #endif

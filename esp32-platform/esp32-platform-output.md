@@ -3,8 +3,8 @@
 ## 📊 Project Information
 
 - **Project Name**: `esp32-platform`
-- **Generated On**: 2026-05-08 04:55:13 (Asia/Novosibirsk / GMT+07:00)
-- **Total Files Processed**: 29
+- **Generated On**: 2026-05-22 18:41:56 (Asia/Novosibirsk / GMT+07:00)
+- **Total Files Processed**: 33
 - **Export Tool**: Easy Whole Project to Single Text File for LLMs v1.1.0
 - **Tool Author**: Jota / José Guilherme Pandolfi
 
@@ -21,20 +21,20 @@
 
 ```
 ├── 📁 data/
-│   └── 📄 index.html (10.72 KB)
+│   └── 📄 index.html (10.93 KB)
 ├── 📁 src/
 │   ├── 📁 apps/
 │   │   └── 📁 boiler/
-│   │       ├── 📄 BoilerApp.h (3.37 KB)
-│   │       ├── 📄 BoilerAppDevice.cpp (18.48 KB)
-│   │       └── 📄 BoilerAppDevice.h (517 B)
+│   │       ├── 📄 BoilerApp.h (4.98 KB)
+│   │       ├── 📄 BoilerAppDevice.cpp (25.39 KB)
+│   │       └── 📄 BoilerAppDevice.h (631 B)
 │   ├── 📁 core/
 │   │   ├── 📄 ConfigManager.cpp (2.31 KB)
 │   │   ├── 📄 ConfigManager.h (442 B)
 │   │   ├── 📄 CoreTypes.h (2.13 KB)
-│   │   ├── 📄 NetworkManager.cpp (3.7 KB)
-│   │   ├── 📄 NetworkManager.h (377 B)
-│   │   ├── 📄 WebHandler.cpp (10.35 KB)
+│   │   ├── 📄 NetworkManager.cpp (5.4 KB)
+│   │   ├── 📄 NetworkManager.h (408 B)
+│   │   ├── 📄 WebHandler.cpp (11.83 KB)
 │   │   └── 📄 WebHandler.h (644 B)
 │   ├── 📁 devices/
 │   │   ├── 📁 boiler/
@@ -42,9 +42,12 @@
 │   │   │   ├── 📄 BoilerDevice.h (621 B)
 │   │   │   └── 📄 BoilerTypes.h (2.42 KB)
 │   │   ├── 📁 boiler-monitor/
-│   │   │   ├── 📄 BMonDevice.cpp (23.35 KB)
+│   │   │   ├── 📄 BMonDevice.cpp (23.83 KB)
 │   │   │   ├── 📄 BMonDevice.h (1012 B)
 │   │   │   └── 📄 BMonTypes.h (5.05 KB)
+│   │   ├── 📁 ekonom/
+│   │   │   ├── 📄 EkoNomDevice.cpp (6.49 KB)
+│   │   │   └── 📄 EkoNomDevice.h (1.79 KB)
 │   │   └── 📁 kc868-a16/
 │   │       ├── 📄 A16Device.cpp (20.35 KB)
 │   │       ├── 📄 A16Device.h (1019 B)
@@ -56,11 +59,14 @@
 │   │   ├── 📁 mqtt/
 │   │   │   ├── 📄 MqttHandler.cpp (6.13 KB)
 │   │   │   └── 📄 MqttHandler.h (992 B)
+│   │   ├── 📁 rs485/
+│   │   │   ├── 📄 Rs485Handler.cpp (23.43 KB)
+│   │   │   └── 📄 Rs485Handler.h (2.33 KB)
 │   │   └── 📁 telegram/
 │   │       ├── 📄 TgHandler.cpp (6.78 KB)
 │   │       └── 📄 TgHandler.h (860 B)
-│   └── 📄 main.cpp (7.48 KB)
-├── 📄 platformio.ini (3.26 KB)
+│   └── 📄 main.cpp (11.28 KB)
+├── 📄 platformio.ini (3.39 KB)
 └── 📄 sdkconfig.defaults (192 B)
 ```
 
@@ -85,6 +91,8 @@
 - [📄 src/devices/boiler-monitor/BMonDevice.cpp](#📄-src-devices-boiler-monitor-bmondevice-cpp)
 - [📄 src/devices/boiler-monitor/BMonDevice.h](#📄-src-devices-boiler-monitor-bmondevice-h)
 - [📄 src/devices/boiler-monitor/BMonTypes.h](#📄-src-devices-boiler-monitor-bmontypes-h)
+- [📄 src/devices/ekonom/EkoNomDevice.cpp](#📄-src-devices-ekonom-ekonomdevice-cpp)
+- [📄 src/devices/ekonom/EkoNomDevice.h](#📄-src-devices-ekonom-ekonomdevice-h)
 - [📄 src/devices/kc868-a16/A16Device.cpp](#📄-src-devices-kc868-a16-a16device-cpp)
 - [📄 src/devices/kc868-a16/A16Device.h](#📄-src-devices-kc868-a16-a16device-h)
 - [📄 src/devices/kc868-a16/A16Types.h](#📄-src-devices-kc868-a16-a16types-h)
@@ -92,6 +100,8 @@
 - [📄 src/modules/modem/ModemHandler.h](#📄-src-modules-modem-modemhandler-h)
 - [📄 src/modules/mqtt/MqttHandler.cpp](#📄-src-modules-mqtt-mqtthandler-cpp)
 - [📄 src/modules/mqtt/MqttHandler.h](#📄-src-modules-mqtt-mqtthandler-h)
+- [📄 src/modules/rs485/Rs485Handler.cpp](#📄-src-modules-rs485-rs485handler-cpp)
+- [📄 src/modules/rs485/Rs485Handler.h](#📄-src-modules-rs485-rs485handler-h)
 - [📄 src/modules/telegram/TgHandler.cpp](#📄-src-modules-telegram-tghandler-cpp)
 - [📄 src/modules/telegram/TgHandler.h](#📄-src-modules-telegram-tghandler-h)
 - [📄 src/main.cpp](#📄-src-main-cpp)
@@ -103,18 +113,18 @@
 
 | Metric | Count |
 |--------|-------|
-| Total Files | 29 |
-| Total Directories | 13 |
-| Text Files | 28 |
+| Total Files | 33 |
+| Total Directories | 15 |
+| Text Files | 32 |
 | Binary Files | 1 |
-| Total Size | 205.74 KB |
+| Total Size | 256.24 KB |
 
 ### 📄 File Types Distribution
 
 | Extension | Count |
 |-----------|-------|
-| `.h` | 15 |
-| `.cpp` | 11 |
+| `.h` | 17 |
+| `.cpp` | 13 |
 | `.html` | 1 |
 | `.ini` | 1 |
 | `.defaults` | 1 |
@@ -124,15 +134,15 @@
 ### <a id="📄-data-index-html"></a>📄 `data/index.html`
 
 **File Info:**
-- **Size**: 10.72 KB
+- **Size**: 10.93 KB
 - **Extension**: `.html`
 - **Language**: `html`
 - **Location**: `data/index.html`
 - **Relative Path**: `data`
 - **Created**: 2026-02-18 20:59:52 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-05-06 12:10:00 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `d53234570ed318c850b9b94d3ebd532b`
-- **SHA256**: `f6fb094073e3a8d01743e77009a3f95880b79f68a8e930fe23bd5a664e933dc2`
+- **Modified**: 2026-05-22 07:56:09 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `df65a1f42fa21443d3b0a02d70ec4260`
+- **SHA256**: `70d4ec7bdb7a67c1f08d57ae4f8be4318b8fbacd8870bd97ccfe32ddbcde1283`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -334,7 +344,7 @@ button.btn-secondary { background: var(--border); color: var(--text); }
 
 <div class="status-bar" id="statusBar">
   <div class="status-dot"><div class="dot" id="dot_wifi"></div>Wi-Fi</div>
-  <div class="status-dot"><div class="dot" id="dot_eth"></div>ETH</div>
+  <div class="status-dot"><div class="dot" id="dot_eth"></div>ETH <span id="eth_ip" style="font-size:10px;color:var(--muted)"></span></div>
   <div class="status-dot"><div class="dot" id="dot_mqtt"></div>MQTT</div>
   <div class="status-dot"><div class="dot" id="dot_tg"></div>Telegram</div>
   <div class="status-dot"><div class="dot" id="dot_modem"></div>Модем</div>
@@ -427,18 +437,20 @@ async function updateStatus() {
     };
     set('dot_wifi', d.wifi);
     set('dot_eth',  d.eth);
+      const ethIp = document.getElementById('eth_ip');
+      if (ethIp) ethIp.textContent = d.eth ? '(' + (d.eth_ip || '') + ')' : '';
     set('dot_mqtt', d.mqtt);
     set('dot_tg',   d.tg);
-    const dotModem = document.getElementById('dot_modem');
-    if (dotModem) {
-      if (!d.modem_enabled) {
-        dotModem.classList.remove('on', 'off');  // серый — дефолт
-      } else {
-        const reg = d.modem_creg == 1 || d.modem_creg == 5;
-        dotModem.classList.toggle('on', reg);
-        dotModem.classList.toggle('off', !reg);
+      const dotModem = document.getElementById('dot_modem');
+      if (dotModem) {
+        if (!d.modem_enabled) {
+          dotModem.classList.remove('on', 'off');  // серый — дефолт
+        } else {
+          const reg = d.modem_creg == 1 || d.modem_creg == 5;
+          dotModem.classList.toggle('on', reg);
+          dotModem.classList.toggle('off', !reg);
+        }
       }
-    }
     const online = d.eth || d.wifi;
     const el = document.getElementById('status_online');
     if (el) { el.textContent = online ? 'ONLINE' : 'OFFLINE';
@@ -462,15 +474,15 @@ setInterval(updateStatus, 5000);
 ### <a id="📄-src-apps-boiler-boilerapp-h"></a>📄 `src/apps/boiler/BoilerApp.h`
 
 **File Info:**
-- **Size**: 3.37 KB
+- **Size**: 4.98 KB
 - **Extension**: `.h`
 - **Language**: `text`
 - **Location**: `src/apps/boiler/BoilerApp.h`
 - **Relative Path**: `src/apps/boiler`
 - **Created**: 2026-02-18 04:57:08 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-18 04:57:08 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `5a6f1a1b16eb96059c384df667da24da`
-- **SHA256**: `000d76a5a8e40790a3d2481aaa9abbe58a293e24f38d1676cb59cd01c648836d`
+- **Modified**: 2026-05-22 18:41:55 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `bb5186fcf9f4eb4770fe7b2fc945be09`
+- **SHA256**: `af0066205903efd8a95d0779f5b1fd73afd842b54aac53f5c1a633f6f7b24b45`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -519,6 +531,8 @@ struct BoilerAppConfig {
 //  СОСТОЯНИЕ КОТЛА — runtime
 // ============================================================
 #define BOILER_HIST_SIZE 60  // 60 × 10сек = 10 минут
+#define BOILER_HIST1H_SIZE 360  // 360 × 10сек = 1 час
+#define BOILER_POWER_ON_KW 0.5f // порог "котёл работает", кВт
 
 struct BoilerAppState {
     // Температуры
@@ -554,6 +568,32 @@ struct BoilerAppState {
     uint8_t  hist_head  = 0;
     uint8_t  hist_count = 0;
 
+    
+    // Аналитика за последний час
+    float    hist1h_power[BOILER_HIST1H_SIZE] = {};  // мощность, кВт
+    float    hist1h_delta[BOILER_HIST1H_SIZE] = {};  // дельта T, °C
+    uint16_t hist1h_head  = 0;
+    uint16_t hist1h_count = 0;
+ 
+    // Расчётные показатели (обновляются каждые 10 сек)
+    float    power_avg_1h    = 0.0f;  // средняя мощность за час, кВт
+    float    power_peak_1h   = 0.0f;  // пиковая мощность за час, кВт
+    float    delta_avg_1h    = 0.0f;  // средняя дельта T за час, °C
+    uint16_t cycles_1h       = 0;     // количество включений за час
+    uint16_t runtime_min     = 0;     // время работы за час, мин
+    uint16_t idle_min        = 0;     // время простоя за час, мин
+    uint8_t  duty_pct        = 0;     // duty cycle, %
+    uint16_t cycle_dur_min   = 0;     // длительность текущего цикла, мин
+    bool     burner_on       = false; // котёл сейчас работает
+    uint32_t cycle_start_ms  = 0;     // millis() начала текущего цикла
+ 
+    void pushHistory1h(float p, float dt) {
+        hist1h_power[hist1h_head] = p;
+        hist1h_delta[hist1h_head] = dt;
+        hist1h_head = (hist1h_head + 1) % BOILER_HIST1H_SIZE;
+        if (hist1h_count < BOILER_HIST1H_SIZE) hist1h_count++;
+    }
+
     void pushHistory(float p) {
         hist_power[hist_head] = p;
         hist_head = (hist_head + 1) % BOILER_HIST_SIZE;
@@ -573,15 +613,15 @@ extern BoilerAppState  boilerAppState;
 ### <a id="📄-src-apps-boiler-boilerappdevice-cpp"></a>📄 `src/apps/boiler/BoilerAppDevice.cpp`
 
 **File Info:**
-- **Size**: 18.48 KB
+- **Size**: 25.39 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/apps/boiler/BoilerAppDevice.cpp`
 - **Relative Path**: `src/apps/boiler`
 - **Created**: 2026-02-18 04:58:28 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-18 04:58:28 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `c2f4c51cabd8083c7ea2fc7ce05da164`
-- **SHA256**: `9091ed31abb5d1e53d06e449760119db32e8c08016955e0388b4fe409627f7c5`
+- **Modified**: 2026-05-22 18:41:53 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `1baadd524f0fb6482699ebc9fa4d42cb`
+- **SHA256**: `21ae50b0e959889687d5c5a79241fa3b3583815c6c38b2a3854fae67004a6828`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -601,6 +641,10 @@ extern BoilerAppState  boilerAppState;
 #endif
 #ifdef MODULE_TELEGRAM
 #include "../../modules/telegram/TgHandler.h"
+#endif
+
+#ifdef DEVICE_EKONOM
+#include "../../devices/ekonom/EkoNomDevice.h"
 #endif
 
 BoilerAppConfig boilerAppCfg;
@@ -667,6 +711,54 @@ static const char BOILER_MON_HTML[] PROGMEM = R"html(
       </div>
     </div>
   </div>
+
+  <div class="card" style="margin-top:10px">
+  <div class="section-label">АНАЛИТИКА (последний час)</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_avg">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Ср. мощность кВт</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_peak">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Пик мощности кВт</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_dt">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Ср. ΔT °C</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_duty">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Duty cycle %</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_cyc">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Включений</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_run">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Работа мин</div>
+    </div>
+    <div style="background:#111318;border-radius:8px;padding:10px 8px;text-align:center">
+      <div style="font-size:20px;font-weight:800;color:var(--accent)" id="a_idle">—</div>
+      <div style="font-size:10px;color:var(--muted);margin-top:2px">Простой мин</div>
+    </div>
+  </div>
+
+  <div style="margin-top:8px;padding:8px 10px;background:#111318;border-radius:8px;
+              display:flex;align-items:center;gap:8px;font-size:13px">
+    <span id="a_burner_led" style="width:10px;height:10px;border-radius:50%;
+          background:var(--muted);flex-shrink:0"></span>
+    <span id="a_burner_txt">—</span>
+    <span style="margin-left:auto;color:var(--muted);font-size:11px">
+      Текущий цикл: <b id="a_cycdur">—</b> мин
+    </span>
+  </div>
+</div>
 
   <div class="m-card">
     <div class="m-card-label">ИСТОРИЯ МОЩНОСТИ</div>
@@ -776,7 +868,25 @@ async function loadBoilerCfg() {
   document.getElementById('p_min').value        = d.p_min;
   document.getElementById('p_max').value        = d.p_max;
   document.getElementById('pub_interval').value = d.pub_interval;
-}
+
+
+  if (d.power_avg_1h  !== undefined) {
+    document.getElementById('a_avg').textContent    = d.power_avg_1h.toFixed(1);
+    document.getElementById('a_peak').textContent   = d.power_peak_1h.toFixed(1);
+    document.getElementById('a_dt').textContent     = d.delta_avg_1h.toFixed(1);
+    document.getElementById('a_duty').textContent   = d.duty_pct + '%';
+    document.getElementById('a_cyc').textContent    = d.cycles_1h;
+    document.getElementById('a_run').textContent    = d.runtime_min;
+    document.getElementById('a_idle').textContent   = d.idle_min;
+    document.getElementById('a_cycdur').textContent = d.cycle_dur_min;
+    const led = document.getElementById('a_burner_led');
+    led.style.background = d.burner_on ? 'var(--ok)' : 'var(--muted)';
+    led.style.boxShadow  = d.burner_on ? '0 0 6px var(--ok)' : 'none';
+    document.getElementById('a_burner_txt').textContent =
+      d.burner_on ? 'Горелка работает' : 'Горелка выключена';
+  }
+
+  }
 async function saveBoilerCfg() {
   const data = {
     t_max:                +document.getElementById('t_max').value,
@@ -823,6 +933,18 @@ void BoilerAppDevice::init() {
         doc["power_kw"]   = boilerAppState.power_kw;
         doc["energy_kwh"] = boilerAppState.energy_kwh;
 
+        
+        // Аналитика
+        doc["power_avg_1h"]  = boilerAppState.power_avg_1h;
+        doc["power_peak_1h"] = boilerAppState.power_peak_1h;
+        doc["delta_avg_1h"]  = boilerAppState.delta_avg_1h;
+        doc["cycles_1h"]     = boilerAppState.cycles_1h;
+        doc["runtime_min"]   = boilerAppState.runtime_min;
+        doc["idle_min"]      = boilerAppState.idle_min;
+        doc["duty_pct"]      = boilerAppState.duty_pct;
+        doc["cycle_dur_min"] = boilerAppState.cycle_dur_min;
+        doc["burner_on"]     = boilerAppState.burner_on;
+    
         JsonArray hist = doc["history"].to<JsonArray>();
         uint8_t start = (boilerAppState.hist_head - boilerAppState.hist_count
                          + BOILER_HIST_SIZE) % BOILER_HIST_SIZE;
@@ -884,6 +1006,63 @@ void BoilerAppDevice::init() {
     Serial.println("[BOILER] App init OK");
 }
 
+void BoilerAppDevice::_updateAnalytics() {
+    auto& s = boilerAppState;
+ 
+    // 1. Записать в часовой буфер
+    s.pushHistory1h(s.power_kw, s.t_delta);
+ 
+    // 2. Подсчёт показателей по буферу
+    float sum_p = 0, peak_p = 0, sum_dt = 0;
+    uint16_t on_ticks = 0;  // тиков (по 10 сек) когда котёл работал
+    uint16_t prev_on = 0;
+    uint16_t cyc = 0;
+    uint16_t n = s.hist1h_count;
+ 
+    for (uint16_t i = 0; i < n; i++) {
+        // Идём от старых к новым
+        uint16_t idx = (s.hist1h_head - n + i + BOILER_HIST1H_SIZE) % BOILER_HIST1H_SIZE;
+        float p  = s.hist1h_power[idx];
+        float dt = s.hist1h_delta[idx];
+ 
+        sum_p  += p;
+        sum_dt += dt;
+        if (p > peak_p) peak_p = p;
+ 
+        bool on = (p >= BOILER_POWER_ON_KW);
+        if (on) on_ticks++;
+        // Считаем включения: переход 0→1
+        if (on && !prev_on) cyc++;
+        prev_on = on;
+    }
+ 
+    if (n > 0) {
+        s.power_avg_1h  = sum_p  / n;
+        s.delta_avg_1h  = sum_dt / n;
+        s.power_peak_1h = peak_p;
+        s.cycles_1h     = cyc;
+        // on_ticks × 10 сек → минуты
+        s.runtime_min   = (on_ticks * 10) / 60;
+        s.idle_min       = ((n - on_ticks) * 10) / 60;
+        s.duty_pct      = (uint8_t)((on_ticks * 100) / n);
+    }
+ 
+    // 3. Текущий цикл
+    bool now_on = (s.power_kw >= BOILER_POWER_ON_KW);
+    if (now_on && !s.burner_on) {
+        // Включился
+        s.burner_on      = true;
+        s.cycle_start_ms = millis();
+    } else if (!now_on && s.burner_on) {
+        // Выключился
+        s.burner_on = false;
+        s.cycle_start_ms = millis();
+    }
+    if (s.cycle_start_ms > 0) {
+        s.cycle_dur_min = (uint16_t)((millis() - s.cycle_start_ms) / 60000);
+    }
+}
+
 // ============================================================
 //  LOOP
 // ============================================================
@@ -898,15 +1077,20 @@ void BoilerAppDevice::loop() {
     if (millis() - _lastHistory > 10000) {
         _lastHistory = millis();
         boilerAppState.pushHistory(boilerAppState.power_kw);
+        _updateAnalytics(); 
         boilerAppState.energy_kwh += boilerAppState.power_kw * (10.0f / 3600.0f);
     }
 
-#ifdef MODULE_MQTT
-    if (millis() - _lastPub > boilerAppCfg.pub_interval) {
-        _lastPub = millis();
-        publishMqtt();
-    }
-#endif
+    #ifdef MODULE_MQTT
+        if (millis() - _lastPub > boilerAppCfg.pub_interval) {
+            _lastPub = millis();
+            publishMqtt();
+        }
+    #endif
+
+    #ifdef DEVICE_EKONOM
+        updateFromEkoNom();
+    #endif
 }
 
 // ============================================================
@@ -944,6 +1128,20 @@ void BoilerAppDevice::updateFromA16() {
     // Итоговый расход — берём больший из двух
     boilerAppState.flow_lpm = max(boilerAppState.flow1_lpm, boilerAppState.flow2_lpm);
 }
+
+#ifdef DEVICE_EKONOM
+void BoilerAppDevice::updateFromEkoNom() {
+    if (!ekoNomData.valid) return;
+    boilerAppState.t_supply  = ekoNomData.t_supply;
+    boilerAppState.t_return  = ekoNomData.t_return;
+    boilerAppState.t_delta   = ekoNomData.t_delta;
+    float lpm = ekoNomData.flow_m3h * 1000.0f / 60.0f;
+    boilerAppState.flow1_lpm = lpm;   // отображается в UI
+    boilerAppState.flow2_lpm = 0.0f;  // второго расходомера нет
+    boilerAppState.flow_lpm  = lpm;   // используется для расчёта мощности 
+    boilerAppState.power_kw  = ekoNomData.power_kw;
+}
+#endif
 
 void BoilerAppDevice::calcPower() {
     // P(кВт) = m_dot(кг/с) × Cp(кДж/кг·К) × ΔT(К)
@@ -1027,15 +1225,15 @@ bool BoilerAppDevice::saveConfig() {
 ### <a id="📄-src-apps-boiler-boilerappdevice-h"></a>📄 `src/apps/boiler/BoilerAppDevice.h`
 
 **File Info:**
-- **Size**: 517 B
+- **Size**: 631 B
 - **Extension**: `.h`
 - **Language**: `text`
 - **Location**: `src/apps/boiler/BoilerAppDevice.h`
 - **Relative Path**: `src/apps/boiler`
 - **Created**: 2026-02-18 04:57:12 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-18 04:57:12 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `67420ed002706b2f83d2b97f12c7f586`
-- **SHA256**: `8e9ac315bc5a682168892985fefffa41cdde542cbe2a18cf78ee52d4d41aa8ac`
+- **Modified**: 2026-05-22 18:41:55 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `35c75a808e7aed1c4dc2c9f87a230417`
+- **SHA256**: `731077e579cf55c297271b051a6a619833e8df1624c3ac282bd66c7ab0a8dd03`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -1062,6 +1260,12 @@ private:
     static uint32_t _lastCalc;
     static uint32_t _lastHistory;
     static uint32_t _lastPub;
+
+    static void _updateAnalytics();
+
+    #ifdef DEVICE_EKONOM
+        static void updateFromEkoNom();
+    #endif
 };
 
 #endif
@@ -1280,15 +1484,15 @@ extern SemaphoreHandle_t coreMutex;
 ### <a id="📄-src-core-networkmanager-cpp"></a>📄 `src/core/NetworkManager.cpp`
 
 **File Info:**
-- **Size**: 3.7 KB
+- **Size**: 5.4 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/core/NetworkManager.cpp`
 - **Relative Path**: `src/core`
 - **Created**: 2026-02-18 03:18:42 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-03-20 12:31:12 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `eaa1c36a90947bcf5aabf63f9d06bbc3`
-- **SHA256**: `af34c509f5e0365bd14bb8a096bd3f3a19ea51cfc340519aac91fd2f3b3758f3`
+- **Modified**: 2026-05-22 07:20:17 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `6305b28a5d81f6efd4aa8f4e590d11db`
+- **SHA256**: `1568f66002dd70cbbd361d8712a74a2b56711d6ad5a2ff673d62a3f601ce646a`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -1302,8 +1506,14 @@ extern SemaphoreHandle_t coreMutex;
 #include "../devices/boiler-monitor/BMonTypes.h"
 #endif
 
+RTC_DATA_ATTR static uint8_t _ethRebootCount = 0;
+
 DNSServer  NetworkManager::_dns;
 uint32_t   NetworkManager::_lastEthCheck = 0;
+// ETH watchdog
+static bool     _ethWdArmed   = true;
+static uint8_t  _ethWdPhySt   = 0;      // 0=idle, 1=phy low, 2=phy high
+static uint32_t _ethWdTimer   = 0;
 
 void NetworkManager::begin() {
     WiFi.onEvent(onWiFiEvent);
@@ -1336,11 +1546,49 @@ void NetworkManager::begin() {
     Serial.printf("[NET] Device name: %s\n", baseCfg.device_name);
 }
 
+void NetworkManager::_ethPhyReset() {
+    Serial.println("[NET] ETH watchdog: resetting PHY");
+    #ifdef ETH_POWER_PIN
+    digitalWrite(ETH_POWER_PIN, LOW);
+    #endif
+}
+
 void NetworkManager::loop() {
     xSemaphoreTake(coreMutex, portMAX_DELAY);
     bool connected      = sysState.ethConnected || sysState.wifiConnected;
     bool apActive       = sysState.apMode;
     xSemaphoreGive(coreMutex);
+
+    // ETH watchdog
+    if (_ethWdArmed) {
+        if (sysState.ethConnected) {
+            _ethWdArmed    = false;
+            _ethRebootCount = 0;
+        } else if (_ethWdPhySt == 0 && millis() - _ethWdTimer > 30000) {
+            if (_ethRebootCount < 3) {
+                _ethPhyReset();
+                _ethWdPhySt = 1;
+                _ethWdTimer = millis();
+            } else {
+                Serial.println("[NET] ETH watchdog: giving up after 3 attempts");
+                _ethWdArmed = false;
+                // AP поднимется штатно через существующую логику
+            }
+        } else if (_ethWdPhySt == 1 && millis() - _ethWdTimer > 200) {
+            // PHY был LOW 200мс — поднимаем
+            #ifdef ETH_POWER_PIN
+            digitalWrite(ETH_POWER_PIN, HIGH);
+            #endif
+            _ethWdPhySt = 2;
+            _ethWdTimer = millis();
+        } else if (_ethWdPhySt == 2 && millis() - _ethWdTimer > 30000) {
+            // Ждали 30 сек после PHY reset — не помогло
+            _ethRebootCount++;
+            _ethWdPhySt = 0;
+            _ethWdTimer = millis();
+            Serial.printf("[NET] ETH watchdog: PHY reset attempt %d failed\n", _ethRebootCount);
+        }
+    }
 
     // Captive portal DNS
 #ifdef MODULE_CAPTIVE_PORTAL
@@ -1387,6 +1635,8 @@ void NetworkManager::onWiFiEvent(WiFiEvent_t event) {
                 WiFi.disconnect(true);
                 sysState.wifiConnected = false;
             }
+            _ethRebootCount = 0;
+            _ethWdArmed     = false;
             break;
 
         case ARDUINO_EVENT_ETH_DISCONNECTED:
@@ -1420,15 +1670,15 @@ void NetworkManager::onWiFiEvent(WiFiEvent_t event) {
 ### <a id="📄-src-core-networkmanager-h"></a>📄 `src/core/NetworkManager.h`
 
 **File Info:**
-- **Size**: 377 B
+- **Size**: 408 B
 - **Extension**: `.h`
 - **Language**: `text`
 - **Location**: `src/core/NetworkManager.h`
 - **Relative Path**: `src/core`
 - **Created**: 2026-02-17 12:55:36 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-17 12:55:36 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `1312433b079fa80d42ae26570480e96d`
-- **SHA256**: `ddf39c07c2362e0b4c39b09e5c5511b427a10db192bf16a73a77ba1606ca9102`
+- **Modified**: 2026-05-22 07:20:17 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `e3b658371ac67347e154019fc95a96c7`
+- **SHA256**: `51dfe1fc3a5a8bb16a6220215490ac8b61b8ab26df3b17c52a297a398043ecc5`
 - **Encoding**: ASCII
 
 **File code content:**
@@ -1450,7 +1700,7 @@ public:
 private:
     static void startAP();
     static void onWiFiEvent(WiFiEvent_t event);
-
+    static void _ethPhyReset();
     static DNSServer  _dns;
     static uint32_t   _lastEthCheck;
 };
@@ -1462,15 +1712,15 @@ private:
 ### <a id="📄-src-core-webhandler-cpp"></a>📄 `src/core/WebHandler.cpp`
 
 **File Info:**
-- **Size**: 10.35 KB
+- **Size**: 11.83 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/core/WebHandler.cpp`
 - **Relative Path**: `src/core`
 - **Created**: 2026-02-18 22:12:02 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-05-08 04:55:13 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `1b0d4e4e7d906ee2f04e87a76596ba44`
-- **SHA256**: `11ab56d259067c6b4d8d63a9bd2fe95e7c743b05729a2c2b22385965bcf3389f`
+- **Modified**: 2026-05-22 14:25:59 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `445e6aeb0a906ff1de0f6908403a8b14`
+- **SHA256**: `e05cf81541002f01990cc58d0d296fd35963c59ef247e3ea617577ff5079f1fc`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -1480,6 +1730,8 @@ private:
 #include "ConfigManager.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <ETH.h>
+#include <WiFi.h>
 
 #ifdef MODULE_MODEM
 extern int  _modemCreg;
@@ -1534,7 +1786,9 @@ void WebHandler::init(AsyncWebServer& server) {
         String id = req->getParam("id")->value();
         for (auto& tab : _tabs) {
             if (id == tab.id) {
-                req->send(200, "text/html", tab.html);
+                AsyncWebServerResponse* resp = req->beginResponse(200, "text/html", tab.html);
+                resp->addHeader("Cache-Control", "no-store");
+                req->send(resp);
                 return;
             }
         }
@@ -1546,6 +1800,7 @@ void WebHandler::init(AsyncWebServer& server) {
         JsonDocument doc;
         xSemaphoreTake(coreMutex, portMAX_DELAY);
         doc["eth"]   = sysState.ethConnected;
+        doc["eth_ip"] = sysState.ethConnected ? ETH.localIP().toString() : "";
         doc["wifi"]  = sysState.wifiConnected;
         doc["ap"]    = sysState.apMode;
         doc["mqtt"]  = sysState.mqttConnected;
@@ -1559,8 +1814,34 @@ void WebHandler::init(AsyncWebServer& server) {
         #endif
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
+    });
 
+    server.on("/api/net-status", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["eth_connected"]  = sysState.ethConnected;
+        doc["wifi_connected"] = sysState.wifiConnected;
+        doc["ap_mode"]        = sysState.apMode;
+        doc["eth_ip"]         = sysState.ethConnected ? ETH.localIP().toString() : "";
+        doc["wifi_ip"]        = sysState.wifiConnected ? WiFi.localIP().toString() : "";
+        doc["ap_ip"]          = sysState.apMode ? WiFi.softAPIP().toString() : "";
+        doc["wifi_rssi"]      = sysState.wifiConnected ? WiFi.RSSI() : 0;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
 
+    server.on("/api/wifi-scan", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        JsonArray arr = doc["networks"].to<JsonArray>();
+        int n = WiFi.scanNetworks();
+        for (int i = 0; i < n; i++) {
+            JsonObject net = arr.add<JsonObject>();
+            net["ssid"] = WiFi.SSID(i);
+            net["rssi"] = WiFi.RSSI(i);
+            net["enc"]  = WiFi.encryptionType(i) != WIFI_AUTH_OPEN;
+        }
+        WiFi.scanDelete();
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
     });
 
     server.on("/api/syslog", HTTP_GET, [](AsyncWebServerRequest* req) {
@@ -2314,15 +2595,15 @@ extern BoilerState  boilerState;
 ### <a id="📄-src-devices-boiler-monitor-bmondevice-cpp"></a>📄 `src/devices/boiler-monitor/BMonDevice.cpp`
 
 **File Info:**
-- **Size**: 23.35 KB
+- **Size**: 23.83 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/devices/boiler-monitor/BMonDevice.cpp`
 - **Relative Path**: `src/devices/boiler-monitor`
 - **Created**: 2026-03-20 07:06:03 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-04-18 10:03:50 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `5a00a0d0c0bd80cb5acb05bd96f04f32`
-- **SHA256**: `1ee8d152662b4ef5caa4be19bd8d93b7c9625600fb543f3394ee7a8a733a5064`
+- **Modified**: 2026-05-09 05:48:40 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `4d6ff40402c6cc680c1b698383d362f4`
+- **SHA256**: `8a0cac0dcc683ae765442d166699e1238fcc7c9dabec096b5feaf0467b9d18ac`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -2592,6 +2873,7 @@ void BMonDevice::init() {
     attachInterrupt(digitalPinToInterrupt(BMON_PIN_FLOW1), onFlow1, FALLING);
     attachInterrupt(digitalPinToInterrupt(BMON_PIN_FLOW2), onFlow2, FALLING);
     Serial.println("[BMON] Flow interrupts attached");
+    Serial.printf("[BMON] GPIO2=%d GPIO4=%d\n", digitalRead(BMON_PIN_FLOW1), digitalRead(BMON_PIN_FLOW2));
 
     // Аналоговые входы давления
     pinMode(BMON_PIN_PRESS1, INPUT);
@@ -2628,6 +2910,8 @@ void BMonDevice::init() {
         doc["alarm_high"] = bmonState.alarm_high;
         doc["alarm_low"]  = bmonState.alarm_low;
         doc["alarm_sensor"] = bmonState.alarm_sensor;
+        doc["pulse1_count"] = bmonState.pulse1_count;
+        doc["pulse2_count"] = bmonState.pulse2_count;
 
         JsonArray hist = doc["history"].to<JsonArray>();
         uint8_t start = (bmonState.hist_head - bmonState.hist_count + BMON_HISTORY_SIZE) % BMON_HISTORY_SIZE;
@@ -2698,6 +2982,13 @@ void BMonDevice::init() {
 void BMonDevice::loop() {
     uint32_t now = millis();
 
+    static uint32_t lastDbg = 0;
+    if (millis() - lastDbg > 2000) {
+        lastDbg = millis();
+        Serial.printf("[BMON] GPIO2=%d GPIO4=%d\n", 
+            digitalRead(BMON_PIN_FLOW1), digitalRead(BMON_PIN_FLOW2));
+    }
+
     // Опрос температур и давления каждые 2 сек
     if (now - _lastRead > 2000) {
         _lastRead = now;
@@ -2762,11 +3053,11 @@ void BMonDevice::readTemperatures() {
     bmonState.alarm_sensor = false;
 
     int16_t raw;
-    raw = ads.readADC_SingleEnded(0); bmonState.t_supply  = ntcToTemp(raw, bmonCfg.ntc_b);
-    raw = ads.readADC_SingleEnded(1); bmonState.t_return  = ntcToTemp(raw, bmonCfg.ntc_b);
-    raw = ads.readADC_SingleEnded(2); bmonState.t_room    = ntcToTemp(raw, bmonCfg.ntc_b);
-    raw = ads.readADC_SingleEnded(3); bmonState.t_outdoor = ntcToTemp(raw, bmonCfg.ntc_b);
-
+    raw = ads.readADC_SingleEnded(3); bmonState.t_supply  = ntcToTemp(raw, bmonCfg.ntc_b); // NTC1
+    raw = ads.readADC_SingleEnded(2); bmonState.t_return  = ntcToTemp(raw, bmonCfg.ntc_b); // NTC2
+    raw = ads.readADC_SingleEnded(1); bmonState.t_room    = ntcToTemp(raw, bmonCfg.ntc_b); // NTC3
+    raw = ads.readADC_SingleEnded(0); bmonState.t_outdoor = ntcToTemp(raw, bmonCfg.ntc_b); // NTC4
+      
     // Дельта только если оба датчика живые
     if (!isnan(bmonState.t_supply) && !isnan(bmonState.t_return))
         bmonState.t_delta = bmonState.t_supply - bmonState.t_return;
@@ -3118,6 +3409,223 @@ extern BMonConfig bmonCfg;
 extern BMonState  bmonState;
 
 #endif // DEVICE_BOILER_MONITOR
+```
+
+---
+
+### <a id="📄-src-devices-ekonom-ekonomdevice-cpp"></a>📄 `src/devices/ekonom/EkoNomDevice.cpp`
+
+**File Info:**
+- **Size**: 6.49 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/devices/ekonom/EkoNomDevice.cpp`
+- **Relative Path**: `src/devices/ekonom`
+- **Created**: 2026-05-22 16:16:26 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-05-22 16:33:09 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `c99d2a0bd1a9a45e34eeeb262ee8fec6`
+- **SHA256**: `6a46b73a15f8a086ed283e2473a5e6bd2b211d6d90ebcd77418bd83a03061950`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#include "EkoNomDevice.h"
+#include "../../modules/rs485/Rs485Handler.h"
+
+// ── Глобальные данные ────────────────────────────────────────────────────────
+EkoNomData ekoNomData;
+
+// ── Статика ──────────────────────────────────────────────────────────────────
+EkoNomDevice::State    EkoNomDevice::_state        = IDLE;
+uint32_t               EkoNomDevice::_lastPollMs   = 0;
+uint32_t               EkoNomDevice::_sentMs       = 0;
+uint8_t                EkoNomDevice::_pollInterval = 30;
+
+// ── Запросы (CRC предрассчитан и проверен на реальном приборе) ───────────────
+// R1: 01 03 00 00 00 0C 45 CF  — рег 0x00-0x0B: энергия, темп., дельта, объём
+// R2: 01 03 00 0C 00 02 04 08  — рег 0x0C-0x0D: расход
+// R3: 01 03 00 0E 00 02 A5 C8  — рег 0x0E-0x0F: мощность
+static const uint8_t REQ_R1[] = {0x01,0x03,0x00,0x00,0x00,0x0C,0x45,0xCF};
+static const uint8_t REQ_R2[] = {0x01,0x03,0x00,0x0C,0x00,0x02,0x04,0x08};
+static const uint8_t REQ_R3[] = {0x01,0x03,0x00,0x0E,0x00,0x02,0xA5,0xC8};
+
+static const uint16_t TIMEOUT_MS = 1000;
+
+// ── Вспомогательные ──────────────────────────────────────────────────────────
+uint32_t EkoNomDevice::_reg32(const uint8_t* d, int offset) {
+    return ((uint32_t)d[offset]   << 24)
+         | ((uint32_t)d[offset+1] << 16)
+         | ((uint32_t)d[offset+2] <<  8)
+         |  (uint32_t)d[offset+3];
+}
+
+// ── Парсинг ──────────────────────────────────────────────────────────────────
+// R1 ответ: 01 03 18 [24 байта] CRC CRC
+// Раскладка по регистрам (каждый параметр = 2 регистра = 4 байта):
+//   offset 3:  0x00-0x01 — энергия       (÷100 кВт·ч)
+//   offset 7:  0x02-0x03 — зарезервировано
+//   offset 11: 0x04-0x05 — T подачи      (÷100 °C)
+//   offset 15: 0x06-0x07 — T обратки     (÷100 °C)
+//   offset 19: 0x08-0x09 — ΔT            (÷100 °C)
+//   offset 23: 0x0A-0x0B — объём         (÷100 м³)
+bool EkoNomDevice::_parseR1(const uint8_t* d, size_t len) {
+    if (len < 27) return false;
+    if (d[0] != 0x01 || d[1] != 0x03 || d[2] != 0x18) return false;
+    ekoNomData.energy_kwh = _reg32(d,  3) / 100.0f;
+    ekoNomData.t_supply   = _reg32(d, 11) / 100.0f;
+    ekoNomData.t_return   = _reg32(d, 15) / 100.0f;
+    ekoNomData.t_delta    = _reg32(d, 19) / 100.0f;
+    ekoNomData.volume_m3  = _reg32(d, 23) / 100.0f;
+    return true;
+}
+
+// R2 ответ: 01 03 04 [4 байта] CRC CRC — расход (÷10000 м³/ч)
+bool EkoNomDevice::_parseR2(const uint8_t* d, size_t len) {
+    if (len < 9) return false;
+    if (d[0] != 0x01 || d[1] != 0x03 || d[2] != 0x04) return false;
+    ekoNomData.flow_m3h = _reg32(d, 3) / 10000.0f;
+    return true;
+}
+
+// R3 ответ: 01 03 04 [4 байта] CRC CRC — мощность (÷100 кВт)
+bool EkoNomDevice::_parseR3(const uint8_t* d, size_t len) {
+    if (len < 9) return false;
+    if (d[0] != 0x01 || d[1] != 0x03 || d[2] != 0x04) return false;
+    ekoNomData.power_kw = _reg32(d, 3) / 100.0f;
+    return true;
+}
+
+// ── Callback от Rs485Handler ─────────────────────────────────────────────────
+void EkoNomDevice::_onFrame(const uint8_t* data, size_t len) {
+    switch (_state) {
+        case WAIT_R1:
+            if (_parseR1(data, len)) {
+                _state = WAIT_R2;
+                Rs485Handler::sendBytes(REQ_R2, sizeof(REQ_R2));
+                _sentMs = millis();
+            } else {
+                Serial.printf("[EKONOM] R1 parse error, len=%d\n", len);
+                _state = IDLE;
+            }
+            break;
+
+        case WAIT_R2:
+            if (_parseR2(data, len)) {
+                _state = WAIT_R3;
+                Rs485Handler::sendBytes(REQ_R3, sizeof(REQ_R3));
+                _sentMs = millis();
+            } else {
+                Serial.printf("[EKONOM] R2 parse error, len=%d\n", len);
+                _state = IDLE;
+            }
+            break;
+
+        case WAIT_R3:
+            if (_parseR3(data, len)) {
+                ekoNomData.valid      = true;
+                ekoNomData.updated_ms = millis();
+                Serial.printf("[EKONOM] Ts=%.2f Tr=%.2f dT=%.2f P=%.2f kW F=%.4f m3/h E=%.2f kWh\n",
+                    ekoNomData.t_supply, ekoNomData.t_return, ekoNomData.t_delta,
+                    ekoNomData.power_kw, ekoNomData.flow_m3h, ekoNomData.energy_kwh);
+            } else {
+                Serial.printf("[EKONOM] R3 parse error, len=%d\n", len);
+            }
+            _state = IDLE;
+            break;
+
+        default:
+            break;
+    }
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+void EkoNomDevice::init(uint8_t pollIntervalSec) {
+    _pollInterval = pollIntervalSec;
+    Rs485Handler::onFrame = _onFrame;
+    Serial.printf("[EKONOM] Init OK, poll every %ds\n", _pollInterval);
+}
+
+// ── LOOP ─────────────────────────────────────────────────────────────────────
+void EkoNomDevice::loop() {
+    uint32_t now = millis();
+
+    // Таймаут ожидания ответа
+    if (_state != IDLE && (now - _sentMs) > TIMEOUT_MS) {
+        Serial.printf("[EKONOM] Timeout in state %d\n", (int)_state);
+        _state = IDLE;
+    }
+
+    // Запуск нового цикла опроса
+    if (_state == IDLE && (now - _lastPollMs) >= (uint32_t)_pollInterval * 1000) {
+        _lastPollMs = now;
+        _state = WAIT_R1;
+        Rs485Handler::sendBytes(REQ_R1, sizeof(REQ_R1));
+        _sentMs = now;
+    }
+}
+```
+
+---
+
+### <a id="📄-src-devices-ekonom-ekonomdevice-h"></a>📄 `src/devices/ekonom/EkoNomDevice.h`
+
+**File Info:**
+- **Size**: 1.79 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/devices/ekonom/EkoNomDevice.h`
+- **Relative Path**: `src/devices/ekonom`
+- **Created**: 2026-05-22 16:15:32 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-05-22 16:26:12 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `925a3475f13d56d0d01fa760d6af27ee`
+- **SHA256**: `a1a0aecfc212a6273ea8c283c4b64d76112269a59ee39250b688855171ce52f8`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef DEVICE_EKONOM
+
+#include <Arduino.h>
+
+// ── Данные теплосчётчика ─────────────────────────────────────────────────────
+struct EkoNomData {
+    float    energy_kwh  = 0;    // накопленная энергия, кВт·ч
+    float    t_supply    = 0;    // температура подачи, °C
+    float    t_return    = 0;    // температура обратки, °C
+    float    t_delta     = 0;    // разность температур, °C
+    float    volume_m3   = 0;    // объём, м³
+    float    flow_m3h    = 0;    // расход, м³/ч
+    float    power_kw    = 0;    // мощность, кВт
+    uint32_t updated_ms  = 0;    // millis() последнего успешного опроса
+    bool     valid       = false;
+};
+
+extern EkoNomData ekoNomData;
+
+// ── Драйвер ──────────────────────────────────────────────────────────────────
+class EkoNomDevice {
+public:
+    static void init(uint8_t pollIntervalSec = 30);
+    static void loop();
+
+private:
+    enum State { IDLE, WAIT_R1, WAIT_R2, WAIT_R3 };
+    static State    _state;
+    static uint32_t _lastPollMs;
+    static uint32_t _sentMs;
+    static uint8_t  _pollInterval;
+
+    static void    _onFrame(const uint8_t* data, size_t len);
+    static bool    _parseR1(const uint8_t* data, size_t len);
+    static bool    _parseR2(const uint8_t* data, size_t len);
+    static bool    _parseR3(const uint8_t* data, size_t len);
+    static uint32_t _reg32(const uint8_t* d, int offset);
+};
+
+#endif // DEVICE_EKONOM
 ```
 
 ---
@@ -5583,6 +6091,574 @@ private:
 
 ---
 
+### <a id="📄-src-modules-rs485-rs485handler-cpp"></a>📄 `src/modules/rs485/Rs485Handler.cpp`
+
+**File Info:**
+- **Size**: 23.43 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/modules/rs485/Rs485Handler.cpp`
+- **Relative Path**: `src/modules/rs485`
+- **Created**: 2026-05-21 19:00:42 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-05-22 15:00:22 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `e814bd66ded6da96ff75f14f9d51a311`
+- **SHA256**: `c38db487f5da5ba8d9b9e9f7728fcb751b0d26f00ec2d07fcb29158a0a5ace12`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef MODULE_RS485
+#include "Rs485Handler.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include <AsyncJson.h>
+#include <ArduinoJson.h>
+#include <WiFiServer.h>
+#include <WiFiClient.h>
+
+// ── Глобальные данные ────────────────────────────────────────────────────────
+Rs485Config rs485Cfg;
+Rs485Status rs485Status;
+void (*Rs485Handler::onFrame)(const uint8_t*, size_t) = nullptr;
+
+// ── Статические члены ────────────────────────────────────────────────────────
+HardwareSerial* Rs485Handler::_serial    = nullptr;
+uint32_t        Rs485Handler::_lastByteMs = 0;
+uint8_t         Rs485Handler::_rxBuf[256];
+size_t          Rs485Handler::_rxLen     = 0;
+
+static WiFiServer*  _tcpServer  = nullptr;
+static WiFiClient   _tcpClients[4];
+static const uint8_t MAX_CLIENTS = 4;
+
+// ── HTML вкладки ─────────────────────────────────────────────────────────────
+static const char RS485_TAB_HTML[] PROGMEM = R"html(
+<div class="r4-page">
+
+  <!-- Статус -->
+  <div class="r4-card">
+    <div class="r4-label">СТАТУС RS485</div>
+    <div class="r4-status-row">
+      <span class="r4-led" id="r_led"></span>
+      <span id="r_status_txt">—</span>
+      <span style="margin-left:auto;color:var(--muted);font-size:12px">TCP: <b id="r_tcp">0</b></span>
+    </div>
+    <div class="r4-counters">
+      <div class="r4-cnt"><div class="r4-cnt-val" id="r_rx">0</div><div class="r4-cnt-lbl">RX байт</div></div>
+      <div class="r4-cnt"><div class="r4-cnt-val" id="r_tx">0</div><div class="r4-cnt-lbl">TX байт</div></div>
+    </div>
+  </div>
+
+  <!-- Консоль -->
+  <div class="r4-card">
+    <div class="r4-label">КОНСОЛЬ (HEX)</div>
+    <div id="r_log" class="r4-log"></div>
+    <div style="display:flex;gap:6px;margin-top:8px">
+      <input type="text" id="r_cmd" placeholder="01 03 00 08 00 02 44 0A"
+             style="flex:1;min-width:0;background:#111318;border:1px solid var(--border);border-radius:6px;padding:7px 10px;color:var(--text);font-family:monospace;font-size:12px"
+             onkeydown="if(event.key==='Enter')rSend()">
+      <button onclick="rSend()"
+              style="width:auto;flex-shrink:0;background:var(--accent);color:#111;border:none;border-radius:6px;padding:7px 14px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:0">▶</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:6px;align-items:center">
+      <button onclick="rClear()" class="r4-btn-sm">🗑 Очистить</button>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px">
+        <input type="checkbox" id="r_auto" checked> Авто
+      </label>
+    </div>
+  </div>
+
+  <!-- Генератор Modbus -->
+  <div class="r4-card">
+    <div class="r4-label">ГЕНЕРАТОР MODBUS RTU</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <select id="g_fc" onchange="gCalc()" style="width:100%;margin-bottom:0;background:#111318;border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-size:12px">
+        <option value="03">FC03 Read Holding Registers</option>
+        <option value="04">FC04 Read Input Registers</option>
+        <option value="06">FC06 Write Single Register</option>
+        <option value="10">FC16 Write Multiple Registers</option>
+      </select>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span style="font-size:11px;color:var(--muted);white-space:nowrap">ID</span>
+        <input type="number" id="g_id" value="1" min="1" max="247" oninput="gCalc()"
+               style="width:52px!important;min-width:0;margin-bottom:0;background:#111318;border:1px solid var(--border);border-radius:6px;padding:5px 7px;color:var(--text);font-size:12px">
+        <span style="font-size:11px;color:var(--muted);white-space:nowrap">Рег.</span>
+        <input type="number" id="g_reg" value="8" min="0" max="65535" oninput="gCalc()"
+               style="flex:1;width:0!important;min-width:0;margin-bottom:0;background:#111318;border:1px solid var(--border);border-radius:6px;padding:5px 7px;color:var(--text);font-size:12px">
+        <span style="font-size:11px;color:var(--muted);white-space:nowrap">N/Val</span>
+        <input type="number" id="g_cnt" value="2" min="1" max="125" oninput="gCalc()"
+               style="width:52px!important;min-width:0;margin-bottom:0;background:#111318;border:1px solid var(--border);border-radius:6px;padding:5px 7px;color:var(--text);font-size:12px">
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:10px;background:#111318;border:1px solid var(--border);border-radius:6px;padding:8px 10px">
+      <span style="color:var(--muted);font-size:11px;white-space:nowrap">HEX:</span>
+      <span id="g_hex" style="font-family:monospace;font-size:13px;color:var(--accent);flex:1;word-break:break-all;white-space:normal">—</span>
+      <button onclick="gUse()" style="width:auto!important;margin-bottom:0;flex-shrink:0;background:var(--border);color:var(--text);border:none;border-radius:6px;padding:5px 10px;font-size:11px;cursor:pointer;white-space:nowrap">→ В консоль</button>
+    </div>
+    <div style="font-size:11px;color:var(--muted);margin-top:4px" id="g_desc"></div>
+  </div>
+
+  <!-- Настройки -->
+  <div class="r4-card">
+    <div class="r4-label">НАСТРОЙКИ</div>
+    <div class="r4-cfg-grid">
+      <label>Скорость (baud)</label>
+      <select id="c_baud">
+        <option>1200</option><option>2400</option><option>4800</option>
+        <option>9600</option><option>19200</option><option>38400</option>
+        <option>57600</option><option>115200</option>
+      </select>
+      <label>Биты данных</label>
+      <select id="c_data">
+        <option value="8">8</option>
+        <option value="7">7</option>
+      </select>
+      <label>Чётность</label>
+      <select id="c_parity">
+        <option value="0">None</option>
+        <option value="1">Even</option>
+        <option value="2">Odd</option>
+      </select>
+      <label>Стоп-биты</label>
+      <select id="c_stop">
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </select>
+      <label>DE/RE пин (-1 = нет)</label>
+      <input type="number" id="c_de" min="-1" max="39">
+      <label>TCP порт моста (0 = выкл)</label>
+      <input type="number" id="c_tcp" min="0" max="65535">
+      <label>Межфреймовый таймаут (мс)</label>
+      <input type="number" id="c_ift" min="1" max="100">
+    </div>
+    <button onclick="rSaveCfg()" style="margin-top:10px" class="r4-btn-save">💾 Сохранить и перезагрузить</button>
+  </div>
+
+</div>
+
+<style>
+.r4-page{display:flex;flex-direction:column;gap:10px}
+.r4-card{background:var(--card);border-radius:10px;padding:14px;border:1px solid var(--border)}
+.r4-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.r4-status-row{display:flex;align-items:center;gap:8px;font-size:13px}
+.r4-led{width:10px;height:10px;border-radius:50%;background:var(--muted);flex-shrink:0}
+.r4-led.on{background:var(--ok);box-shadow:0 0 6px var(--ok)}
+.r4-led.off{background:var(--danger);box-shadow:0 0 6px var(--danger)}
+.r4-counters{display:flex;gap:16px;margin-top:10px}
+.r4-cnt{text-align:center}
+.r4-cnt-val{font-size:20px;font-weight:800;color:var(--accent)}
+.r4-cnt-lbl{font-size:10px;color:var(--muted)}
+.r4-log{background:#111318;border:1px solid var(--border);border-radius:6px;padding:8px;
+        height:180px;overflow-y:auto;font-family:monospace;font-size:11px;
+        color:var(--text);word-break:break-all}
+.r4-log .rx{color:var(--cool)}
+.r4-log .tx{color:var(--warm)}
+.r4-log .ts{color:var(--muted);font-size:10px;margin-right:4px}
+.r4-send-row{display:flex;gap:6px;margin-top:8px;align-items:center}
+.r4-input{flex:1;width:0;background:#111318;border:1px solid var(--border);border-radius:6px;
+          padding:7px 10px;color:var(--text);font-family:monospace;font-size:12px}
+.r4-btn-send{background:var(--accent);color:#111;border:none;border-radius:6px;
+             padding:7px 16px;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;white-space:nowrap}
+.r4-btn-sm{background:var(--border);color:var(--text);border:none;border-radius:6px;
+           padding:5px 10px;font-size:11px;cursor:pointer}
+.r4-btn-save{background:var(--accent);color:#111;border:none;border-radius:6px;
+             padding:8px 16px;font-size:13px;font-weight:700;cursor:pointer}
+.r4-gen-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;align-items:center}
+.r4-gen-grid label{font-size:12px;color:var(--muted)}
+.r4-gen-grid select,.r4-gen-grid input[type=number]{
+  background:#111318;border:1px solid var(--border);border-radius:6px;
+  padding:6px 8px;color:var(--text);font-size:12px;width:100%}
+.r4-gen-result{display:flex;align-items:center;gap:8px;margin-top:10px;
+               background:#111318;border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.r4-hex-out{font-family:monospace;font-size:13px;color:var(--accent);flex:1;word-break:break-all}
+.r4-cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;align-items:center}
+.r4-cfg-grid label{font-size:12px;color:var(--muted)}
+.r4-cfg-grid select,.r4-cfg-grid input[type=number]{
+  background:#111318;border:1px solid var(--border);border-radius:6px;
+  padding:6px 8px;color:var(--text);font-size:12px;width:100%}
+</style>
+
+<script>
+// ── Консоль ──────────────────────────────────────────────────────────────────
+let _rLog=[], _rLastRx='';
+function rTs(){const d=new Date();return('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+':'+('0'+d.getSeconds()).slice(-2)}
+function rAppend(cls,hex){
+  _rLog.push('<div><span class="ts">'+rTs()+'</span><span class="'+cls+'">'+(cls==='rx'?'← ':'→ ')+hex+'</span></div>');
+  if(_rLog.length>300)_rLog.shift();
+  const el=document.getElementById('r_log');
+  el.innerHTML=_rLog.join('');
+  el.scrollTop=el.scrollHeight;
+}
+function rClear(){_rLog=[];document.getElementById('r_log').innerHTML=''}
+async function rSend(){
+  const hex=document.getElementById('r_cmd').value.trim();
+  if(!hex)return;
+  const r=await fetch('/api/rs485/send',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({hex})});
+  if(r.ok)rAppend('tx',hex);
+}
+async function rPoll(){
+  try{
+    const d=await(await fetch('/api/rs485/status')).json();
+    const led=document.getElementById('r_led');
+    led.className='r4-led '+(d.running?'on':'off');
+    document.getElementById('r_status_txt').textContent=d.running?'Работает':'Остановлен';
+    document.getElementById('r_tcp').textContent=d.tcp_clients;
+    document.getElementById('r_rx').textContent=d.rx_bytes;
+    document.getElementById('r_tx').textContent=d.tx_bytes;
+    if(d.last_rx_hex&&d.last_rx_hex!==_rLastRx){_rLastRx=d.last_rx_hex;rAppend('rx',d.last_rx_hex)}
+  }catch(e){}
+}
+
+// ── Генератор CRC16 Modbus ────────────────────────────────────────────────────
+function crc16(buf){
+  let crc=0xFFFF;
+  for(let i=0;i<buf.length;i++){
+    crc^=buf[i];
+    for(let j=0;j<8;j++) crc=(crc&1)?(crc>>>1)^0xA001:(crc>>>1);
+  }
+  return crc;
+}
+function toHex2(n){return('0'+n.toString(16).toUpperCase()).slice(-2)}
+function gCalc(){
+  const fc=parseInt(document.getElementById('g_fc').value,16);
+  const id=parseInt(document.getElementById('g_id').value)||1;
+  const reg=parseInt(document.getElementById('g_reg').value)||0;
+  const cnt=parseInt(document.getElementById('g_cnt').value)||1;
+  let buf=[];
+  if(fc===3||fc===4){
+    buf=[id,fc,(reg>>8)&0xFF,reg&0xFF,(cnt>>8)&0xFF,cnt&0xFF];
+  } else if(fc===6){
+    buf=[id,fc,(reg>>8)&0xFF,reg&0xFF,(cnt>>8)&0xFF,cnt&0xFF];
+  } else if(fc===0x10){
+    const bc=cnt*2;
+    buf=[id,0x10,(reg>>8)&0xFF,reg&0xFF,(cnt>>8)&0xFF,cnt&0xFF,bc];
+    for(let i=0;i<cnt;i++){buf.push(0x00);buf.push(0x00);}
+  }
+  const c=crc16(buf);
+  buf.push(c&0xFF);buf.push((c>>8)&0xFF);
+  const hex=buf.map(toHex2).join(' ');
+  document.getElementById('g_hex').textContent=hex;
+  const descs={3:'Читать Holding Registers',4:'Читать Input Registers',6:'Записать 1 регистр',0x10:'Записать N регистров'};
+  document.getElementById('g_desc').textContent=
+    (descs[fc]||'')+' | slave='+id+' | reg='+reg+' (0x'+('000'+reg.toString(16).toUpperCase()).slice(-4)+') | '+(fc<=4?'count=':'value=')+cnt;
+}
+function gUse(){
+  const hex=document.getElementById('g_hex').textContent;
+  if(hex!=='—')document.getElementById('r_cmd').value=hex;
+}
+
+// ── Конфиг ───────────────────────────────────────────────────────────────────
+async function rLoadCfg(){
+  const d=await(await fetch('/api/rs485/config')).json();
+  document.getElementById('c_baud').value=d.baud;
+  document.getElementById('c_data').value=d.data_bits;
+  document.getElementById('c_parity').value=d.parity;
+  document.getElementById('c_stop').value=d.stop_bits;
+  document.getElementById('c_de').value=d.de_pin;
+  document.getElementById('c_tcp').value=d.tcp_port;
+  document.getElementById('c_ift').value=d.inter_frame;
+}
+async function rSaveCfg(){
+  const data={
+    baud:+document.getElementById('c_baud').value,
+    data_bits:+document.getElementById('c_data').value,
+    parity:+document.getElementById('c_parity').value,
+    stop_bits:+document.getElementById('c_stop').value,
+    de_pin:+document.getElementById('c_de').value,
+    tcp_port:+document.getElementById('c_tcp').value,
+    inter_frame:+document.getElementById('c_ift').value,
+  };
+  const r=await fetch('/api/rs485/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+  if(r.ok){alert('Сохранено. Устройство перезагрузится.');setTimeout(()=>location.reload(),3000);}
+}
+
+// ── Init ─────────────────────────────────────────────────────────────────────
+rLoadCfg();gCalc();rPoll();
+setInterval(()=>{if(document.getElementById('r_auto').checked)rPoll();},500);
+</script>
+)html";
+
+// ── Вспомогательные функции ──────────────────────────────────────────────────
+String Rs485Handler::_toHex(const uint8_t* data, size_t len){
+  String s; s.reserve(len*3);
+  for(size_t i=0;i<len;i++){if(i)s+=' ';char b[3];snprintf(b,3,"%02X",data[i]);s+=b;}
+  return s;
+}
+size_t Rs485Handler::_fromHex(const String& hex, uint8_t* buf, size_t maxLen){
+  size_t count=0; int i=0;
+  while(i<(int)hex.length()&&count<maxLen){
+    while(i<(int)hex.length()&&hex[i]==' ')i++;
+    if(i+1>=(int)hex.length())break;
+    char b[3]={hex[i],hex[i+1],0};
+    buf[count++]=(uint8_t)strtol(b,nullptr,16);i+=2;
+  }
+  return count;
+}
+
+// ── UART init ────────────────────────────────────────────────────────────────
+void Rs485Handler::_initSerial(){
+  uint32_t config=SERIAL_8N1;
+  if     (rs485Cfg.parity==1&&rs485Cfg.stop_bits==1)config=SERIAL_8E1;
+  else if(rs485Cfg.parity==1&&rs485Cfg.stop_bits==2)config=SERIAL_8E2;
+  else if(rs485Cfg.parity==2&&rs485Cfg.stop_bits==1)config=SERIAL_8O1;
+  else if(rs485Cfg.parity==2&&rs485Cfg.stop_bits==2)config=SERIAL_8O2;
+  else if(rs485Cfg.stop_bits==2)                     config=SERIAL_8N2;
+
+  if(!_serial) _serial=new HardwareSerial(2);
+  _serial->begin(rs485Cfg.baud, config, rs485Cfg.rx_pin, rs485Cfg.tx_pin);
+
+  if(rs485Cfg.de_pin>=0){
+    pinMode(rs485Cfg.de_pin,OUTPUT);
+    digitalWrite(rs485Cfg.de_pin,LOW);
+  }
+  rs485Status.running=true;
+  Serial.printf("[RS485] UART2 %d baud RX=%d TX=%d DE=%d\n",
+    rs485Cfg.baud,rs485Cfg.rx_pin,rs485Cfg.tx_pin,rs485Cfg.de_pin);
+}
+
+// ── Отправка ─────────────────────────────────────────────────────────────────
+void Rs485Handler::sendBytes(const uint8_t* data, size_t len){
+  if(!_serial||!rs485Status.running)return;
+  if(rs485Cfg.de_pin>=0){digitalWrite(rs485Cfg.de_pin,HIGH);delayMicroseconds(200);}
+  _serial->write(data,len);
+  _serial->flush();
+  if(rs485Cfg.de_pin>=0){delayMicroseconds(200);digitalWrite(rs485Cfg.de_pin,LOW);}
+  rs485Status.tx_bytes+=len;
+  rs485Status.last_tx_hex=_toHex(data,len);
+}
+void Rs485Handler::sendHex(const String& hexStr){
+  uint8_t buf[256];
+  size_t len=_fromHex(hexStr,buf,sizeof(buf));
+  if(len>0)sendBytes(buf,len);
+}
+
+// ── Чтение ───────────────────────────────────────────────────────────────────
+void Rs485Handler::_readSerial(){
+  if(!_serial)return;
+  uint32_t now=millis();
+  while(_serial->available()&&_rxLen<sizeof(_rxBuf)){
+    _rxBuf[_rxLen++]=_serial->read();
+    _lastByteMs=now;
+    rs485Status.last_rx_ms=now;
+  }
+  if(_rxLen>0&&(now-_lastByteMs)>=rs485Cfg.inter_frame){
+    rs485Status.rx_bytes+=_rxLen;
+    rs485Status.last_rx_hex=_toHex(_rxBuf,_rxLen);
+    _broadcastToTcp(_rxBuf,_rxLen);
+    if(onFrame)onFrame(_rxBuf,_rxLen);
+    _rxLen=0;
+  }
+}
+
+// ── TCP мост ─────────────────────────────────────────────────────────────────
+void Rs485Handler::_broadcastToTcp(const uint8_t* data, size_t len){
+  if(!_tcpServer)return;
+  uint8_t count=0;
+  for(uint8_t i=0;i<MAX_CLIENTS;i++){
+    if(_tcpClients[i]&&_tcpClients[i].connected()){_tcpClients[i].write(data,len);count++;}
+  }
+  rs485Status.tcp_clients=count;
+}
+void Rs485Handler::_handleTcpClients(){
+  if(!_tcpServer)return;
+  if(_tcpServer->hasClient()){
+    WiFiClient inc=_tcpServer->accept();
+    bool placed=false;
+    for(uint8_t i=0;i<MAX_CLIENTS;i++){
+      if(!_tcpClients[i]||!_tcpClients[i].connected()){_tcpClients[i]=inc;placed=true;break;}
+    }
+    if(!placed)inc.stop();
+  }
+  uint8_t count=0;
+  for(uint8_t i=0;i<MAX_CLIENTS;i++){
+    if(!_tcpClients[i]||!_tcpClients[i].connected())continue;
+    count++;
+    while(_tcpClients[i].available()){
+      uint8_t buf[128];int n=_tcpClients[i].readBytes(buf,sizeof(buf));
+      if(n>0)sendBytes(buf,n);
+    }
+  }
+  rs485Status.tcp_clients=count;
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+void Rs485Handler::init(){
+  loadConfig();
+  if(!rs485Cfg.enabled){Serial.println("[RS485] Disabled");return;}
+  _initSerial();
+  if(rs485Cfg.tcp_port>0){
+    _tcpServer=new WiFiServer(rs485Cfg.tcp_port);
+    _tcpServer->begin();
+    Serial.printf("[RS485] TCP bridge port %d\n",rs485Cfg.tcp_port);
+  }
+  WebHandler::registerTab({"rs485","RS485","🔌",RS485_TAB_HTML});
+  extern AsyncWebServer server;
+
+  server.on("/api/rs485/status",HTTP_GET,[](AsyncWebServerRequest* req){
+    JsonDocument doc;
+    doc["running"]=rs485Status.running;doc["rx_bytes"]=rs485Status.rx_bytes;
+    doc["tx_bytes"]=rs485Status.tx_bytes;doc["tcp_clients"]=rs485Status.tcp_clients;
+    doc["last_rx_hex"]=rs485Status.last_rx_hex;doc["last_tx_hex"]=rs485Status.last_tx_hex;
+    String out;serializeJson(doc,out);req->send(200,"application/json",out);
+  });
+  server.on("/api/rs485/config",HTTP_GET,[](AsyncWebServerRequest* req){
+    JsonDocument doc;
+    doc["baud"]=rs485Cfg.baud;doc["parity"]=rs485Cfg.parity;
+    doc["data_bits"]=rs485Cfg.data_bits;doc["stop_bits"]=rs485Cfg.stop_bits;
+    doc["de_pin"]=rs485Cfg.de_pin;doc["tcp_port"]=rs485Cfg.tcp_port;
+    doc["inter_frame"]=rs485Cfg.inter_frame;
+    doc["rx_pin"]=rs485Cfg.rx_pin;doc["tx_pin"]=rs485Cfg.tx_pin;
+    String out;serializeJson(doc,out);req->send(200,"application/json",out);
+  });
+  auto* hSave=new AsyncCallbackJsonWebHandler("/api/rs485/save",
+    [](AsyncWebServerRequest* req,JsonVariant& json){
+      JsonObject o=json.as<JsonObject>();
+      rs485Cfg.baud       =o["baud"]       |9600;
+      rs485Cfg.data_bits  =o["data_bits"]  |8;
+      rs485Cfg.parity     =o["parity"]     |0;
+      rs485Cfg.stop_bits  =o["stop_bits"]  |1;
+      rs485Cfg.de_pin     =o["de_pin"]     |-1;
+      rs485Cfg.tcp_port   =o["tcp_port"]   |8485;
+      rs485Cfg.inter_frame=o["inter_frame"]|4;
+      Rs485Handler::saveConfig();
+      req->send(200,"application/json","{\"status\":\"ok\"}");
+      delay(500); ESP.restart();
+    }
+  );
+  server.addHandler(hSave);
+  auto* hSend=new AsyncCallbackJsonWebHandler("/api/rs485/send",
+    [](AsyncWebServerRequest* req,JsonVariant& json){
+      String hex=json["hex"]|"";
+      if(hex.length()>0)Rs485Handler::sendHex(hex);
+      req->send(200,"application/json","{\"status\":\"ok\"}");
+    }
+  );
+  server.addHandler(hSend);
+  Serial.println("[RS485] Init OK");
+}
+
+// ── LOOP ─────────────────────────────────────────────────────────────────────
+void Rs485Handler::loop(){
+  if(!rs485Status.running)return;
+  _readSerial();
+  _handleTcpClients();
+}
+
+// ── Конфиг ───────────────────────────────────────────────────────────────────
+bool Rs485Handler::loadConfig(){
+  JsonDocument doc;
+  if(!ConfigManager::loadJson("/rs485.json",doc))return false;
+  rs485Cfg.enabled    =doc["enabled"]    |true;
+  rs485Cfg.rx_pin     =doc["rx_pin"]     |16;
+  rs485Cfg.tx_pin     =doc["tx_pin"]     |13;
+  rs485Cfg.de_pin     =doc["de_pin"]     |-1;
+  rs485Cfg.baud       =doc["baud"]       |9600;
+  rs485Cfg.data_bits  =doc["data_bits"]  |8;
+  rs485Cfg.parity     =doc["parity"]     |0;
+  rs485Cfg.stop_bits  =doc["stop_bits"]  |1;
+  rs485Cfg.tcp_port   =doc["tcp_port"]   |8485;
+  rs485Cfg.inter_frame=doc["inter_frame"]|4;
+  return true;
+}
+bool Rs485Handler::saveConfig(){
+  JsonDocument doc;
+  doc["enabled"]=rs485Cfg.enabled;doc["rx_pin"]=rs485Cfg.rx_pin;doc["tx_pin"]=rs485Cfg.tx_pin;
+  doc["de_pin"]=rs485Cfg.de_pin;doc["baud"]=rs485Cfg.baud;doc["data_bits"]=rs485Cfg.data_bits;
+  doc["parity"]=rs485Cfg.parity;doc["stop_bits"]=rs485Cfg.stop_bits;
+  doc["tcp_port"]=rs485Cfg.tcp_port;doc["inter_frame"]=rs485Cfg.inter_frame;
+  return ConfigManager::saveJson("/rs485.json",doc);
+}
+
+#endif // MODULE_RS485
+```
+
+---
+
+### <a id="📄-src-modules-rs485-rs485handler-h"></a>📄 `src/modules/rs485/Rs485Handler.h`
+
+**File Info:**
+- **Size**: 2.33 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/modules/rs485/Rs485Handler.h`
+- **Relative Path**: `src/modules/rs485`
+- **Created**: 2026-05-21 19:00:33 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-05-22 14:41:34 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `e3c44d35038d74b0c15a33c14a8886fa`
+- **SHA256**: `0b691fa760bad61785a5b6cec91ecaa7ac17c664a7149db26756d71f0c31d81f`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef MODULE_RS485
+
+#include <HardwareSerial.h>
+#include "../../core/CoreTypes.h"
+
+// ── Конфиг (сохраняется в /rs485.json) ──────────────────────────────────────
+struct Rs485Config {
+    bool     enabled     = true;
+    int      rx_pin      = 16;
+    int      tx_pin      = 13;
+    int      de_pin      = -1;     // DE/RE пин MAX485, -1 = не используется
+    uint32_t baud        = 9600;
+    uint8_t  data_bits   = 8;
+    uint8_t  stop_bits   = 1;
+    uint8_t  parity      = 0;      // 0=none, 1=even, 2=odd
+    uint16_t tcp_port    = 8485;   // TCP-мост, 0 = отключён
+    uint16_t inter_frame = 4;      // мс тишины = конец фрейма
+};
+
+// ── Состояние ────────────────────────────────────────────────────────────────
+struct Rs485Status {
+    bool     running     = false;
+    uint32_t rx_bytes    = 0;
+    uint32_t tx_bytes    = 0;
+    uint8_t  tcp_clients = 0;
+    uint32_t last_rx_ms  = 0;
+    String   last_rx_hex;
+    String   last_tx_hex;
+};
+
+extern Rs485Config rs485Cfg;
+extern Rs485Status rs485Status;
+
+class Rs485Handler {
+public:
+    static void   init();
+    static void   loop();
+    static bool   loadConfig();
+    static bool   saveConfig();
+
+    // Отправить байты в шину (из консоли или другого модуля)
+    static void sendBytes(const uint8_t* data, size_t len);
+    static void sendHex(const String& hexStr);  // "01 03 00 00 00 02 C4 0B"
+
+    // Callback при получении фрейма из шины
+    static void (*onFrame)(const uint8_t* data, size_t len);
+
+private:
+    static void _initSerial();
+    static void _handleTcpClients();
+    static void _readSerial();
+    static void _broadcastToTcp(const uint8_t* data, size_t len);
+    static String _toHex(const uint8_t* data, size_t len);
+    static size_t _fromHex(const String& hex, uint8_t* buf, size_t maxLen);
+
+    static HardwareSerial* _serial;
+    static uint32_t        _lastByteMs;
+    static uint8_t         _rxBuf[256];
+    static size_t          _rxLen;
+};
+
+#endif // MODULE_RS485
+```
+
+---
+
 ### <a id="📄-src-modules-telegram-tghandler-cpp"></a>📄 `src/modules/telegram/TgHandler.cpp`
 
 **File Info:**
@@ -5852,16 +6928,16 @@ private:
 ### <a id="📄-src-main-cpp"></a>📄 `src/main.cpp`
 
 **File Info:**
-- **Size**: 7.48 KB
+- **Size**: 11.28 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/main.cpp`
 - **Relative Path**: `src`
 - **Created**: 2026-02-18 22:12:18 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-04-20 12:36:32 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `f14c3d4dc258021676131f8ad752037b`
-- **SHA256**: `5557b058cc10785a4380231ee349d25a4ce07f68db031cbe5ab0cc6bd38bbedc`
-- **Encoding**: UTF-8
+- **Modified**: 2026-05-22 16:25:28 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `02a32dca9de23164adfa936c9f54a342`
+- **SHA256**: `b85ba41ed7943b6e4e5bb65404dd04a54ceadd31f8a058cdb95a34f7d8c6e389`
+- **Encoding**: ASCII
 
 **File code content:**
 
@@ -5891,12 +6967,21 @@ private:
 #ifdef DEVICE_BOILER_MONITOR
 #include "devices/boiler-monitor/BMonDevice.h"
 #endif
+
 #if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
 #include "apps/boiler/BoilerAppDevice.h"
 #endif
 
+#ifdef DEVICE_EKONOM
+#include "devices/ekonom/EkoNomDevice.h"
+#endif
+
 #ifdef MODULE_MODEM
 #include "modules/modem/ModemHandler.h"
+#endif
+
+#ifdef MODULE_RS485
+#include "modules/rs485/Rs485Handler.h"
 #endif
 
 AsyncWebServer server(80);
@@ -5945,95 +7030,181 @@ void setup() {
     ModemHandler::init();
     #endif
 
-    // Вкладка настроек сети — всегда последняя
-    static const char SETTINGS_HTML[] = R"html(
-<div class="settings-group">
-  <h3>🌐 Сеть</h3>
-  <label><input type="checkbox" id="eth_dhcp" onchange="toggleEth()"> DHCP (Ethernet)</label>
-  <div id="eth_static" style="display:none">
-    <input type="text" name="eth_ip"   placeholder="IP: 192.168.1.100">
-    <input type="text" name="eth_mask" placeholder="Маска: 255.255.255.0">
-    <input type="text" name="eth_gw"   placeholder="Шлюз: 192.168.1.1">
-    <input type="text" name="eth_dns"  placeholder="DNS: 8.8.8.8">
-  </div>
-  <input type="text"     name="wifi_ssid"   placeholder="WiFi SSID">
-  <input type="password" name="wifi_pass"   placeholder="WiFi Password">
-  <input type="text"     name="device_name" placeholder="Имя устройства">
-</div>
-<div class="settings-group">
-  <h3>🔒 Веб-интерфейс</h3>
-  <input type="text"     name="web_user" placeholder="Пользователь">
-  <input type="password" name="web_pass" placeholder="Пароль">
-</div>
-<button onclick="saveSettings()">💾 Сохранить настройки</button>
-<div class="settings-group" style="margin-top:12px">
-  <h3>📂 Резервное копирование</h3>
-  <a href="/api/backup" download="backup.json">
-    <button type="button">📥 Скачать backup (всё)</button>
-  </a>
-  <a href="/api/download-config" download="base.json">
-    <button type="button" class="btn-secondary">📥 Только сетевые настройки</button>
-  </a>
-  <label style="margin-top:8px">Восстановить из backup.json:</label>
-  <input type="file" id="configUpload" accept=".json">
-  <button onclick="uploadConfig()">📤 Восстановить</button>
-</div>
-<div class="settings-group">
-  <h3>⚙️ Системные действия</h3>
-  <label>Прошивка или файловая система (.bin):</label>
-  <form method="POST" action="/update" enctype="multipart/form-data">
-    <input type="file" name="update">
-    <button type="submit">🚀 Обновить ПО</button>
-  </form>
-  <button onclick="fetch('/api/reboot').then(()=>alert('Перезагружаюсь...'))" class="btn-danger">
-    🔄 Перезагрузка
-  </button>
-</div>
-<script>
-let _currentCfg = {};
+    #ifdef MODULE_RS485
+        Rs485Handler::init();
+    #endif
 
-async function loadSettings() {
-  const r = await fetch('/api/get-config');
-  if (!r.ok) return;
-  _currentCfg = await r.json();
-  document.getElementById('eth_dhcp').checked = _currentCfg.eth_dhcp;
-  Object.keys(_currentCfg).forEach(k => {
-    const el = document.querySelector('[name="'+k+'"]');
-    if (el) el.value = _currentCfg[k];
-  });
-  toggleEth();
-}
-function toggleEth() {
-  document.getElementById('eth_static').style.display =
-    document.getElementById('eth_dhcp').checked ? 'none' : 'block';
-}
-async function saveSettings() {
-  // Берём текущий конфиг как базу, поверх него — только непустые поля
-  const data = Object.assign({}, _currentCfg);
-  data.eth_dhcp = document.getElementById('eth_dhcp').checked;
-  const fields = ['eth_ip','eth_mask','eth_gw','eth_dns',
-                  'wifi_ssid','wifi_pass','device_name','web_user','web_pass'];
-  fields.forEach(k => {
-    const el = document.querySelector('[name="'+k+'"]');
-    if (el && el.value.trim() !== '') data[k] = el.value.trim();
-  });
-  const r = await fetch('/api/save-config', {method:'POST',
-    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-  if (r.ok) alert('Настройки сохранены');
-}
-async function uploadConfig() {
-  const file = document.getElementById('configUpload').files[0];
-  if (!file) return alert('Выберите файл!');
-  const text = await file.text();
-  let data;
-  try { data = JSON.parse(text); } catch(e) { return alert('Неверный JSON'); }
-  const r = await fetch('/api/restore', {method:'POST',
-    headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
-  if (r.ok) alert('Восстановлено. Перезагрузка...');
-}
-loadSettings();
-</script>
-)html";
+    #ifdef DEVICE_EKONOM
+        EkoNomDevice::init(30);   // опрос каждые 30 сек
+    #endif
+
+    // Вкладка настроек сети — всегда последняя
+
+    static const char SETTINGS_HTML[] = R"html(
+    <div class="settings-group">
+      <h3>📡 Статус сети</h3>
+      <div id="net_status" style="font-size:12px;color:var(--muted)">загрузка...</div>
+    </div>
+
+    <div class="settings-group">
+      <h3>🌐 Сеть</h3>
+      <label><input type="checkbox" id="eth_dhcp" onchange="toggleEth()"> DHCP (Ethernet)</label>
+      <div id="eth_static" style="display:none">
+        <input type="text" name="eth_ip"   placeholder="IP: 192.168.1.100">
+        <input type="text" name="eth_mask" placeholder="Маска: 255.255.255.0">
+        <input type="text" name="eth_gw"   placeholder="Шлюз: 192.168.1.1">
+        <input type="text" name="eth_dns"  placeholder="DNS: 8.8.8.8">
+      </div>
+      <label style="margin-top:8px">WiFi SSID</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" name="wifi_ssid" placeholder="SSID" style="margin:0;flex:1">
+        <button onclick="scanWifi()" style="width:auto;padding:10px 12px;margin:0">🔍</button>
+      </div>
+      <div id="wifi_scan_results" style="display:none;margin-top:4px;border:1px solid var(--border);
+        border-radius:6px;max-height:160px;overflow-y:auto;background:var(--bg)"></div>
+      <input type="password" name="wifi_pass" placeholder="WiFi Password" style="margin-top:8px">
+      <input type="text" name="device_name" placeholder="Имя устройства">
+    </div>
+
+    <div class="settings-group">
+      <h3>🔒 Веб-интерфейс</h3>
+      <input type="text"     name="web_user" placeholder="Пользователь">
+      <input type="password" name="web_pass" placeholder="Пароль">
+    </div>
+    <button onclick="saveSettings()">💾 Сохранить настройки</button>
+
+    <div class="settings-group" style="margin-top:12px">
+      <h3>📂 Резервное копирование</h3>
+      <a href="/api/backup" download="backup.json">
+        <button type="button">📥 Скачать backup (всё)</button>
+      </a>
+      <a href="/api/download-config" download="base.json">
+        <button type="button" class="btn-secondary">📥 Только сетевые настройки</button>
+      </a>
+      <label style="margin-top:8px">Восстановить из backup.json:</label>
+      <input type="file" id="configUpload" accept=".json">
+      <button onclick="uploadConfig()">📤 Восстановить</button>
+    </div>
+
+    <div class="settings-group">
+      <h3>⚙️ Системные действия</h3>
+      <label>Прошивка или файловая система (.bin):</label>
+      <form method="POST" action="/update" enctype="multipart/form-data">
+        <input type="file" name="update">
+        <button type="submit">🚀 Обновить ПО</button>
+      </form>
+      <button onclick="fetch('/api/reboot').then(()=>alert('Перезагружаюсь...'))" class="btn-danger">
+        🔄 Перезагрузка
+      </button>
+    </div>
+
+    <script>
+    let _currentCfg = {};
+
+    async function loadNetStatus() {
+      try {
+        const r = await fetch('/api/net-status');
+        const d = await r.json();
+        let html = '';
+        if (d.eth_connected)
+          html += `<b>ETH:</b> ${d.eth_ip} &nbsp;`;
+        else
+          html += `<b>ETH:</b> <span style="color:var(--danger)">не подключён</span> &nbsp;`;
+        if (d.wifi_connected)
+          html += `<b>WiFi:</b> ${d.wifi_ip} (${d.wifi_rssi} dBm) &nbsp;`;
+        else if (d.ap_mode)
+          html += `<b>AP:</b> ${d.ap_ip} &nbsp;`;
+        else
+          html += `<b>WiFi:</b> <span style="color:var(--muted)">не подключён</span> &nbsp;`;
+        document.getElementById('net_status').innerHTML = html;
+      } catch(e) {}
+    }
+
+    async function scanWifi() {
+      const btn = event.target;
+      btn.textContent = '⏳';
+      btn.disabled = true;
+      try {
+        const r = await fetch('/api/wifi-scan');
+        const d = await r.json();
+        const container = document.getElementById('wifi_scan_results');
+        container.style.display = 'block';
+        container.innerHTML = '';
+        if (!d.networks || d.networks.length === 0) {
+          container.innerHTML = '<div style="padding:8px;color:var(--muted)">Сети не найдены</div>';
+          return;
+        }
+        // Сортируем по уровню сигнала
+        d.networks.sort((a,b) => b.rssi - a.rssi);
+        d.networks.forEach(n => {
+          const bars = n.rssi > -50 ? '████' : n.rssi > -65 ? '███░' :
+                      n.rssi > -75 ? '██░░' : '█░░░';
+          const lock = n.enc ? '🔒' : '🔓';
+          const div = document.createElement('div');
+          div.style.cssText = 'padding:8px 12px;cursor:pointer;border-bottom:1px solid var(--border);font-size:12px';
+          div.innerHTML = `${lock} <b>${n.ssid}</b> <span style="color:var(--muted);float:right">${bars} ${n.rssi} dBm</span>`;
+          div.onmouseenter = () => div.style.background = 'var(--border)';
+          div.onmouseleave = () => div.style.background = '';
+          div.onclick = () => {
+            document.querySelector('[name="wifi_ssid"]').value = n.ssid;
+            container.style.display = 'none';
+            document.querySelector('[name="wifi_pass"]').focus();
+          };
+          container.appendChild(div);
+        });
+      } catch(e) {
+        alert('Ошибка сканирования');
+      } finally {
+        btn.textContent = '🔍';
+        btn.disabled = false;
+      }
+    }
+
+    async function loadSettings() {
+      const r = await fetch('/api/get-config');
+      if (!r.ok) return;
+      _currentCfg = await r.json();
+      document.getElementById('eth_dhcp').checked = _currentCfg.eth_dhcp;
+      Object.keys(_currentCfg).forEach(k => {
+        const el = document.querySelector('[name="'+k+'"]');
+        if (el) el.value = _currentCfg[k];
+      });
+      toggleEth();
+    }
+    function toggleEth() {
+      document.getElementById('eth_static').style.display =
+        document.getElementById('eth_dhcp').checked ? 'none' : 'block';
+    }
+    async function saveSettings() {
+      const data = Object.assign({}, _currentCfg);
+      data.eth_dhcp = document.getElementById('eth_dhcp').checked;
+      const fields = ['eth_ip','eth_mask','eth_gw','eth_dns',
+                      'wifi_ssid','wifi_pass','device_name','web_user','web_pass'];
+      fields.forEach(k => {
+        const el = document.querySelector('[name="'+k+'"]');
+        if (el && el.value.trim() !== '') data[k] = el.value.trim();
+      });
+      const r = await fetch('/api/save-config', {method:'POST',
+        headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+      if (r.ok) alert('Настройки сохранены');
+    }
+    async function uploadConfig() {
+      const file = document.getElementById('configUpload').files[0];
+      if (!file) return alert('Выберите файл!');
+      const text = await file.text();
+      let data;
+      try { data = JSON.parse(text); } catch(e) { return alert('Неверный JSON'); }
+      const r = await fetch('/api/restore', {method:'POST',
+        headers:{'Content-Type':'application/json'}, body: JSON.stringify(data)});
+      if (r.ok) alert('Восстановлено. Перезагрузка...');
+    }
+
+    loadSettings();
+    loadNetStatus();
+    setInterval(loadNetStatus, 5000);
+    </script>
+    )html";
+
     WebHandler::registerTab({"settings", "Настройки", "⚙️", SETTINGS_HTML});
 
     // 4. Запуск веб-сервера
@@ -6092,6 +7263,14 @@ void loop() {
     ModemHandler::loop();
     #endif
 
+    #ifdef MODULE_RS485
+        Rs485Handler::loop();
+    #endif
+
+    #ifdef DEVICE_EKONOM
+        EkoNomDevice::loop();
+    #endif
+
     // Перезагрузка по запросу из веб-интерфейса
     xSemaphoreTake(coreMutex, portMAX_DELAY);
     bool reboot = sysState.pendingReboot && (millis() - sysState.rebootAt > 500);
@@ -6106,15 +7285,15 @@ void loop() {
 ### <a id="📄-platformio-ini"></a>📄 `platformio.ini`
 
 **File Info:**
-- **Size**: 3.26 KB
+- **Size**: 3.39 KB
 - **Extension**: `.ini`
 - **Language**: `text`
 - **Location**: `platformio.ini`
 - **Relative Path**: `root`
 - **Created**: 2026-02-18 04:58:44 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-04-18 10:13:05 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `2c86fb5e86d42c764aa8a7be00968b39`
-- **SHA256**: `6f0bfe87d8af9e630e4660c9b23f892052424b6aed8de2c911db25149874e0fa`
+- **Modified**: 2026-05-22 16:26:12 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `4e23f902237722b3209ba66dd2ef4aa9`
+- **SHA256**: `d49aa23a664ccf4a9e003111353345e235d81dc9a73d57b09cf7be8b63971c57`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -6126,6 +7305,8 @@ board = esp32dev
 framework = arduino
 monitor_speed = 115200
 upload_speed = 921600
+upload_protocol = espota
+upload_port = 192.168.88.23
 
 board_build.partitions = min_spiffs.csv
 board_build.filesystem = littlefs
@@ -6146,9 +7327,11 @@ build_flags =
     -D MODULE_MQTT
     -D MODULE_OTA
     -D MODULE_CAPTIVE_PORTAL
+    -D MODULE_RS485
     ; ---------- Устройство (только одно!) ----------------------
     ; -D DEVICE_BOILER
     -D DEVICE_KC868_A16
+    -D DEVICE_EKONOM
     ; ---------- Железо -----------------------------------------
     -D ETH_ADDR=1
     -D ETH_POWER_PIN=16
@@ -6156,6 +7339,7 @@ build_flags =
     -D ETH_MDIO_PIN=18
     ; ---------- Приложения (поверх device) --------------------
     -D APP_BOILER
+    -D APP_EKONOM
     ; ---------- Include paths ----------------------------------
     -I src/core
     -I src/modules/mqtt
@@ -6163,6 +7347,7 @@ build_flags =
     -I src/devices/boiler
     -I src/devices/kc868-a16
     -I src/apps/boiler
+    -I src/modules/rs485
 
 [env:modem-device]
 platform = espressif32
@@ -6209,7 +7394,7 @@ framework = arduino
 monitor_speed = 115200
 upload_speed = 115200
 upload_protocol = espota
-upload_port = 192.168.1.89
+upload_port = 192.168.1.127
 
 board_build.partitions = min_spiffs.csv
 board_build.filesystem = littlefs

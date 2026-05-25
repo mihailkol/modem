@@ -26,6 +26,7 @@ public:
 
     // Callback для входящих сообщений — устройство может переопределить
     static void (*onMessage)(const char* topic, const char* payload, unsigned int len);
+    static void addSubscription(const char* topic);
 
 private:
     static void reconnect();

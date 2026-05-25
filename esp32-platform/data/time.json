@@ -1,0 +1,7 @@
+{
+  "tz_offset_min": 420,
+  "ntp_enabled": true,
+  "mqtt_enabled": false,
+  "ntp_server": "pool.ntp.org",
+  "mqtt_topic": ""
+}

@@ -198,6 +198,10 @@ button.btn-secondary { background: var(--border); color: var(--text); }
   <div class="status-dot"><div class="dot" id="dot_mqtt"></div>MQTT</div>
   <div class="status-dot"><div class="dot" id="dot_tg"></div>Telegram</div>
   <div class="status-dot"><div class="dot" id="dot_modem"></div>Модем</div>
+  <div id="sys_time" style="font-size:11px;color:var(--muted);
+       font-family:monospace;margin-left:auto;padding:0 8px">
+    --:--:--
+  </div>  
   <div class="status-online" id="status_online">●</div>
   <div style="font-size:10px;color:var(--muted);margin-left:8px" id="status_build"></div>
 </div>
@@ -309,6 +313,20 @@ async function updateStatus() {
     if (bld && d.build) bld.textContent = 'fw: ' + d.build;
   } catch(e) {}
 }
+
+async function updateTime() {
+  try {
+    const d = await (await fetch('/api/time')).json();
+    const srcs = {ntp:'🛰',mqtt:'🏠',gsm:'📡',rtc:'⏱',none:''};
+    document.getElementById('sys_time').textContent =
+      (srcs[d.source] || '') + ' ' + (d.time_str || '--:--:--');
+    document.getElementById('sys_time').style.color =
+      d.synced ? 'var(--text)' : 'var(--muted)';
+  } catch(e) {}
+}
+updateTime();
+setInterval(updateTime, 5000);
+ 
 
 initUI();
 updateStatus();

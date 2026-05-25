@@ -730,6 +730,9 @@ void ModemHandler::_parseTime(const String& line) {
     time_t t_unix = mktime(&tm);
     struct timeval tv = { t_unix, 0 };
     settimeofday(&tv, nullptr);
+    #ifdef MODULE_TIME
+        TimeManager::notifySynced(TimeSource::MODEM);
+    #endif
     _timeSync = true;
     _addLog("Time synced: " + t);
 }

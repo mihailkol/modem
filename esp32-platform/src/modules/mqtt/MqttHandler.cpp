@@ -1,9 +1,14 @@
 #ifdef MODULE_MQTT
+#include <vector>
 #include "MqttHandler.h"
 #include "../../core/ConfigManager.h"
 #include "../../core/WebHandler.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+
+#ifdef MODULE_TIME
+#include "../time/TimeManager.h"
+#endif
 
 MqttConfig mqttCfg;
 
@@ -12,6 +17,13 @@ void (*MqttHandler::onMessage)(const char*, const char*, unsigned int) = nullptr
 static WiFiClient    _espClient;
 static PubSubClient  _client(_espClient);
 static uint32_t      _lastRetry = 0;
+static std::vector<String> _extraSubs;
+
+void MqttHandler::addSubscription(const char* topic) {
+    _extraSubs.push_back(String(topic));
+    // Если уже подключены — подписываемся сразу
+    if (_client.connected()) _client.subscribe(topic);
+}
 
 // HTML вкладки настроек MQTT (PROGMEM)
 static const char MQTT_TAB_HTML[] PROGMEM = R"html(
@@ -141,6 +153,7 @@ void MqttHandler::reconnect() {
         Serial.println("[MQTT] Connected");
         String sub = String(baseCfg.device_name) + "/set/#";
         _client.subscribe(sub.c_str());
+        for (auto& s : _extraSubs) _client.subscribe(s.c_str());
     } else {
         Serial.printf("[MQTT] Failed rc=%d\n", _client.state());
     }
@@ -170,10 +183,15 @@ void MqttHandler::publish(const char* topic, const char* payload, bool retained)
 }
 
 void MqttHandler::_defaultCallback(char* topic, byte* payload, unsigned int length) {
+    char buf[length + 1];
+    memcpy(buf, payload, length);
+    buf[length] = '\0';
+
+#ifdef MODULE_TIME
+    TimeManager::onMqttMessage(topic, buf);
+#endif
+
     if (onMessage) {
-        char buf[length + 1];
-        memcpy(buf, payload, length);
-        buf[length] = '\0';
         onMessage(topic, buf, length);
     }
 }

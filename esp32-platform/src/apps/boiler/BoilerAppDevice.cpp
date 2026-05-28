@@ -154,6 +154,25 @@ async function updateBoiler() {
     document.getElementById('b_pret').textContent    = d.p_return.toFixed(2);
     document.getElementById('b_pdelta').textContent  = d.p_delta.toFixed(2);
     drawChart(d.history || []);
+    
+    // Аналитика
+    if (d.power_avg_1h !== undefined) {
+      document.getElementById('a_avg').textContent    = d.power_avg_1h.toFixed(1);
+      document.getElementById('a_peak').textContent   = d.power_peak_1h.toFixed(1);
+      document.getElementById('a_dt').textContent     = d.delta_avg_1h.toFixed(1);
+      document.getElementById('a_duty').textContent   = d.duty_pct + '%';
+      document.getElementById('a_cyc').textContent    = d.cycles_1h;
+      document.getElementById('a_run').textContent    = d.runtime_min;
+      document.getElementById('a_idle').textContent   = d.idle_min;
+      document.getElementById('a_cycdur').textContent = d.cycle_dur_min;
+      const led = document.getElementById('a_burner_led');
+      led.style.background = d.burner_on ? 'var(--ok)' : 'var(--muted)';
+      led.style.boxShadow  = d.burner_on ? '0 0 6px var(--ok)' : 'none';
+      document.getElementById('a_burner_txt').textContent =
+        d.burner_on ? 'Горелка работает' : 'Горелка выключена';
+      }
+
+
   } catch(e) {}
 }
 
@@ -477,8 +496,8 @@ void BoilerAppDevice::updateFromA16() {
     boilerAppState.t_delta = boilerAppState.t_supply - boilerAppState.t_return;
 
     // Давление из ADC (уже сконвертировано A16Device в физические единицы)
-    boilerAppState.p_supply = a16State.adc_value[BOILER_ADC_P1];
-    boilerAppState.p_return = a16State.adc_value[BOILER_ADC_P2];
+    boilerAppState.p_supply = roundf(a16State.adc_value[BOILER_ADC_P1] * 10.0f) / 10.0f;
+    boilerAppState.p_return = roundf(a16State.adc_value[BOILER_ADC_P2] * 10.0f) / 10.0f;    
     boilerAppState.p_delta  = boilerAppState.p_supply - boilerAppState.p_return;
 
     // Расход из счётчиков импульсов DIN

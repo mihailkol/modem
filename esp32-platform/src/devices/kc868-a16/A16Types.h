@@ -51,6 +51,7 @@ enum class AnalogMode : uint8_t {
     MODE_RAW       // 0-4095 АЦП без конвертации
 };
 
+
 // ============================================================
 //  КОНФИГ A16 — сохраняется в /device.json
 // ============================================================
@@ -93,7 +94,14 @@ struct A16State {
 
     // Аналоговые входы
     int   adc_raw[4]   = {};
-    float adc_value[4] = {};   // в физических единицах
+    float adc_ma[4]    = {};   
+    float adc_value[4] = {};   
+
+    // Буфер скользящего среднего для 4-20мА (каналы 0 и 1)
+    static const uint8_t ADC_MA_BUF = 10;
+    int   adc_ma_buf[2][10] = {};
+    uint8_t adc_ma_idx[2]   = {};
+    bool    adc_ma_full[2]  = {};
 
     // 1-Wire датчики
     uint8_t  ow_count = 0;

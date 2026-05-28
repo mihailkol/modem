@@ -40,6 +40,10 @@
 #include "modules/rs485/Rs485Handler.h"
 #endif
 
+#ifdef MODULE_TIME
+#include "modules/time/TimeManager.h"
+#endif
+
 AsyncWebServer server(80);
 
 void setup() {
@@ -57,6 +61,10 @@ void setup() {
     //    Устройство регистрирует свои вкладки первыми (Мониторинг, Уставки)
     //    Затем модули добавляют свои (MQTT, Telegram)
     //    Последней — вкладка Настройки (core)
+
+    #ifdef MODULE_TIME
+    TimeManager::init();
+    #endif
 
     #ifdef DEVICE_BOILER_MONITOR
     BMonDevice::init();
@@ -120,6 +128,25 @@ void setup() {
         border-radius:6px;max-height:160px;overflow-y:auto;background:var(--bg)"></div>
       <input type="password" name="wifi_pass" placeholder="WiFi Password" style="margin-top:8px">
       <input type="text" name="device_name" placeholder="Имя устройства">
+    </div>
+
+    <div class="settings-group" id="time_settings">
+      <h3>🕐 Время</h3>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span id="st_led" style="width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0"></span>
+        <span id="st_time" style="font-family:monospace;font-weight:700;color:var(--accent)">--:--:--</span>
+        <span id="st_src" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+      <label>Часовой пояс (мин от UTC)</label>
+      <input type="text" name="tz_offset_min" placeholder="180 = UTC+3">
+      <label>NTP сервер</label>
+      <input type="text" name="ntp_server" placeholder="pool.ntp.org">
+      <label>MQTT топик времени</label>
+      <input type="text" name="mqtt_time_topic" placeholder="homeassistant/sensor/time/state">
+      <div style="display:flex;gap:12px;margin-top:4px">
+        <label><input type="checkbox" id="ntp_enabled"> NTP</label>
+        <label><input type="checkbox" id="mqtt_time_enabled"> MQTT</label>
+      </div>
     </div>
 
     <div class="settings-group">
@@ -231,7 +258,34 @@ void setup() {
       document.getElementById('eth_static').style.display =
         document.getElementById('eth_dhcp').checked ? 'none' : 'block';
     }
+
+    // Время
+    fetch('/api/time/config').then(r=>r.json()).then(d=>{
+      document.querySelector('[name="tz_offset_min"]').value = d.tz_offset_min || 180;
+      document.querySelector('[name="ntp_server"]').value    = d.ntp_server || 'pool.ntp.org';
+      document.querySelector('[name="mqtt_time_topic"]').value = d.mqtt_topic || '';
+      document.getElementById('ntp_enabled').checked  = d.ntp_enabled;
+      document.getElementById('mqtt_time_enabled').checked = d.mqtt_enabled;
+    });
+    // Статус времени
+    fetch('/api/time').then(r=>r.json()).then(d=>{
+      const srcs={ntp:'🛰 NTP',mqtt:'🏠 MQTT',gsm:'📡 GSM',rtc:'⏱ RTC',none:''};
+      document.getElementById('st_led').style.background = d.synced ? 'var(--ok)' : 'var(--muted)';
+      document.getElementById('st_time').textContent = d.time_str || '--:--:--';
+      document.getElementById('st_src').textContent  = srcs[d.source] || '';
+    });
+
     async function saveSettings() {
+
+    const timeData = {
+      tz_offset_min: +document.querySelector('[name="tz_offset_min"]').value,
+      ntp_server:    document.querySelector('[name="ntp_server"]').value,
+      mqtt_topic:    document.querySelector('[name="mqtt_time_topic"]').value,
+      ntp_enabled:   document.getElementById('ntp_enabled').checked,
+      mqtt_enabled:  document.getElementById('mqtt_time_enabled').checked,
+    };
+    fetch('/api/time/save', {method:'POST',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(timeData)});
       const data = Object.assign({}, _currentCfg);
       data.eth_dhcp = document.getElementById('eth_dhcp').checked;
       const fields = ['eth_ip','eth_mask','eth_gw','eth_dns',
@@ -325,6 +379,10 @@ void loop() {
 
     #ifdef DEVICE_EKONOM
         EkoNomDevice::loop();
+    #endif
+
+    #ifdef MODULE_TIME
+        TimeManager::loop();
     #endif
 
     // Перезагрузка по запросу из веб-интерфейса

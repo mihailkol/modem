@@ -3,8 +3,8 @@
 ## 📊 Project Information
 
 - **Project Name**: `esp32-platform`
-- **Generated On**: 2026-05-22 18:41:56 (Asia/Novosibirsk / GMT+07:00)
-- **Total Files Processed**: 33
+- **Generated On**: 2026-05-28 18:54:15 (Asia/Novosibirsk / GMT+07:00)
+- **Total Files Processed**: 36
 - **Export Tool**: Easy Whole Project to Single Text File for LLMs v1.1.0
 - **Tool Author**: Jota / José Guilherme Pandolfi
 
@@ -21,12 +21,13 @@
 
 ```
 ├── 📁 data/
-│   └── 📄 index.html (10.93 KB)
+│   ├── 📄 index.html (11.49 KB)
+│   └── 📄 time.json (132 B)
 ├── 📁 src/
 │   ├── 📁 apps/
 │   │   └── 📁 boiler/
 │   │       ├── 📄 BoilerApp.h (4.98 KB)
-│   │       ├── 📄 BoilerAppDevice.cpp (25.39 KB)
+│   │       ├── 📄 BoilerAppDevice.cpp (26.46 KB)
 │   │       └── 📄 BoilerAppDevice.h (631 B)
 │   ├── 📁 core/
 │   │   ├── 📄 ConfigManager.cpp (2.31 KB)
@@ -49,24 +50,27 @@
 │   │   │   ├── 📄 EkoNomDevice.cpp (6.49 KB)
 │   │   │   └── 📄 EkoNomDevice.h (1.79 KB)
 │   │   └── 📁 kc868-a16/
-│   │       ├── 📄 A16Device.cpp (20.35 KB)
+│   │       ├── 📄 A16Device.cpp (21.51 KB)
 │   │       ├── 📄 A16Device.h (1019 B)
-│   │       └── 📄 A16Types.h (3.71 KB)
+│   │       └── 📄 A16Types.h (3.94 KB)
 │   ├── 📁 modules/
 │   │   ├── 📁 modem/
-│   │   │   ├── 📄 ModemHandler.cpp (51.31 KB)
+│   │   │   ├── 📄 ModemHandler.cpp (51.4 KB)
 │   │   │   └── 📄 ModemHandler.h (3.46 KB)
 │   │   ├── 📁 mqtt/
-│   │   │   ├── 📄 MqttHandler.cpp (6.13 KB)
-│   │   │   └── 📄 MqttHandler.h (992 B)
+│   │   │   ├── 📄 MqttHandler.cpp (6.61 KB)
+│   │   │   └── 📄 MqttHandler.h (1.02 KB)
 │   │   ├── 📁 rs485/
 │   │   │   ├── 📄 Rs485Handler.cpp (23.43 KB)
 │   │   │   └── 📄 Rs485Handler.h (2.33 KB)
-│   │   └── 📁 telegram/
-│   │       ├── 📄 TgHandler.cpp (6.78 KB)
-│   │       └── 📄 TgHandler.h (860 B)
-│   └── 📄 main.cpp (11.28 KB)
-├── 📄 platformio.ini (3.39 KB)
+│   │   ├── 📁 telegram/
+│   │   │   ├── 📄 TgHandler.cpp (6.78 KB)
+│   │   │   └── 📄 TgHandler.h (860 B)
+│   │   └── 📁 time/
+│   │       ├── 📄 TimeManager.cpp (11.31 KB)
+│   │       └── 📄 TimeManager.h (1.94 KB)
+│   └── 📄 main.cpp (13.97 KB)
+├── 📄 platformio.ini (3.44 KB)
 └── 📄 sdkconfig.defaults (192 B)
 ```
 
@@ -75,6 +79,7 @@
 **Project Files:**
 
 - [📄 data/index.html](#📄-data-index-html)
+- [📄 data/time.json](#📄-data-time-json)
 - [📄 src/apps/boiler/BoilerApp.h](#📄-src-apps-boiler-boilerapp-h)
 - [📄 src/apps/boiler/BoilerAppDevice.cpp](#📄-src-apps-boiler-boilerappdevice-cpp)
 - [📄 src/apps/boiler/BoilerAppDevice.h](#📄-src-apps-boiler-boilerappdevice-h)
@@ -104,6 +109,8 @@
 - [📄 src/modules/rs485/Rs485Handler.h](#📄-src-modules-rs485-rs485handler-h)
 - [📄 src/modules/telegram/TgHandler.cpp](#📄-src-modules-telegram-tghandler-cpp)
 - [📄 src/modules/telegram/TgHandler.h](#📄-src-modules-telegram-tghandler-h)
+- [📄 src/modules/time/TimeManager.cpp](#📄-src-modules-time-timemanager-cpp)
+- [📄 src/modules/time/TimeManager.h](#📄-src-modules-time-timemanager-h)
 - [📄 src/main.cpp](#📄-src-main-cpp)
 - [📄 platformio.ini](#📄-platformio-ini)
 
@@ -113,19 +120,20 @@
 
 | Metric | Count |
 |--------|-------|
-| Total Files | 33 |
-| Total Directories | 15 |
-| Text Files | 32 |
+| Total Files | 36 |
+| Total Directories | 16 |
+| Text Files | 35 |
 | Binary Files | 1 |
-| Total Size | 256.24 KB |
+| Total Size | 275.99 KB |
 
 ### 📄 File Types Distribution
 
 | Extension | Count |
 |-----------|-------|
-| `.h` | 17 |
-| `.cpp` | 13 |
+| `.h` | 18 |
+| `.cpp` | 14 |
 | `.html` | 1 |
+| `.json` | 1 |
 | `.ini` | 1 |
 | `.defaults` | 1 |
 
@@ -134,15 +142,15 @@
 ### <a id="📄-data-index-html"></a>📄 `data/index.html`
 
 **File Info:**
-- **Size**: 10.93 KB
+- **Size**: 11.49 KB
 - **Extension**: `.html`
 - **Language**: `html`
 - **Location**: `data/index.html`
 - **Relative Path**: `data`
 - **Created**: 2026-02-18 20:59:52 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-05-22 07:56:09 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `df65a1f42fa21443d3b0a02d70ec4260`
-- **SHA256**: `70d4ec7bdb7a67c1f08d57ae4f8be4318b8fbacd8870bd97ccfe32ddbcde1283`
+- **Modified**: 2026-05-26 01:38:11 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `de8f5946e0a1bf971c8ea727f6df1032`
+- **SHA256**: `578fe39b769e75bb72e720d154c3fd97e0b9715ede5866e4a5355d3287b8d842`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -348,6 +356,7 @@ button.btn-secondary { background: var(--border); color: var(--text); }
   <div class="status-dot"><div class="dot" id="dot_mqtt"></div>MQTT</div>
   <div class="status-dot"><div class="dot" id="dot_tg"></div>Telegram</div>
   <div class="status-dot"><div class="dot" id="dot_modem"></div>Модем</div>
+  <div id="sys_time" style="font-size:11px;color:var(--muted);font-family:monospace;padding:0 8px">--:--:--</div>
   <div class="status-online" id="status_online">●</div>
   <div style="font-size:10px;color:var(--muted);margin-left:8px" id="status_build"></div>
 </div>
@@ -460,6 +469,20 @@ async function updateStatus() {
   } catch(e) {}
 }
 
+async function updateTime() {
+  try {
+    const d = await (await fetch('/api/time')).json();
+    const srcs = {ntp:'🛰',mqtt:'🏠',gsm:'📡',rtc:'⏱',none:''};
+    document.getElementById('sys_time').textContent =
+      (srcs[d.source] || '') + ' ' + (d.time_str || '--:--:--');
+    document.getElementById('sys_time').style.color =
+      d.synced ? 'var(--text)' : 'var(--muted)';
+  } catch(e) {}
+}
+updateTime();
+setInterval(updateTime, 5000);
+ 
+
 initUI();
 updateStatus();
 setInterval(updateStatus, 5000);
@@ -467,6 +490,34 @@ setInterval(updateStatus, 5000);
 </body>
 </html>
 
+```
+
+---
+
+### <a id="📄-data-time-json"></a>📄 `data/time.json`
+
+**File Info:**
+- **Size**: 132 B
+- **Extension**: `.json`
+- **Language**: `json`
+- **Location**: `data/time.json`
+- **Relative Path**: `data`
+- **Created**: 2026-05-24 06:51:33 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-05-24 06:52:45 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `1c7ba559490247a04fbd4a1eb0e808ec`
+- **SHA256**: `f22d330324cf072645d2a84d0c247c47ad3f9c7c595b0b22b50c4bae33cd4cfd`
+- **Encoding**: ASCII
+
+**File code content:**
+
+```json
+{
+  "tz_offset_min": 420,
+  "ntp_enabled": true,
+  "mqtt_enabled": false,
+  "ntp_server": "pool.ntp.org",
+  "mqtt_topic": ""
+}
 ```
 
 ---
@@ -613,15 +664,15 @@ extern BoilerAppState  boilerAppState;
 ### <a id="📄-src-apps-boiler-boilerappdevice-cpp"></a>📄 `src/apps/boiler/BoilerAppDevice.cpp`
 
 **File Info:**
-- **Size**: 25.39 KB
+- **Size**: 26.46 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/apps/boiler/BoilerAppDevice.cpp`
 - **Relative Path**: `src/apps/boiler`
 - **Created**: 2026-02-18 04:58:28 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-05-22 18:41:53 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `1baadd524f0fb6482699ebc9fa4d42cb`
-- **SHA256**: `21ae50b0e959889687d5c5a79241fa3b3583815c6c38b2a3854fae67004a6828`
+- **Modified**: 2026-05-28 18:54:14 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `4458277a21c57b45cc1f5ac6a2257e9a`
+- **SHA256**: `1a3a32306f3acfea507531f0743494cefe9171e83e7bb37a64d7c8e13128e09d`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -783,6 +834,25 @@ async function updateBoiler() {
     document.getElementById('b_pret').textContent    = d.p_return.toFixed(2);
     document.getElementById('b_pdelta').textContent  = d.p_delta.toFixed(2);
     drawChart(d.history || []);
+    
+    // Аналитика
+    if (d.power_avg_1h !== undefined) {
+      document.getElementById('a_avg').textContent    = d.power_avg_1h.toFixed(1);
+      document.getElementById('a_peak').textContent   = d.power_peak_1h.toFixed(1);
+      document.getElementById('a_dt').textContent     = d.delta_avg_1h.toFixed(1);
+      document.getElementById('a_duty').textContent   = d.duty_pct + '%';
+      document.getElementById('a_cyc').textContent    = d.cycles_1h;
+      document.getElementById('a_run').textContent    = d.runtime_min;
+      document.getElementById('a_idle').textContent   = d.idle_min;
+      document.getElementById('a_cycdur').textContent = d.cycle_dur_min;
+      const led = document.getElementById('a_burner_led');
+      led.style.background = d.burner_on ? 'var(--ok)' : 'var(--muted)';
+      led.style.boxShadow  = d.burner_on ? '0 0 6px var(--ok)' : 'none';
+      document.getElementById('a_burner_txt').textContent =
+        d.burner_on ? 'Горелка работает' : 'Горелка выключена';
+      }
+
+
   } catch(e) {}
 }
 
@@ -1106,8 +1176,8 @@ void BoilerAppDevice::updateFromA16() {
     boilerAppState.t_delta = boilerAppState.t_supply - boilerAppState.t_return;
 
     // Давление из ADC (уже сконвертировано A16Device в физические единицы)
-    boilerAppState.p_supply = a16State.adc_value[BOILER_ADC_P1];
-    boilerAppState.p_return = a16State.adc_value[BOILER_ADC_P2];
+    boilerAppState.p_supply = roundf(a16State.adc_value[BOILER_ADC_P1] * 10.0f) / 10.0f;
+    boilerAppState.p_return = roundf(a16State.adc_value[BOILER_ADC_P2] * 10.0f) / 10.0f;    
     boilerAppState.p_delta  = boilerAppState.p_supply - boilerAppState.p_return;
 
     // Расход из счётчиков импульсов DIN
@@ -3633,15 +3703,15 @@ private:
 ### <a id="📄-src-devices-kc868-a16-a16device-cpp"></a>📄 `src/devices/kc868-a16/A16Device.cpp`
 
 **File Info:**
-- **Size**: 20.35 KB
+- **Size**: 21.51 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/devices/kc868-a16/A16Device.cpp`
 - **Relative Path**: `src/devices/kc868-a16`
 - **Created**: 2026-02-18 03:18:58 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-18 03:18:58 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `512d0e9b168b70e34c8a528db13990b4`
-- **SHA256**: `0e3e108078a58d551f904f8887bc80d4726c5253ca09a9090616e5579c88d33c`
+- **Modified**: 2026-05-28 18:54:14 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `fd819ed46366db3d6e78b044d213f773`
+- **SHA256**: `86e05fc8ded668f87b79fcfbf2d75a6bb4183cdf31eb11f88c2f9110f6eca98c`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -3888,12 +3958,21 @@ async function updateA16() {
 
     // ADC
     for (let i=0; i<4; i++) {
-      const v = d.adc_value[i];
       const el = document.getElementById('adc_v'+i);
-      if (el) el.textContent = v.toFixed(2);
-      const pct = Math.min(100, Math.max(0, d.adc_pct[i]));
+      const un = document.getElementById('adc_u'+i);
       const bar = document.getElementById('adc_b'+i);
+      const pct = Math.min(100, Math.max(0, d.adc_pct[i]));
       if (bar) bar.style.width = pct+'%';
+      if (i < 2) {
+        // 4-20мА каналы — показываем мА
+        const ma = d.adc_ma ? d.adc_ma[i] : null;
+        if (el) el.textContent = ma != null ? ma.toFixed(2) : '--';
+        if (un) un.textContent = 'мА';
+      } else {
+        // 0-5В каналы — показываем вольты
+        if (el) el.textContent = d.adc_value[i].toFixed(2);
+        if (un) un.textContent = 'В';
+      }
     }
 
     // 1-Wire
@@ -3974,8 +4053,12 @@ void A16Device::init() {
         // ADC
         JsonArray adcV = doc["adc_value"].to<JsonArray>();
         JsonArray adcP = doc["adc_pct"].to<JsonArray>();
+        JsonArray adcR = doc["adc_raw"].to<JsonArray>();
+        JsonArray adcM = doc["adc_ma"].to<JsonArray>();  
         for (int i = 0; i < 4; i++) {
             adcV.add(a16State.adc_value[i]);
+            adcR.add(a16State.adc_raw[i]);
+            adcM.add(a16State.adc_ma[i]); 
             float range = a16Cfg.adc_max[i] - a16Cfg.adc_min[i];
             float pct = (range > 0)
                 ? (a16State.adc_value[i] - a16Cfg.adc_min[i]) / range * 100.0f
@@ -4092,8 +4175,7 @@ void A16Device::readDigitalInputs() {
 //  АНАЛОГОВЫЕ ВХОДЫ
 // ============================================================
 void A16Device::readAnalog() {
-    const uint8_t pins[4] = {A16_ADC_CH1, A16_ADC_CH2, A16_ADC_CH3, A16_ADC_CH4};
-
+    const uint8_t pins[4] = {A16_ADC_CH1, A16_ADC_CH3, A16_ADC_CH4, A16_ADC_CH2};
     for (int i = 0; i < 4; i++) {
         // Среднее из 4 измерений для стабильности
         int32_t sum = 0;
@@ -4104,12 +4186,24 @@ void A16Device::readAnalog() {
 
         switch (a16Cfg.adc_mode[i]) {
             case AnalogMode::MODE_4_20MA: {
-                // 4мА = ~820 (1В на АЦП 12бит 3.3В ref), 20мА = ~4095
-                // Через резистор 150Ом: 4мА→0.6В, 20мА→3В
-                float pct = (raw - 820.0f) / (4095.0f - 820.0f);
-                pct = constrain(pct, 0.0f, 1.0f);
+                // Скользящее среднее по буферу
+                if (i < 2) {
+                    a16State.adc_ma_buf[i][a16State.adc_ma_idx[i]] = raw;
+                    a16State.adc_ma_idx[i] = (a16State.adc_ma_idx[i] + 1) % 10;
+                    if (a16State.adc_ma_idx[i] == 0) a16State.adc_ma_full[i] = true;
+                    uint8_t cnt = a16State.adc_ma_full[i] ? 10 : a16State.adc_ma_idx[i];
+                    int32_t sum = 0;
+                    for (uint8_t k = 0; k < cnt; k++) sum += a16State.adc_ma_buf[i][k];
+                    raw = (cnt > 0) ? (sum / cnt) : raw;
+                }
+
+                float ma = 4.0f + (raw - 557.0f) / (4402.0f - 557.0f) * 16.0f;
+                ma = constrain(ma, 4.0f, 20.0f);
+                a16State.adc_ma[i] = ma;
+
+                float pct = (ma - 4.0f) / 16.0f;
                 a16State.adc_value[i] = a16Cfg.adc_min[i] +
-                    pct * (a16Cfg.adc_max[i] - a16Cfg.adc_min[i]);
+                                        pct * (a16Cfg.adc_max[i] - a16Cfg.adc_min[i]);
                 break;
             }
             case AnalogMode::MODE_0_5V: {
@@ -4323,15 +4417,15 @@ private:
 ### <a id="📄-src-devices-kc868-a16-a16types-h"></a>📄 `src/devices/kc868-a16/A16Types.h`
 
 **File Info:**
-- **Size**: 3.71 KB
+- **Size**: 3.94 KB
 - **Extension**: `.h`
 - **Language**: `text`
 - **Location**: `src/devices/kc868-a16/A16Types.h`
 - **Relative Path**: `src/devices/kc868-a16`
 - **Created**: 2026-02-18 03:29:22 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-18 03:29:22 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `099e6c7f9ef6adc95d493c1c3f50da14`
-- **SHA256**: `e567171299e4e535bfd6842f695b9947058dc1277aef7fbc7f0e0b13784fbde2`
+- **Modified**: 2026-05-28 18:54:14 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `a5ba4e5ebfae52702938bfb449413ffd`
+- **SHA256**: `949a518a7bc981960a69323960859dcad80e140664b410fd6185e79ad0aceee2`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -4390,6 +4484,7 @@ enum class AnalogMode : uint8_t {
     MODE_RAW       // 0-4095 АЦП без конвертации
 };
 
+
 // ============================================================
 //  КОНФИГ A16 — сохраняется в /device.json
 // ============================================================
@@ -4432,7 +4527,14 @@ struct A16State {
 
     // Аналоговые входы
     int   adc_raw[4]   = {};
-    float adc_value[4] = {};   // в физических единицах
+    float adc_ma[4]    = {};   
+    float adc_value[4] = {};   
+
+    // Буфер скользящего среднего для 4-20мА (каналы 0 и 1)
+    static const uint8_t ADC_MA_BUF = 10;
+    int   adc_ma_buf[2][10] = {};
+    uint8_t adc_ma_idx[2]   = {};
+    bool    adc_ma_full[2]  = {};
 
     // 1-Wire датчики
     uint8_t  ow_count = 0;
@@ -4453,15 +4555,15 @@ extern A16State  a16State;
 ### <a id="📄-src-modules-modem-modemhandler-cpp"></a>📄 `src/modules/modem/ModemHandler.cpp`
 
 **File Info:**
-- **Size**: 51.31 KB
+- **Size**: 51.4 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/modules/modem/ModemHandler.cpp`
 - **Relative Path**: `src/modules/modem`
 - **Created**: 2026-04-17 05:26:47 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-05-08 04:40:19 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `cdc2878789f6ef530cef79e2aaecef2d`
-- **SHA256**: `5e45048864ba36920d5d74b2a8531132b38e69644be5635cef2739f4596a2c8d`
+- **Modified**: 2026-05-24 06:08:10 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `a960e634fbab9207ec12351d05b69016`
+- **SHA256**: `902410265a877c8f630428e2472cc7b10c09986d59e9f83da2c560b724556fac`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -5199,6 +5301,9 @@ void ModemHandler::_parseTime(const String& line) {
     time_t t_unix = mktime(&tm);
     struct timeval tv = { t_unix, 0 };
     settimeofday(&tv, nullptr);
+    #ifdef MODULE_TIME
+        TimeManager::notifySynced(TimeSource::MODEM);
+    #endif
     _timeSync = true;
     _addLog("Time synced: " + t);
 }
@@ -5834,26 +5939,31 @@ private:
 ### <a id="📄-src-modules-mqtt-mqtthandler-cpp"></a>📄 `src/modules/mqtt/MqttHandler.cpp`
 
 **File Info:**
-- **Size**: 6.13 KB
+- **Size**: 6.61 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/modules/mqtt/MqttHandler.cpp`
 - **Relative Path**: `src/modules/mqtt`
 - **Created**: 2026-02-17 12:57:02 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-04-20 12:36:32 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `3be31fb5193fc8a1e45a9bc4e93001ee`
-- **SHA256**: `3b68257427484f92ea2ce292c01ada693b453dceffd5785cf497d917d9666d01`
+- **Modified**: 2026-05-24 06:52:45 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `5ee33718fcebb52e58ce5f2dede767c8`
+- **SHA256**: `bfafcf8658010dc4aadc8923f347f32751bb76f9020097afa537a344468447c8`
 - **Encoding**: UTF-8
 
 **File code content:**
 
 ```cpp
 #ifdef MODULE_MQTT
+#include <vector>
 #include "MqttHandler.h"
 #include "../../core/ConfigManager.h"
 #include "../../core/WebHandler.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+
+#ifdef MODULE_TIME
+#include "../time/TimeManager.h"
+#endif
 
 MqttConfig mqttCfg;
 
@@ -5862,6 +5972,13 @@ void (*MqttHandler::onMessage)(const char*, const char*, unsigned int) = nullptr
 static WiFiClient    _espClient;
 static PubSubClient  _client(_espClient);
 static uint32_t      _lastRetry = 0;
+static std::vector<String> _extraSubs;
+
+void MqttHandler::addSubscription(const char* topic) {
+    _extraSubs.push_back(String(topic));
+    // Если уже подключены — подписываемся сразу
+    if (_client.connected()) _client.subscribe(topic);
+}
 
 // HTML вкладки настроек MQTT (PROGMEM)
 static const char MQTT_TAB_HTML[] PROGMEM = R"html(
@@ -5991,6 +6108,7 @@ void MqttHandler::reconnect() {
         Serial.println("[MQTT] Connected");
         String sub = String(baseCfg.device_name) + "/set/#";
         _client.subscribe(sub.c_str());
+        for (auto& s : _extraSubs) _client.subscribe(s.c_str());
     } else {
         Serial.printf("[MQTT] Failed rc=%d\n", _client.state());
     }
@@ -6020,10 +6138,15 @@ void MqttHandler::publish(const char* topic, const char* payload, bool retained)
 }
 
 void MqttHandler::_defaultCallback(char* topic, byte* payload, unsigned int length) {
+    char buf[length + 1];
+    memcpy(buf, payload, length);
+    buf[length] = '\0';
+
+#ifdef MODULE_TIME
+    TimeManager::onMqttMessage(topic, buf);
+#endif
+
     if (onMessage) {
-        char buf[length + 1];
-        memcpy(buf, payload, length);
-        buf[length] = '\0';
         onMessage(topic, buf, length);
     }
 }
@@ -6037,15 +6160,15 @@ void MqttHandler::_defaultCallback(char* topic, byte* payload, unsigned int leng
 ### <a id="📄-src-modules-mqtt-mqtthandler-h"></a>📄 `src/modules/mqtt/MqttHandler.h`
 
 **File Info:**
-- **Size**: 992 B
+- **Size**: 1.02 KB
 - **Extension**: `.h`
 - **Language**: `text`
 - **Location**: `src/modules/mqtt/MqttHandler.h`
 - **Relative Path**: `src/modules/mqtt`
 - **Created**: 2026-02-17 12:56:36 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-02-17 12:56:36 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `24692f63d150d60ed8ecf27849e0852f`
-- **SHA256**: `648b425aaccb48b131911dd29fea9ccf51750c3189905d098b81092d64af5e74`
+- **Modified**: 2026-05-24 06:25:14 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `53ea2e826a1ca4ea17f2ec862b1ab88f`
+- **SHA256**: `5adfa52ebea804783a5e5a096e1c130dd26f5a08607a279a251263214c9e8dd2`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -6079,6 +6202,7 @@ public:
 
     // Callback для входящих сообщений — устройство может переопределить
     static void (*onMessage)(const char* topic, const char* payload, unsigned int len);
+    static void addSubscription(const char* topic);
 
 private:
     static void reconnect();
@@ -6925,18 +7049,404 @@ private:
 
 ---
 
+### <a id="📄-src-modules-time-timemanager-cpp"></a>📄 `src/modules/time/TimeManager.cpp`
+
+**File Info:**
+- **Size**: 11.31 KB
+- **Extension**: `.cpp`
+- **Language**: `cpp`
+- **Location**: `src/modules/time/TimeManager.cpp`
+- **Relative Path**: `src/modules/time`
+- **Created**: 2026-05-24 06:03:22 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-05-25 21:20:55 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `0b980a7afbd15d383b3f13dbc8ae1eab`
+- **SHA256**: `2799d1110cb370c57a9b93d35a6fc540bc3a1bee7dfb5491978a944ab1b18c80`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```cpp
+#ifdef MODULE_TIME
+#include "TimeManager.h"
+#include "../../core/ConfigManager.h"
+#include "../../core/WebHandler.h"
+#include "../../core/CoreTypes.h"
+#ifdef MODULE_MQTT
+#include "../mqtt/MqttHandler.h"
+#endif
+#include <ArduinoJson.h>
+#include <AsyncJson.h>
+
+#ifdef TIME_SOURCE_NTP
+#include <esp_sntp.h>
+#endif
+
+// ── Глобальные данные ────────────────────────────────────────────────────────
+TimeConfig timeCfg;
+
+
+// ── Статика ──────────────────────────────────────────────────────────────────
+TimeSource  TimeManager::_source      = TimeSource::NONE;
+bool        TimeManager::_synced      = false;
+uint32_t    TimeManager::_lastNtpMs   = 0;
+uint32_t    TimeManager::_lastMqttMs  = 0;
+
+// ── Основной интерфейс ───────────────────────────────────────────────────────
+time_t TimeManager::now() {
+    return time(nullptr);
+}
+
+bool TimeManager::isSynced() {
+    return _synced;
+}
+
+TimeSource TimeManager::source() {
+    return _source;
+}
+
+String TimeManager::sourceStr() {
+    switch (_source) {
+        case TimeSource::MODEM: return "gsm";
+        case TimeSource::MQTT:  return "mqtt";
+        case TimeSource::NTP:   return "ntp";
+        case TimeSource::RTC:   return "rtc";
+        default:                return "none";
+    }
+}
+
+String TimeManager::formatTime(const char* fmt) {
+    if (!_synced) return "--:--:--";
+    time_t t = now() + (time_t)timeCfg.tz_offset_min * 60L;  // ← offset вручную
+    struct tm* tm = gmtime(&t);  // ← gmtime, не localtime
+    char buf[32];
+    strftime(buf, sizeof(buf), fmt, tm);
+    return String(buf);
+}
+
+String TimeManager::formatDateTime(const char* fmt) {
+    if (!_synced) return "не синхронизировано";
+    time_t t = now();
+    struct tm* tm = localtime(&t);
+    char buf[32];
+    strftime(buf, sizeof(buf), fmt, tm);
+    return String(buf);
+}
+
+// ── Уведомление от внешнего источника (GSM/RTC) ──────────────────────────────
+void TimeManager::notifySynced(TimeSource src) {
+    // GSM и RTC имеют приоритет над MQTT и NTP
+    if (src == TimeSource::MODEM || src == TimeSource::RTC) {
+        _source = src;
+        _synced = true;
+        Serial.printf("[TIME] Synced from %s: %s\n",
+            sourceStr().c_str(), formatDateTime().c_str());
+    }
+}
+
+// ── MQTT источник ─────────────────────────────────────────────────────────────
+void TimeManager::onMqttMessage(const char* topic, const char* payload) {
+    if (!timeCfg.mqtt_enabled) return;
+    if (strcmp(topic, timeCfg.mqtt_topic) != 0) return;
+    // Принимаем unix timestamp (число) или ISO строку "2024-01-15T12:34:56"
+    String s = String(payload);
+    time_t t = 0;
+    if (s.length() == 19 && s[4] == '-') {
+        // ISO формат: "2024-01-15T12:34:56"
+        struct tm tm = {};
+        tm.tm_year = s.substring(0, 4).toInt() - 1900;
+        tm.tm_mon  = s.substring(5, 7).toInt() - 1;
+        tm.tm_mday = s.substring(8, 10).toInt();
+        tm.tm_hour = s.substring(11, 13).toInt();
+        tm.tm_min  = s.substring(14, 16).toInt();
+        tm.tm_sec  = s.substring(17, 19).toInt();
+        t = mktime(&tm);
+    } else {
+        // Unix timestamp
+        t = (time_t)s.toInt();
+    }
+    if (t < 1700000000UL) return;  // sanity check (после 2023)
+
+    struct timeval tv = { t, 0 };
+    settimeofday(&tv, nullptr);
+    _lastMqttMs = millis();
+
+    // MQTT источник только если нет GSM/RTC
+    if (_source == TimeSource::NONE || _source == TimeSource::NTP
+        || _source == TimeSource::MQTT) {
+        _source = TimeSource::MQTT;
+        _synced = true;
+        Serial.printf("[TIME] Synced from MQTT: %s\n", formatDateTime().c_str());
+    }
+}
+
+// ── NTP ──────────────────────────────────────────────────────────────────────
+void TimeManager::_syncNtp() {
+#ifdef TIME_SOURCE_NTP
+    if (!timeCfg.ntp_enabled) return;
+    if (_source == TimeSource::MODEM || _source == TimeSource::RTC) return;
+
+    // Формируем POSIX TZ строку: UTC смещение (знак инвертирован в POSIX!)
+    // UTC+3 → "UTC-3", UTC-5 → "UTC+5"
+    int h = timeCfg.tz_offset_min / 60;
+    int m = abs(timeCfg.tz_offset_min % 60);
+    char tz_str[16];
+    if (m == 0)
+        snprintf(tz_str, sizeof(tz_str), "UTC%+d", -h);
+    else
+        snprintf(tz_str, sizeof(tz_str), "UTC%+d:%02d", -h, m);
+    setenv("TZ", tz_str, 1);
+    tzset();
+
+    configTime(0, 0, timeCfg.ntp_server);  // offset=0, timezone через TZ env
+
+    Serial.printf("[TIME] NTP sync: %s TZ=%s\n", timeCfg.ntp_server, tz_str);
+    _lastNtpMs = millis();
+#endif
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+void TimeManager::init() {
+    loadConfig();
+
+    applyTimezone();
+
+    extern AsyncWebServer server;
+
+    server.on("/api/time/config", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        doc["tz_offset_min"] = timeCfg.tz_offset_min;
+        doc["ntp_server"]    = timeCfg.ntp_server;
+        doc["mqtt_topic"]    = timeCfg.mqtt_topic;
+        doc["ntp_enabled"]   = timeCfg.ntp_enabled;
+        doc["mqtt_enabled"]  = timeCfg.mqtt_enabled;
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    server.on("/api/time", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        time_t t = now();
+        struct tm* ltm = localtime(&t);
+        struct tm* gtm = gmtime(&t);
+        char local_buf[32], gmt_buf[32];
+        strftime(local_buf, sizeof(local_buf), "%H:%M:%S", ltm);
+        strftime(gmt_buf,   sizeof(gmt_buf),   "%H:%M:%S", gtm);
+        doc["synced"]     = _synced;
+        doc["unix"]       = (uint32_t)t;
+        doc["source"]     = sourceStr();
+        doc["time_str"]   = formatTime();
+        doc["date_str"]   = formatDateTime();
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    // server.on("/api/time", HTTP_GET, [](AsyncWebServerRequest* req) {
+    //     JsonDocument doc;
+    //     doc["synced"]   = _synced;
+    //     doc["unix"]     = (uint32_t)now();
+    //     doc["source"]   = sourceStr();
+    //     doc["time_str"] = formatTime();
+    //     doc["date_str"] = formatDateTime();
+    //     doc["tz_applied"] = f.tz_applied;
+    //     String out; serializeJson(doc, out);
+    //     req->send(200, "application/json", out);
+    // });
+
+
+    auto* hSave = new AsyncCallbackJsonWebHandler("/api/time/save",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject o = json.as<JsonObject>();
+            timeCfg.tz_offset_min = o["tz_offset_min"] | 180;
+            strlcpy(timeCfg.ntp_server,  o["ntp_server"]  | "pool.ntp.org", sizeof(timeCfg.ntp_server));
+            strlcpy(timeCfg.mqtt_topic,  o["mqtt_topic"]  | "", sizeof(timeCfg.mqtt_topic));
+            timeCfg.ntp_enabled  = o["ntp_enabled"]  | true;
+            timeCfg.mqtt_enabled = o["mqtt_enabled"] | true;
+            TimeManager::saveConfig();
+            TimeManager::applyTimezone();
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(hSave);
+
+    // Запускаем NTP если нет более приоритетного источника
+    if (timeCfg.ntp_enabled) _syncNtp();
+
+    // Подписка на MQTT топик времени
+#ifdef MODULE_MQTT
+    if (timeCfg.mqtt_enabled && strlen(timeCfg.mqtt_topic) > 0)
+        MqttHandler::addSubscription(timeCfg.mqtt_topic);
+#endif
+
+    Serial.println("[TIME] Init OK");
+}
+
+// ── LOOP ─────────────────────────────────────────────────────────────────────
+void TimeManager::loop() {
+    uint32_t now_ms = millis();
+
+#ifdef TIME_SOURCE_NTP
+    // Проверяем успешность NTP синхронизации
+    if (timeCfg.ntp_enabled
+        && (_source == TimeSource::NONE || _source == TimeSource::NTP)
+        && !_synced) {
+        time_t t = time(nullptr);
+        if (t > 1700000000UL) {
+            _source = TimeSource::NTP;
+            _synced = true;
+            Serial.printf("[TIME] NTP synced: %s\n", formatDateTime().c_str());
+        }
+    }
+    // Периодическая ресинхронизация NTP
+    if (timeCfg.ntp_enabled
+        && _source == TimeSource::NTP
+        && (now_ms - _lastNtpMs) > NTP_INTERVAL_MS) {
+        _syncNtp();
+    }
+#endif
+
+    // Если MQTT источник давно не присылал — сбрасываем приоритет
+    if (_source == TimeSource::MQTT
+        && (now_ms - _lastMqttMs) > MQTT_TIMEOUT_MS) {
+        Serial.println("[TIME] MQTT time source lost");
+        _source = TimeSource::NONE;
+        _synced = false;
+    }
+}
+
+// ── Конфиг ───────────────────────────────────────────────────────────────────
+bool TimeManager::loadConfig() {
+    JsonDocument doc;
+    if (!ConfigManager::loadJson("/time.json", doc)) return false;
+    timeCfg.tz_offset_min = doc["tz_offset_min"] | 180;
+    timeCfg.ntp_enabled   = doc["ntp_enabled"]   | true;
+    timeCfg.mqtt_enabled  = doc["mqtt_enabled"]  | true;
+    strlcpy(timeCfg.ntp_server, doc["ntp_server"] | "pool.ntp.org", sizeof(timeCfg.ntp_server));
+    strlcpy(timeCfg.mqtt_topic, doc["mqtt_topic"] | "", sizeof(timeCfg.mqtt_topic));
+    return true;
+}
+
+bool TimeManager::saveConfig() {
+    JsonDocument doc;
+    doc["tz_offset_min"] = timeCfg.tz_offset_min;
+    doc["ntp_enabled"]   = timeCfg.ntp_enabled;
+    doc["mqtt_enabled"]  = timeCfg.mqtt_enabled;
+    doc["ntp_server"]    = timeCfg.ntp_server;
+    doc["mqtt_topic"]    = timeCfg.mqtt_topic;
+    return ConfigManager::saveJson("/time.json", doc);
+}
+
+void TimeManager::applyTimezone() {
+    long offset_sec = timeCfg.tz_offset_min * 60L;
+    // Сбрасываем TZ env чтобы не мешал
+    setenv("TZ", "UTC0", 1);
+    tzset();
+    configTime(offset_sec, 0, timeCfg.ntp_enabled ? timeCfg.ntp_server : "");
+    strlcpy(timeCfg.tz_applied, String(offset_sec).c_str(), sizeof(timeCfg.tz_applied));
+    Serial.printf("[TIME] configTime offset=%lds server=%s\n", offset_sec, timeCfg.ntp_server);
+}
+
+#endif // MODULE_TIME
+```
+
+---
+
+### <a id="📄-src-modules-time-timemanager-h"></a>📄 `src/modules/time/TimeManager.h`
+
+**File Info:**
+- **Size**: 1.94 KB
+- **Extension**: `.h`
+- **Language**: `text`
+- **Location**: `src/modules/time/TimeManager.h`
+- **Relative Path**: `src/modules/time`
+- **Created**: 2026-05-24 06:03:10 (Asia/Novosibirsk / GMT+07:00)
+- **Modified**: 2026-05-25 18:48:21 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `cd04ae097faba234047508f06469529f`
+- **SHA256**: `fdeae49bc240ae0aa28a9d8ade33cca80fd3f18180a558c5f31dc943a01380dc`
+- **Encoding**: UTF-8
+
+**File code content:**
+
+```text
+#pragma once
+#ifdef MODULE_TIME
+
+#include <Arduino.h>
+#include <time.h>
+
+enum class TimeSource {
+    NONE = 0,
+    MODEM,    // GSM AT+CCLK (уже реализовано в ModemHandler)
+    MQTT,     // топик с unix timestamp
+    NTP,      // configTime
+    RTC       // внешний RTC модуль (будущее)
+};
+
+struct TimeConfig {
+    // NTP
+    bool     ntp_enabled  = true;
+    char     ntp_server[48] = "pool.ntp.org";
+    int16_t  tz_offset_min = 180;   // UTC+3 (Москва)
+
+    char tz_applied[16] = "";
+    
+    // MQTT источник
+    bool     mqtt_enabled = true;
+    char     mqtt_topic[64] = "homeassistant/sensor/time/state"; // HA time entity
+};
+
+extern TimeConfig timeCfg;
+
+class TimeManager {
+public:
+    static void init();
+    static void loop();
+    static bool loadConfig();
+    static bool saveConfig();
+
+    // Основной интерфейс
+    static time_t     now();
+    static bool       isSynced();
+    static TimeSource source();
+    static String     sourceStr();
+    static String     formatTime(const char* fmt = "%H:%M:%S");
+    static String     formatDateTime(const char* fmt = "%d.%m.%Y %H:%M:%S");
+
+    // Вызывается из ModemHandler когда GSM синхронизировал время (уже есть settimeofday)
+    static void notifySynced(TimeSource src);
+
+    // Вызывается из MqttHandler при получении сообщения
+    static void onMqttMessage(const char* topic, const char* payload);
+
+    static void applyTimezone();
+
+private:
+    static TimeSource  _source;
+    static bool        _synced;
+    static uint32_t    _lastNtpMs;
+    static uint32_t    _lastMqttMs;
+    static const uint32_t NTP_INTERVAL_MS  = 3600000UL;  // раз в час
+    static const uint32_t MQTT_TIMEOUT_MS  = 120000UL;   // 2 мин без MQTT = не источник
+
+    static void _syncNtp();
+};
+
+#endif // MODULE_TIME
+```
+
+---
+
 ### <a id="📄-src-main-cpp"></a>📄 `src/main.cpp`
 
 **File Info:**
-- **Size**: 11.28 KB
+- **Size**: 13.97 KB
 - **Extension**: `.cpp`
 - **Language**: `cpp`
 - **Location**: `src/main.cpp`
 - **Relative Path**: `src`
 - **Created**: 2026-02-18 22:12:18 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-05-22 16:25:28 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `02a32dca9de23164adfa936c9f54a342`
-- **SHA256**: `b85ba41ed7943b6e4e5bb65404dd04a54ceadd31f8a058cdb95a34f7d8c6e389`
+- **Modified**: 2026-05-25 21:20:55 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `9277adcf943af2ebdfa6d665182335f0`
+- **SHA256**: `b2f37fda0a09f61aad913aede66adaf799ff917698ba59ec678e2e316065647f`
 - **Encoding**: ASCII
 
 **File code content:**
@@ -6984,6 +7494,10 @@ private:
 #include "modules/rs485/Rs485Handler.h"
 #endif
 
+#ifdef MODULE_TIME
+#include "modules/time/TimeManager.h"
+#endif
+
 AsyncWebServer server(80);
 
 void setup() {
@@ -7001,6 +7515,10 @@ void setup() {
     //    Устройство регистрирует свои вкладки первыми (Мониторинг, Уставки)
     //    Затем модули добавляют свои (MQTT, Telegram)
     //    Последней — вкладка Настройки (core)
+
+    #ifdef MODULE_TIME
+    TimeManager::init();
+    #endif
 
     #ifdef DEVICE_BOILER_MONITOR
     BMonDevice::init();
@@ -7064,6 +7582,25 @@ void setup() {
         border-radius:6px;max-height:160px;overflow-y:auto;background:var(--bg)"></div>
       <input type="password" name="wifi_pass" placeholder="WiFi Password" style="margin-top:8px">
       <input type="text" name="device_name" placeholder="Имя устройства">
+    </div>
+
+    <div class="settings-group" id="time_settings">
+      <h3>🕐 Время</h3>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span id="st_led" style="width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0"></span>
+        <span id="st_time" style="font-family:monospace;font-weight:700;color:var(--accent)">--:--:--</span>
+        <span id="st_src" style="font-size:11px;color:var(--muted)"></span>
+      </div>
+      <label>Часовой пояс (мин от UTC)</label>
+      <input type="text" name="tz_offset_min" placeholder="180 = UTC+3">
+      <label>NTP сервер</label>
+      <input type="text" name="ntp_server" placeholder="pool.ntp.org">
+      <label>MQTT топик времени</label>
+      <input type="text" name="mqtt_time_topic" placeholder="homeassistant/sensor/time/state">
+      <div style="display:flex;gap:12px;margin-top:4px">
+        <label><input type="checkbox" id="ntp_enabled"> NTP</label>
+        <label><input type="checkbox" id="mqtt_time_enabled"> MQTT</label>
+      </div>
     </div>
 
     <div class="settings-group">
@@ -7175,7 +7712,34 @@ void setup() {
       document.getElementById('eth_static').style.display =
         document.getElementById('eth_dhcp').checked ? 'none' : 'block';
     }
+
+    // Время
+    fetch('/api/time/config').then(r=>r.json()).then(d=>{
+      document.querySelector('[name="tz_offset_min"]').value = d.tz_offset_min || 180;
+      document.querySelector('[name="ntp_server"]').value    = d.ntp_server || 'pool.ntp.org';
+      document.querySelector('[name="mqtt_time_topic"]').value = d.mqtt_topic || '';
+      document.getElementById('ntp_enabled').checked  = d.ntp_enabled;
+      document.getElementById('mqtt_time_enabled').checked = d.mqtt_enabled;
+    });
+    // Статус времени
+    fetch('/api/time').then(r=>r.json()).then(d=>{
+      const srcs={ntp:'🛰 NTP',mqtt:'🏠 MQTT',gsm:'📡 GSM',rtc:'⏱ RTC',none:''};
+      document.getElementById('st_led').style.background = d.synced ? 'var(--ok)' : 'var(--muted)';
+      document.getElementById('st_time').textContent = d.time_str || '--:--:--';
+      document.getElementById('st_src').textContent  = srcs[d.source] || '';
+    });
+
     async function saveSettings() {
+
+    const timeData = {
+      tz_offset_min: +document.querySelector('[name="tz_offset_min"]').value,
+      ntp_server:    document.querySelector('[name="ntp_server"]').value,
+      mqtt_topic:    document.querySelector('[name="mqtt_time_topic"]').value,
+      ntp_enabled:   document.getElementById('ntp_enabled').checked,
+      mqtt_enabled:  document.getElementById('mqtt_time_enabled').checked,
+    };
+    fetch('/api/time/save', {method:'POST',
+      headers:{'Content-Type':'application/json'}, body:JSON.stringify(timeData)});
       const data = Object.assign({}, _currentCfg);
       data.eth_dhcp = document.getElementById('eth_dhcp').checked;
       const fields = ['eth_ip','eth_mask','eth_gw','eth_dns',
@@ -7271,6 +7835,10 @@ void loop() {
         EkoNomDevice::loop();
     #endif
 
+    #ifdef MODULE_TIME
+        TimeManager::loop();
+    #endif
+
     // Перезагрузка по запросу из веб-интерфейса
     xSemaphoreTake(coreMutex, portMAX_DELAY);
     bool reboot = sysState.pendingReboot && (millis() - sysState.rebootAt > 500);
@@ -7285,15 +7853,15 @@ void loop() {
 ### <a id="📄-platformio-ini"></a>📄 `platformio.ini`
 
 **File Info:**
-- **Size**: 3.39 KB
+- **Size**: 3.44 KB
 - **Extension**: `.ini`
 - **Language**: `text`
 - **Location**: `platformio.ini`
 - **Relative Path**: `root`
 - **Created**: 2026-02-18 04:58:44 (Asia/Novosibirsk / GMT+07:00)
-- **Modified**: 2026-05-22 16:26:12 (Asia/Novosibirsk / GMT+07:00)
-- **MD5**: `4e23f902237722b3209ba66dd2ef4aa9`
-- **SHA256**: `d49aa23a664ccf4a9e003111353345e235d81dc9a73d57b09cf7be8b63971c57`
+- **Modified**: 2026-05-24 06:08:09 (Asia/Novosibirsk / GMT+07:00)
+- **MD5**: `cb7ed78e681a1b1dcdddb844a346a26f`
+- **SHA256**: `2599e01b55d3757af6823d4a6a54ae030f97edac68f660da73c5fa3f266da743`
 - **Encoding**: UTF-8
 
 **File code content:**
@@ -7328,6 +7896,8 @@ build_flags =
     -D MODULE_OTA
     -D MODULE_CAPTIVE_PORTAL
     -D MODULE_RS485
+    -D MODULE_TIME
+    -D TIME_SOURCE_NTP 
     ; ---------- Устройство (только одно!) ----------------------
     ; -D DEVICE_BOILER
     -D DEVICE_KC868_A16

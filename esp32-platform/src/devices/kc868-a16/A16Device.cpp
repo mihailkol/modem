@@ -239,12 +239,21 @@ async function updateA16() {
 
     // ADC
     for (let i=0; i<4; i++) {
-      const v = d.adc_value[i];
       const el = document.getElementById('adc_v'+i);
-      if (el) el.textContent = v.toFixed(2);
-      const pct = Math.min(100, Math.max(0, d.adc_pct[i]));
+      const un = document.getElementById('adc_u'+i);
       const bar = document.getElementById('adc_b'+i);
+      const pct = Math.min(100, Math.max(0, d.adc_pct[i]));
       if (bar) bar.style.width = pct+'%';
+      if (i < 2) {
+        // 4-20мА каналы — показываем мА
+        const ma = d.adc_ma ? d.adc_ma[i] : null;
+        if (el) el.textContent = ma != null ? ma.toFixed(2) : '--';
+        if (un) un.textContent = 'мА';
+      } else {
+        // 0-5В каналы — показываем вольты
+        if (el) el.textContent = d.adc_value[i].toFixed(2);
+        if (un) un.textContent = 'В';
+      }
     }
 
     // 1-Wire
@@ -325,8 +334,12 @@ void A16Device::init() {
         // ADC
         JsonArray adcV = doc["adc_value"].to<JsonArray>();
         JsonArray adcP = doc["adc_pct"].to<JsonArray>();
+        JsonArray adcR = doc["adc_raw"].to<JsonArray>();
+        JsonArray adcM = doc["adc_ma"].to<JsonArray>();  
         for (int i = 0; i < 4; i++) {
             adcV.add(a16State.adc_value[i]);
+            adcR.add(a16State.adc_raw[i]);
+            adcM.add(a16State.adc_ma[i]); 
             float range = a16Cfg.adc_max[i] - a16Cfg.adc_min[i];
             float pct = (range > 0)
                 ? (a16State.adc_value[i] - a16Cfg.adc_min[i]) / range * 100.0f
@@ -443,8 +456,7 @@ void A16Device::readDigitalInputs() {
 //  АНАЛОГОВЫЕ ВХОДЫ
 // ============================================================
 void A16Device::readAnalog() {
-    const uint8_t pins[4] = {A16_ADC_CH1, A16_ADC_CH2, A16_ADC_CH3, A16_ADC_CH4};
-
+    const uint8_t pins[4] = {A16_ADC_CH1, A16_ADC_CH3, A16_ADC_CH4, A16_ADC_CH2};
     for (int i = 0; i < 4; i++) {
         // Среднее из 4 измерений для стабильности
         int32_t sum = 0;
@@ -455,12 +467,24 @@ void A16Device::readAnalog() {
 
         switch (a16Cfg.adc_mode[i]) {
             case AnalogMode::MODE_4_20MA: {
-                // 4мА = ~820 (1В на АЦП 12бит 3.3В ref), 20мА = ~4095
-                // Через резистор 150Ом: 4мА→0.6В, 20мА→3В
-                float pct = (raw - 820.0f) / (4095.0f - 820.0f);
-                pct = constrain(pct, 0.0f, 1.0f);
+                // Скользящее среднее по буферу
+                if (i < 2) {
+                    a16State.adc_ma_buf[i][a16State.adc_ma_idx[i]] = raw;
+                    a16State.adc_ma_idx[i] = (a16State.adc_ma_idx[i] + 1) % 10;
+                    if (a16State.adc_ma_idx[i] == 0) a16State.adc_ma_full[i] = true;
+                    uint8_t cnt = a16State.adc_ma_full[i] ? 10 : a16State.adc_ma_idx[i];
+                    int32_t sum = 0;
+                    for (uint8_t k = 0; k < cnt; k++) sum += a16State.adc_ma_buf[i][k];
+                    raw = (cnt > 0) ? (sum / cnt) : raw;
+                }
+
+                float ma = 4.0f + (raw - 557.0f) / (4402.0f - 557.0f) * 16.0f;
+                ma = constrain(ma, 4.0f, 20.0f);
+                a16State.adc_ma[i] = ma;
+
+                float pct = (ma - 4.0f) / 16.0f;
                 a16State.adc_value[i] = a16Cfg.adc_min[i] +
-                    pct * (a16Cfg.adc_max[i] - a16Cfg.adc_min[i]);
+                                        pct * (a16Cfg.adc_max[i] - a16Cfg.adc_min[i]);
                 break;
             }
             case AnalogMode::MODE_0_5V: {

@@ -8,6 +8,10 @@
 #include "core/NetworkManager.h"
 #include "core/WebHandler.h"
 
+#ifdef APP_BOILER_ROOM
+#include "apps/boiler-room/BoilerRoomDevice.h"
+#endif
+
 #ifdef MODULE_MQTT
 #include "modules/mqtt/MqttHandler.h"
 #endif
@@ -100,6 +104,10 @@ void setup() {
 
     #ifdef DEVICE_EKONOM
         EkoNomDevice::init(30);   // опрос каждые 30 сек
+    #endif
+
+    #if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM)
+      BoilerRoomDevice::init();
     #endif
 
     // Вкладка настроек сети — всегда последняя
@@ -383,6 +391,10 @@ void loop() {
 
     #ifdef MODULE_TIME
         TimeManager::loop();
+    #endif
+
+    #if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM)
+    BoilerRoomDevice::loop();
     #endif
 
     // Перезагрузка по запросу из веб-интерфейса

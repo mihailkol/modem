@@ -90,6 +90,18 @@ void NetworkManager::loop() {
         }
     }
 
+    // Runtime watchdog — если сеть пропала надолго, перезагружаемся
+    static uint32_t _netLostTimer    = 0;
+    static bool     _netWasConnected = false;
+
+    if (connected) {
+        _netWasConnected = true;
+        _netLostTimer    = millis();
+    } else if (_netWasConnected && millis() - _netLostTimer > 300000) {
+        Serial.println("[NET] Network lost for 5 min, rebooting");
+        ESP.restart();
+    }
+
     // Captive portal DNS
 #ifdef MODULE_CAPTIVE_PORTAL
     if (apActive) _dns.processNextRequest();

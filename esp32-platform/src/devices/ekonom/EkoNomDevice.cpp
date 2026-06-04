@@ -1,3 +1,5 @@
+#ifdef DEVICE_EKONOM
+
 #include "EkoNomDevice.h"
 #include "../../modules/rs485/Rs485Handler.h"
 
@@ -132,3 +134,5 @@ void EkoNomDevice::loop() {
         _sentMs = now;
     }
 }
+
+#endif // DEVICE_EKONOM

@@ -15,6 +15,81 @@
 #include "../../devices/ekonom/EkoNomDevice.h"
 #endif
 
+// ============================================================
+#if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM) && defined(MODULE_DATACHANNEL)
+ 
+#include "../../core/DataChannel.h"
+#include "BoilerRoomDevice.h"
+ 
+// ── Теплосчётчик EkoNom ──────────────────────────────────────
+// Данные актуальны только при heat_valid; логгер получит 0 если
+// EkoNom не отвечал — это допустимо, avg за минуту всё равно
+// посчитается корректно при наличии хотя бы одного валидного чтения.
+// Для критичности можно добавить проверку heat_valid в геттере.
+DECLARE_CHANNEL(brr_heat_t_supply,
+    "brr.heat.t_supply",  "Теплосчётчик подача",   "°C",   CH_FLOAT, 10,
+    []() -> float { return brrState.heat_valid ? brrState.heat_t_supply : NAN; }
+);
+DECLARE_CHANNEL(brr_heat_t_return,
+    "brr.heat.t_return",  "Теплосчётчик обратка",  "°C",   CH_FLOAT, 10,
+    []() -> float { return brrState.heat_valid ? brrState.heat_t_return : NAN; }
+);
+DECLARE_CHANNEL(brr_heat_t_delta,
+    "brr.heat.t_delta",   "Теплосчётчик ΔT",       "°C",   CH_FLOAT, 10,
+    []() -> float { return brrState.heat_valid ? brrState.heat_t_delta : NAN; }
+);
+DECLARE_CHANNEL(brr_heat_flow,
+    "brr.heat.flow_m3h",  "Расход теплоносителя",  "м³/ч", CH_FLOAT, 1000,
+    []() -> float { return brrState.heat_valid ? brrState.heat_flow_m3h : NAN; }
+);
+DECLARE_CHANNEL(brr_heat_power,
+    "brr.heat.power_kw",  "Тепловая мощность",     "кВт",  CH_FLOAT, 100,
+    []() -> float { return brrState.heat_valid ? brrState.heat_power_kw : NAN; }
+);
+// Накопленная энергия и объём — монотонные счётчики
+DECLARE_CHANNEL(brr_heat_energy,
+    "brr.heat.energy_kwh","Тепловая энергия",      "кВт·ч",CH_COUNTER, 1,
+    []() -> float { return brrState.heat_energy_kwh; }
+);
+DECLARE_CHANNEL(brr_heat_volume,
+    "brr.heat.volume_m3", "Объём теплоносителя",   "м³",   CH_COUNTER, 1,
+    []() -> float { return brrState.heat_volume_m3; }
+);
+ 
+// ── Давление ─────────────────────────────────────────────────
+DECLARE_CHANNEL(brr_p_heat,
+    "brr.p_heat",  "Давление отопления", "бар", CH_FLOAT, 100,
+    []() -> float { return brrState.p_heat; }
+);
+DECLARE_CHANNEL(brr_p_water,
+    "brr.p_water", "Давление ХВС",       "бар", CH_FLOAT, 100,
+    []() -> float { return brrState.p_water; }
+);
+ 
+// ── Расход воды (мгновенный) ─────────────────────────────────
+DECLARE_CHANNEL(brr_water_rate,
+    "brr.water.rate_lpm", "Расход воды", "л/мин", CH_FLOAT, 100,
+    []() -> float { return brrState.water_rate_lpm; }
+);
+// Счётчик воды — накопленный объём
+DECLARE_CHANNEL(brr_water_total,
+    "brr.water.total_m3", "Счётчик воды", "м³", CH_COUNTER, 1,
+    []() -> float { return brrState.water_total_m3; }
+);
+ 
+// ── Расход газа (мгновенный) ─────────────────────────────────
+DECLARE_CHANNEL(brr_gas_rate,
+    "brr.gas.rate_m3h",   "Расход газа",   "м³/ч", CH_FLOAT, 1000,
+    []() -> float { return brrState.gas_rate_m3h; }
+);
+// Счётчик газа — накопленный объём
+DECLARE_CHANNEL(brr_gas_total,
+    "brr.gas.total_m3",   "Счётчик газа",  "м³",   CH_COUNTER, 1,
+    []() -> float { return brrState.gas_total_m3; }
+);
+ 
+#endif // DEVICE_KC868_A16 && APP_BOILER_ROOM && MODULE_DATACHANNEL
+
 // ── Глобальные данные ─────────────────────────────────────────────────────────
 BoilerRoomConfig brrCfg;
 BoilerRoomState  brrState;
@@ -181,6 +256,325 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
       <span class="brr-row-val"><span id="brr_gtotal">--</span> м³</span>
     </div>
   </div>
+
+  <!-- История -->
+  <div class="brr-card" id="hist-panel">
+
+    <!-- Заголовок-переключатель -->
+    <div class="brr-label" id="hist-toggle" style="cursor:pointer;user-select:none;margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
+      <span>📈 ИСТОРИЯ</span>
+      <span id="hist-arrow" style="font-size:14px;transition:transform .2s">▼</span>
+    </div>
+
+    <!-- Тело панели (скрыто по умолчанию) -->
+    <div id="hist-body" style="display:none;margin-top:12px">
+
+      <!-- Масштаб + чекбокс диапазона -->
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+        <div style="display:flex;gap:4px;">
+          <button class="hist-scale-btn active" data-level="0" data-last="720">2ч</button>
+          <button class="hist-scale-btn" data-level="1" data-last="1440">24ч</button>
+          <button class="hist-scale-btn" data-level="2" data-last="2016">2нед</button>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;">
+          <input type="checkbox" id="hist-range-cb" style="cursor:pointer;"> диапазон
+        </label>
+      </div>
+
+      <!-- Список каналов -->
+      <div id="hist-channels" style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;"></div>
+
+      <!-- Canvas графика -->
+      <div style="position:relative;height:220px;">
+        <canvas id="hist-chart"></canvas>
+        <div id="hist-empty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">Нет данных</div>
+      </div>
+
+    </div>
+  </div>
+
+<style>
+.hist-scale-btn {
+  background: #111318; border: 1px solid var(--border);
+  color: var(--muted); border-radius: 6px;
+  padding: 4px 12px; font-size: 12px; cursor: pointer;
+  transition: background .15s, color .15s;
+  width: auto !important;
+}
+.hist-scale-btn.active {
+  background: var(--accent); color: #000;
+  border-color: var(--accent);
+}
+.hist-ch-row {
+  display: flex; align-items: center; gap:8px;
+  font-size: 12px; color: var(--text); cursor: pointer;
+}
+.hist-ch-dot {
+  width: 10px; height: 10px; border-radius: 50%;
+  flex-shrink: 0;
+}
+</style>
+
+<script>
+(function() {
+
+// ── Палитра линий ────────────────────────────────────────────
+const COLORS = [
+  '#4fc3f7','#ef5350','#66bb6a','#ffa726',
+  '#ab47bc','#26c6da','#d4e157','#ff7043',
+  '#42a5f5','#ec407a','#26a69a','#8d6e63'
+];
+
+// ── Состояние ────────────────────────────────────────────────
+let chart       = null;
+let chartJsPromise = null;
+let channels    = [];      // [{id, label, unit, type, color, enabled}]
+let currentLevel = 0;
+let currentLast  = 720;
+let showRange    = false;
+let panelOpen    = false;
+
+// ── Переключатель панели ─────────────────────────────────────
+document.getElementById('hist-toggle').addEventListener('click', () => {
+  panelOpen = !panelOpen;
+  document.getElementById('hist-body').style.display = panelOpen ? 'block' : 'none';
+  document.getElementById('hist-arrow').style.transform = panelOpen ? 'rotate(180deg)' : '';
+  if (panelOpen && channels.length === 0) initHistory();
+});
+
+// ── Кнопки масштаба ──────────────────────────────────────────
+document.querySelectorAll('.hist-scale-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.hist-scale-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentLevel = +btn.dataset.level;
+    currentLast  = +btn.dataset.last;
+    loadAndDraw();
+  });
+});
+
+// ── Чекбокс диапазона ────────────────────────────────────────
+document.getElementById('hist-range-cb').addEventListener('change', e => {
+  showRange = e.target.checked;
+  loadAndDraw();
+});
+
+// ── Инициализация: загружаем каналы, потом Chart.js ──────────
+async function initHistory() {
+  try {
+    const resp = await fetch('/api/history/channels');
+    const list = await resp.json();
+
+    // Берём только history:true и enabled:true
+    channels = list
+      .filter(ch => ch.history && ch.enabled)
+      .map((ch, i) => ({
+        ...ch,
+        color:   COLORS[i % COLORS.length],
+        visible: ch.type === 0   // по умолчанию показываем только CH_FLOAT
+      }));
+
+    renderChannelList();
+    loadChartJs();
+  } catch(e) {
+    console.error('[HIST] init error', e);
+  }
+}
+
+// ── Список каналов с чекбоксами ──────────────────────────────
+function renderChannelList() {
+  const el = document.getElementById('hist-channels');
+  el.innerHTML = '';
+  channels.forEach((ch, i) => {
+    const row = document.createElement('label');
+    row.className = 'hist-ch-row';
+    row.innerHTML = `
+      <input type="checkbox" ${ch.visible ? 'checked' : ''} style="cursor:pointer;">
+      <span class="hist-ch-dot" style="background:${ch.color}"></span>
+      <span>${ch.label}</span>
+      <span style="color:var(--muted);font-size:11px;margin-left:auto">${ch.unit}</span>
+    `;
+    row.querySelector('input').addEventListener('change', e => {
+      channels[i].visible = e.target.checked;
+      loadAndDraw();
+    });
+    el.appendChild(row);
+  });
+}
+
+function loadChartJs() {
+    if (chartJsPromise) return chartJsPromise;
+    chartJsPromise = new Promise((resolve) => {
+        if (window.Chart) { resolve(); return; }
+        const s = document.createElement('script');
+        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+        s.onload = resolve;
+        document.head.appendChild(s);
+    });
+    return chartJsPromise;
+}
+
+async function loadAndDraw() {
+    await loadChartJs();
+    try {
+        const url = `/api/history?level=${currentLevel}&last=${currentLast}`;
+        const data = await (await fetch(url)).json();
+        drawChart(data);
+    } catch(e) {
+        console.error('[HIST] load error', e);
+    }
+}
+
+// ── Нормализация 0-1 по массиву ──────────────────────────────
+function normalize(arr) {
+  const valid = arr.filter(v => v !== null && !isNaN(v));
+  if (valid.length === 0) return arr.map(() => null);
+  const mn = Math.min(...valid);
+  const mx = Math.max(...valid);
+  const range = mx - mn;
+  if (range === 0) return arr.map(v => v === null ? null : 0.5);
+  return arr.map(v => v === null ? null : (v - mn) / range);
+}
+
+// ── Форматирование метки времени ─────────────────────────────
+function fmtTs(ts) {
+  if (!ts) return '?';
+  const d = new Date(ts * 1000);
+  const pad = n => String(n).padStart(2,'0');
+  if (currentLevel === 2) {
+    // для 2 недель показываем дату
+    return `${pad(d.getDate())}.${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+// ── Отрисовка графика ────────────────────────────────────────
+function drawChart(data) {
+  const emptyEl = document.getElementById('hist-empty');
+
+  if (!data.ts || data.ts.length === 0) {
+    emptyEl.style.display = 'flex';
+    if (chart) { chart.destroy(); chart = null; }
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  const labels = data.ts.map(fmtTs);
+  const datasets = [];
+
+  channels.forEach(ch => {
+    if (!ch.visible) return;
+
+    // Найти канал в ответе
+    const src = data.channels.find(c => c.id === ch.id);
+    if (!src) return;
+
+    const rawValues = ch.type === 0
+      ? (src.avg || src.values || [])
+      : (src.values || []);
+
+    const normValues = normalize(rawValues);
+
+    // Основная линия
+    datasets.push({
+      label:           ch.label,
+      data:            normValues,
+      borderColor:     ch.color,
+      backgroundColor: ch.color + '22',
+      borderWidth:     1.5,
+      pointRadius:     0,
+      pointHoverRadius:4,
+      tension:         0.3,
+      fill:            false,
+      _raw:            rawValues,
+      _unit:           ch.unit,
+      _chType:         ch.type,
+    });
+
+    // Полоса диапазона min/max для CH_FLOAT
+    if (showRange && ch.type === 0 && src.min && src.max) {
+      const normMin = normalize(src.min);
+      const normMax = normalize(src.max);
+
+      datasets.push({
+        label:           ch.label + ' min',
+        data:            normMin,
+        borderColor:     'transparent',
+        backgroundColor: ch.color + '18',
+        borderWidth:     0,
+        pointRadius:     0,
+        fill:            '+1',  // fill до следующего dataset (max)
+        tension:         0.3,
+        _hidden:         true,
+      });
+      datasets.push({
+        label:           ch.label + ' max',
+        data:            normMax,
+        borderColor:     'transparent',
+        backgroundColor: ch.color + '18',
+        borderWidth:     0,
+        pointRadius:     0,
+        fill:            false,
+        tension:         0.3,
+        _hidden:         true,
+      });
+    }
+  });
+
+  const ctx = document.getElementById('hist-chart').getContext('2d');
+
+  if (chart) { chart.destroy(); }
+
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive:          true,
+      maintainAspectRatio: false,
+      animation:           { duration: 200 },
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1d23',
+          borderColor:     '#2a2d35',
+          borderWidth:     1,
+          titleColor:      '#aaa',
+          bodyColor:       '#eee',
+          padding:         10,
+          callbacks: {
+            label: ctx => {
+              const ds = ctx.dataset;
+              if (ds._hidden) return null;
+              const raw = ds._raw ? ds._raw[ctx.dataIndex] : null;
+              if (raw === null || raw === undefined) return null;
+              return ` ${ds.label}: ${Number(raw).toFixed(2)} ${ds._unit || ''}`;
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: {
+            color:    '#666',
+            font:     { size: 10 },
+            maxTicksLimit: 8,
+            maxRotation: 0,
+          },
+          grid: { color: '#1e2128' }
+        },
+        y: {
+          display: false,   // ось Y скрыта — данные нормализованы
+          min: -0.05,
+          max:  1.05,
+        }
+      }
+    }
+  });
+}
+
+})();
+</script>
 
 </div>
 

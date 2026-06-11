@@ -23,10 +23,17 @@ enum ChannelType : uint8_t {
 // ============================================================
 struct DataChannel {
     // ── Идентификация ────────────────────────────────────────
-    const char* id;           // уникальный id, точка как разделитель
-                              //   "bmon.t_supply", "brr.heat.power_kw"
-    const char* label;        // отображаемое имя (переопределяется из JSON)
-    const char* unit;         // единица измерения: "°C", "бар", "кВт", ""
+    const char* id;            // уникальный id, точка как разделитель
+                               //   "bmon.t_supply", "brr.heat.power_kw"
+    const char* _labelDefault; // исходный label из кода (flash, не меняется)
+    String      _labelOverride;// override из channels.json (пустая = не задан)
+    const char* unit;          // единица измерения: "°C", "бар", "кВт", ""
+
+    // Геттер label: возвращает override если задан, иначе default из кода
+    const char* label() const {
+        return (_labelOverride.length() > 0) ? _labelOverride.c_str() : _labelDefault;
+    }
+    void setLabel(const char* l) { _labelOverride = (l && strlen(l) > 0) ? l : ""; }
 
     // ── Тип и масштабирование ────────────────────────────────
     ChannelType type  = CH_FLOAT;
@@ -67,7 +74,7 @@ struct DataChannel {
                 bool mqtt_ = true,
                 uint32_t mqtt_interval_ = 0,
                 float mqtt_threshold_ = 0.1f)
-        : id(id_), label(label_), unit(unit_),
+        : id(id_), _labelDefault(label_), unit(unit_),
           type(type_), scale(scale_), getter(getter_),
           history(history_), mqtt(mqtt_),
           mqtt_interval(mqtt_interval_), mqtt_threshold(mqtt_threshold_)

@@ -324,7 +324,7 @@ void HistoryLogger::_loadOverrides() {
         JsonObject o = chans[ch->id].as<JsonObject>();
         if (o.containsKey("enabled")) ch->_enabled = o["enabled"].as<bool>();
         const char* savedLabel = o["label"] | "";
-        if (savedLabel && strlen(savedLabel) > 0) ch->label = savedLabel;
+        if (savedLabel && strlen(savedLabel) > 0) ch->setLabel(savedLabel);
         // offset для CH_COUNTER читается в самом device через Preferences,
         // здесь не хранится
     }
@@ -338,7 +338,7 @@ void HistoryLogger::_saveOverrides() {
     for (auto* ch : DataChannel::all()) {
         JsonObject o = chans[ch->id].to<JsonObject>();
         o["enabled"] = ch->_enabled;
-        o["label"]   = ch->label;
+        o["label"]   = ch->label();
         o["unit"]    = ch->unit;
         o["type"]    = (uint8_t)ch->type;
         o["history"] = ch->history;
@@ -390,7 +390,7 @@ void HistoryLogger::_sendL0(AsyncWebServerRequest* req, uint16_t last) {
     for (uint8_t i = 0; i < nCh; i++) {
         JsonObject chObj = chArr.add<JsonObject>();
         chObj["id"]    = _channels[i]->id;
-        chObj["label"] = _channels[i]->label;
+        chObj["label"] = _channels[i]->label();
         chObj["unit"]  = _channels[i]->unit;
         chObj["type"]  = (uint8_t)_channels[i]->type;
         vals[i] = chObj["values"].to<JsonArray>();
@@ -465,7 +465,7 @@ void HistoryLogger::_sendFile(AsyncWebServerRequest* req,
     for (uint8_t i = 0; i < nCh; i++) {
         JsonObject chObj = chArr.add<JsonObject>();
         chObj["id"]    = _channels[i]->id;
-        chObj["label"] = _channels[i]->label;
+        chObj["label"] = _channels[i]->label();
         chObj["unit"]  = _channels[i]->unit;
         chObj["type"]  = (uint8_t)_channels[i]->type;
         // Для CH_FLOAT передаём avg; min/max в отдельных массивах
@@ -539,7 +539,7 @@ void HistoryLogger::_registerRoutes(AsyncWebServer& server) {
         for (auto* ch : DataChannel::all()) {
             JsonObject o = arr.add<JsonObject>();
             o["id"]             = ch->id;
-            o["label"]          = ch->label;
+            o["label"]          = ch->label();
             o["unit"]           = ch->unit;
             o["type"]           = (uint8_t)ch->type;
             o["history"]        = ch->history;
@@ -583,7 +583,7 @@ void HistoryLogger::_registerRoutes(AsyncWebServer& server) {
                 for (auto* ch : DataChannel::all()) {
                     if (strcmp(ch->id, id) != 0) continue;
                     if (o.containsKey("enabled"))         ch->_enabled        = o["enabled"];
-                    if (o.containsKey("label"))            ch->label           = o["label"];
+                    if (o.containsKey("label"))            ch->setLabel(o["label"] | "");
                     if (o.containsKey("history"))          ch->history         = o["history"];
                     if (o.containsKey("mqtt"))             ch->mqtt            = o["mqtt"];
                     if (o.containsKey("mqtt_interval"))    ch->mqtt_interval   = o["mqtt_interval"];

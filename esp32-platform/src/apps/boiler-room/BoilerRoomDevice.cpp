@@ -103,7 +103,7 @@ uint32_t BoilerRoomDevice::_lastPub  = 0;
 static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
 <style>
 .brr-page { display:flex; flex-direction:column; gap:10px; }
-
+ 
 .brr-card {
   background: var(--card);
   border-radius: 10px;
@@ -115,8 +115,7 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
   letter-spacing: .12em; text-transform: uppercase;
   color: var(--muted); margin-bottom: 12px;
 }
-
-/* Сетка 2 колонки */
+ 
 .brr-grid2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -142,8 +141,7 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
 .brr-unit {
   font-size: 11px; color: var(--muted); margin-left: 2px;
 }
-
-/* Большой показатель — мощность теплосчётчика */
+ 
 .brr-big {
   text-align: center; padding: 4px 0 8px;
 }
@@ -158,8 +156,7 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
   font-size: 12px; color: var(--muted);
   margin-top: 6px;
 }
-
-/* Разделительная строка внутри карточки */
+ 
 .brr-row {
   display: flex; justify-content: space-between;
   align-items: baseline;
@@ -170,130 +167,13 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
 .brr-row:last-child { border-bottom: none; }
 .brr-row-lbl { color: var(--muted); }
 .brr-row-val { font-weight: 700; }
-
-/* Статус свежести данных */
+ 
 .brr-age {
   font-size: 11px; color: var(--muted);
   text-align: right; margin-top: 8px;
 }
 .brr-age.stale { color: var(--danger); }
-</style>
-
-<div class="brr-page">
-
-  <!-- Теплосчётчик: мощность крупно -->
-  <div class="brr-card">
-    <div class="brr-label">🔥 ТЕПЛОВАЯ ЭНЕРГИЯ</div>
-    <div class="brr-big">
-      <div>
-        <span class="brr-big-val" id="brr_power">--</span>
-        <span class="brr-big-unit"> кВт</span>
-      </div>
-      <div class="brr-big-sub">
-        Накоплено: <b id="brr_energy">--</b> кВт·ч
-        &nbsp;|&nbsp;
-        Объём: <b id="brr_vol">--</b> м³
-      </div>
-    </div>
-
-    <div class="brr-grid2" style="margin-top:10px">
-      <div class="brr-cell">
-        <div class="brr-cell-lbl">Подача</div>
-        <div><span class="brr-val hot" id="brr_ts">--</span><span class="brr-unit">°C</span></div>
-      </div>
-      <div class="brr-cell">
-        <div class="brr-cell-lbl">Обратка</div>
-        <div><span class="brr-val cool" id="brr_tr">--</span><span class="brr-unit">°C</span></div>
-      </div>
-      <div class="brr-cell">
-        <div class="brr-cell-lbl">Δ температур</div>
-        <div><span class="brr-val" id="brr_dt">--</span><span class="brr-unit">°C</span></div>
-      </div>
-      <div class="brr-cell">
-        <div class="brr-cell-lbl">Расход тепл.</div>
-        <div><span class="brr-val" id="brr_flow">--</span><span class="brr-unit">м³/ч</span></div>
-      </div>
-    </div>
-    <div class="brr-age" id="brr_heat_age">—</div>
-  </div>
-
-  <!-- Давление -->
-  <div class="brr-card">
-    <div class="brr-label">🌡 ДАВЛЕНИЕ</div>
-    <div class="brr-grid2">
-      <div class="brr-cell">
-        <div class="brr-cell-lbl">Отопление</div>
-        <div><span class="brr-val ok" id="brr_ph">--</span><span class="brr-unit">бар</span></div>
-      </div>
-      <div class="brr-cell">
-        <div class="brr-cell-lbl">Вода ХВС</div>
-        <div><span class="brr-val ok" id="brr_pw">--</span><span class="brr-unit">бар</span></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Счётчики -->
-  <div class="brr-card">
-    <div class="brr-label">💧 ВОДОСНАБЖЕНИЕ</div>
-    <div class="brr-row">
-      <span class="brr-row-lbl">Расход</span>
-      <span class="brr-row-val"><span id="brr_wlpm">--</span> л/мин</span>
-    </div>
-    <div class="brr-row">
-      <span class="brr-row-lbl">Накоплено</span>
-      <span class="brr-row-val"><span id="brr_wtotal">--</span> м³</span>
-    </div>
-  </div>
-
-  <div class="brr-card">
-    <div class="brr-label">🔵 ГАЗ</div>
-    <div class="brr-row">
-      <span class="brr-row-lbl">Расход</span>
-      <span class="brr-row-val"><span id="brr_gm3h">--</span> м³/ч</span>
-    </div>
-    <div class="brr-row">
-      <span class="brr-row-lbl">Накоплено</span>
-      <span class="brr-row-val"><span id="brr_gtotal">--</span> м³</span>
-    </div>
-  </div>
-
-  <!-- История -->
-  <div class="brr-card" id="hist-panel">
-
-    <!-- Заголовок-переключатель -->
-    <div class="brr-label" id="hist-toggle" style="cursor:pointer;user-select:none;margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
-      <span>📈 ИСТОРИЯ</span>
-      <span id="hist-arrow" style="font-size:14px;transition:transform .2s">▼</span>
-    </div>
-
-    <!-- Тело панели (скрыто по умолчанию) -->
-    <div id="hist-body" style="display:none;margin-top:12px">
-
-      <!-- Масштаб + чекбокс диапазона -->
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-        <div style="display:flex;gap:4px;">
-          <button class="hist-scale-btn active" data-level="0" data-last="720">2ч</button>
-          <button class="hist-scale-btn" data-level="1" data-last="1440">24ч</button>
-          <button class="hist-scale-btn" data-level="2" data-last="2016">2нед</button>
-        </div>
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;">
-          <input type="checkbox" id="hist-range-cb" style="cursor:pointer;"> диапазон
-        </label>
-      </div>
-
-      <!-- Список каналов -->
-      <div id="hist-channels" style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;"></div>
-
-      <!-- Canvas графика -->
-      <div style="position:relative;height:220px;">
-        <canvas id="hist-chart"></canvas>
-        <div id="hist-empty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">Нет данных</div>
-      </div>
-
-    </div>
-  </div>
-
-<style>
+ 
 .hist-scale-btn {
   background: #111318; border: 1px solid var(--border);
   color: var(--muted); border-radius: 6px;
@@ -314,74 +194,217 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
   flex-shrink: 0;
 }
 </style>
-
+ 
+<div class="brr-page">
+ 
+  <!-- Теплосчётчик: мощность крупно -->
+  <div class="brr-card">
+    <div class="brr-label">🔥 ТЕПЛОВАЯ ЭНЕРГИЯ</div>
+    <div class="brr-big">
+      <div>
+        <span class="brr-big-val" id="brr_power">--</span>
+        <span class="brr-big-unit"> кВт</span>
+      </div>
+      <div class="brr-big-sub">
+        Накоплено: <b id="brr_energy">--</b> кВт·ч
+        &nbsp;|&nbsp;
+        Объём: <b id="brr_vol">--</b> м³
+      </div>
+    </div>
+    <div class="brr-grid2" style="margin-top:10px">
+      <div class="brr-cell">
+        <div class="brr-cell-lbl">Подача</div>
+        <div><span class="brr-val hot" id="brr_ts">--</span><span class="brr-unit">°C</span></div>
+      </div>
+      <div class="brr-cell">
+        <div class="brr-cell-lbl">Обратка</div>
+        <div><span class="brr-val cool" id="brr_tr">--</span><span class="brr-unit">°C</span></div>
+      </div>
+      <div class="brr-cell">
+        <div class="brr-cell-lbl">Δ температур</div>
+        <div><span class="brr-val" id="brr_dt">--</span><span class="brr-unit">°C</span></div>
+      </div>
+      <div class="brr-cell">
+        <div class="brr-cell-lbl">Расход тепл.</div>
+        <div><span class="brr-val" id="brr_flow">--</span><span class="brr-unit">м³/ч</span></div>
+      </div>
+    </div>
+    <div class="brr-age" id="brr_heat_age">—</div>
+  </div>
+ 
+  <!-- Давление -->
+  <div class="brr-card">
+    <div class="brr-label">🌡 ДАВЛЕНИЕ</div>
+    <div class="brr-grid2">
+      <div class="brr-cell">
+        <div class="brr-cell-lbl">Отопление</div>
+        <div><span class="brr-val ok" id="brr_ph">--</span><span class="brr-unit">бар</span></div>
+      </div>
+      <div class="brr-cell">
+        <div class="brr-cell-lbl">Вода ХВС</div>
+        <div><span class="brr-val ok" id="brr_pw">--</span><span class="brr-unit">бар</span></div>
+      </div>
+    </div>
+  </div>
+ 
+  <!-- Счётчики -->
+  <div class="brr-card">
+    <div class="brr-label">💧 ВОДОСНАБЖЕНИЕ</div>
+    <div class="brr-row">
+      <span class="brr-row-lbl">Расход</span>
+      <span class="brr-row-val"><span id="brr_wlpm">--</span> л/мин</span>
+    </div>
+    <div class="brr-row">
+      <span class="brr-row-lbl">Накоплено</span>
+      <span class="brr-row-val"><span id="brr_wtotal">--</span> м³</span>
+    </div>
+  </div>
+ 
+  <div class="brr-card">
+    <div class="brr-label">🔵 ГАЗ</div>
+    <div class="brr-row">
+      <span class="brr-row-lbl">Расход</span>
+      <span class="brr-row-val"><span id="brr_gm3h">--</span> м³/ч</span>
+    </div>
+    <div class="brr-row">
+      <span class="brr-row-lbl">Накоплено</span>
+      <span class="brr-row-val"><span id="brr_gtotal">--</span> м³</span>
+    </div>
+  </div>
+ 
+  <!-- История -->
+  <div class="brr-card" id="hist-panel">
+    <div class="brr-label" id="hist-toggle" style="cursor:pointer;user-select:none;margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
+      <span>📈 ИСТОРИЯ</span>
+      <span id="hist-arrow" style="font-size:14px;transition:transform .2s">▼</span>
+    </div>
+    <div id="hist-body" style="display:none;margin-top:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
+        <div style="display:flex;gap:4px;">
+          <button class="hist-scale-btn active" data-level="0" data-last="720">2ч</button>
+          <button class="hist-scale-btn" data-level="1" data-last="1440">24ч</button>
+          <button class="hist-scale-btn" data-level="2" data-last="2016">2нед</button>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;">
+          <input type="checkbox" id="hist-range-cb" style="cursor:pointer;"> диапазон
+        </label>
+      </div>
+      <div id="hist-channels" style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;"></div>
+      <div style="position:relative;height:220px;">
+        <canvas id="hist-chart"></canvas>
+        <div id="hist-empty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">Нет данных</div>
+      </div>
+    </div>
+  </div>
+ 
+</div>
+ 
 <script>
+function fmt(v, dec) {
+  return (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toFixed(dec);
+}
+ 
+async function brrUpdate() {
+  try {
+    const d = await (await fetch('/api/brr/data')).json();
+    document.getElementById('brr_power').textContent  = fmt(d.heat_power_kw, 1);
+    document.getElementById('brr_energy').textContent = fmt(d.heat_energy_kwh, 1);
+    document.getElementById('brr_vol').textContent    = fmt(d.heat_volume_m3, 2);
+    document.getElementById('brr_ts').textContent     = fmt(d.heat_t_supply, 1);
+    document.getElementById('brr_tr').textContent     = fmt(d.heat_t_return, 1);
+    document.getElementById('brr_dt').textContent     = fmt(d.heat_t_delta, 1);
+    document.getElementById('brr_flow').textContent   = fmt(d.heat_flow_m3h, 3);
+    const ageEl = document.getElementById('brr_heat_age');
+    if (d.heat_valid && d.heat_age_sec !== undefined) {
+      const age = d.heat_age_sec;
+      ageEl.textContent = 'Обновлено ' + age + ' с назад';
+      ageEl.className   = 'brr-age' + (age > 120 ? ' stale' : '');
+    } else {
+      ageEl.textContent = 'Нет данных с теплосчётчика';
+      ageEl.className   = 'brr-age stale';
+    }
+    document.getElementById('brr_ph').textContent    = fmt(d.p_heat, 2);
+    document.getElementById('brr_pw').textContent    = fmt(d.p_water, 2);
+    document.getElementById('brr_wlpm').textContent  = fmt(d.water_rate_lpm, 2);
+    document.getElementById('brr_wtotal').textContent= fmt(d.water_total_m3, 3);
+    document.getElementById('brr_gm3h').textContent  = fmt(d.gas_rate_m3h, 3);
+    document.getElementById('brr_gtotal').textContent= fmt(d.gas_total_m3, 3);
+  } catch(e) {}
+}
+brrUpdate();
+setInterval(brrUpdate, 3000);
+ 
+// ── История ──────────────────────────────────────────────────
 (function() {
-
-// ── Палитра линий ────────────────────────────────────────────
 const COLORS = [
   '#4fc3f7','#ef5350','#66bb6a','#ffa726',
   '#ab47bc','#26c6da','#d4e157','#ff7043',
   '#42a5f5','#ec407a','#26a69a','#8d6e63'
 ];
-
-// ── Состояние ────────────────────────────────────────────────
-let chart       = null;
+ 
+let chart        = null;
 let chartJsPromise = null;
-let channels    = [];      // [{id, label, unit, type, color, enabled}]
+let _drawTimer   = null;
+let channels     = [];
 let currentLevel = 0;
 let currentLast  = 720;
 let showRange    = false;
 let panelOpen    = false;
-
-// ── Переключатель панели ─────────────────────────────────────
+ 
 document.getElementById('hist-toggle').addEventListener('click', () => {
   panelOpen = !panelOpen;
   document.getElementById('hist-body').style.display = panelOpen ? 'block' : 'none';
   document.getElementById('hist-arrow').style.transform = panelOpen ? 'rotate(180deg)' : '';
   if (panelOpen && channels.length === 0) initHistory();
+  else if (panelOpen) debouncedDraw();
 });
-
-// ── Кнопки масштаба ──────────────────────────────────────────
+ 
 document.querySelectorAll('.hist-scale-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.hist-scale-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentLevel = +btn.dataset.level;
     currentLast  = +btn.dataset.last;
-    loadAndDraw();
+    debouncedDraw();
   });
 });
-
-// ── Чекбокс диапазона ────────────────────────────────────────
+ 
 document.getElementById('hist-range-cb').addEventListener('change', e => {
   showRange = e.target.checked;
-  loadAndDraw();
+  debouncedDraw();
 });
-
-// ── Инициализация: загружаем каналы, потом Chart.js ──────────
+ 
+function debouncedDraw() {
+  clearTimeout(_drawTimer);
+  _drawTimer = setTimeout(loadAndDraw, 300);
+}
+ 
+function loadChartJs() {
+  if (chartJsPromise) return chartJsPromise;
+  chartJsPromise = new Promise((resolve) => {
+    if (window.Chart) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
+    s.onload = resolve;
+    s.onerror = () => console.error('[HIST] Chart.js load failed');
+    document.head.appendChild(s);
+  });
+  return chartJsPromise;
+}
+ 
 async function initHistory() {
   try {
-    const resp = await fetch('/api/history/channels');
-    const list = await resp.json();
-
-    // Берём только history:true и enabled:true
+    const list = await (await fetch('/api/history/channels')).json();
     channels = list
       .filter(ch => ch.history && ch.enabled)
-      .map((ch, i) => ({
-        ...ch,
-        color:   COLORS[i % COLORS.length],
-        visible: ch.type === 0   // по умолчанию показываем только CH_FLOAT
-      }));
-
+      .map((ch, i) => ({ ...ch, color: COLORS[i % COLORS.length], visible: ch.type === 0 }));
     renderChannelList();
-    loadChartJs();
+    loadAndDraw();
   } catch(e) {
     console.error('[HIST] init error', e);
   }
 }
-
-// ── Список каналов с чекбоксами ──────────────────────────────
+ 
 function renderChannelList() {
   const el = document.getElementById('hist-channels');
   el.innerHTML = '';
@@ -396,36 +419,34 @@ function renderChannelList() {
     `;
     row.querySelector('input').addEventListener('change', e => {
       channels[i].visible = e.target.checked;
-      loadAndDraw();
+      debouncedDraw();
     });
     el.appendChild(row);
   });
 }
-
-function loadChartJs() {
-    if (chartJsPromise) return chartJsPromise;
-    chartJsPromise = new Promise((resolve) => {
-        if (window.Chart) { resolve(); return; }
-        const s = document.createElement('script');
-        s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-        s.onload = resolve;
-        document.head.appendChild(s);
-    });
-    return chartJsPromise;
-}
+ 
+let dataCache = {};  // { 0: data, 1: data, 2: data }
 
 async function loadAndDraw() {
-    await loadChartJs();
-    try {
-        const url = `/api/history?level=${currentLevel}&last=${currentLast}`;
-        const data = await (await fetch(url)).json();
-        drawChart(data);
-    } catch(e) {
-        console.error('[HIST] load error', e);
+  await loadChartJs();
+  try {
+    if (!dataCache[currentLevel]) {
+      dataCache[currentLevel] = await (await fetch(`/api/history?level=${currentLevel}&last=${currentLast}`)).json();
     }
+    drawChart(dataCache[currentLevel]);
+  } catch(e) {
+    console.error('[HIST] load error', e);
+  }
 }
 
-// ── Нормализация 0-1 по массиву ──────────────────────────────
+// Сбрасывать кеш при смене масштаба
+function onScaleChange(level, last) {
+  currentLevel = level;
+  currentLast  = last;
+  delete dataCache[currentLevel];  // ← перед обновлением currentLevel
+  loadAndDraw();
+}
+ 
 function normalize(arr) {
   const valid = arr.filter(v => v !== null && !isNaN(v));
   if (valid.length === 0) return arr.map(() => null);
@@ -435,113 +456,67 @@ function normalize(arr) {
   if (range === 0) return arr.map(v => v === null ? null : 0.5);
   return arr.map(v => v === null ? null : (v - mn) / range);
 }
-
-// ── Форматирование метки времени ─────────────────────────────
+ 
 function fmtTs(ts) {
   if (!ts) return '?';
   const d = new Date(ts * 1000);
   const pad = n => String(n).padStart(2,'0');
-  if (currentLevel === 2) {
-    // для 2 недель показываем дату
+  if (currentLevel === 2)
     return `${pad(d.getDate())}.${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  }
   return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
-
-// ── Отрисовка графика ────────────────────────────────────────
+ 
 function drawChart(data) {
   const emptyEl = document.getElementById('hist-empty');
-
   if (!data.ts || data.ts.length === 0) {
     emptyEl.style.display = 'flex';
     if (chart) { chart.destroy(); chart = null; }
     return;
   }
   emptyEl.style.display = 'none';
-
+ 
   const labels = data.ts.map(fmtTs);
   const datasets = [];
-
+ 
   channels.forEach(ch => {
     if (!ch.visible) return;
-
-    // Найти канал в ответе
     const src = data.channels.find(c => c.id === ch.id);
     if (!src) return;
-
-    const rawValues = ch.type === 0
-      ? (src.avg || src.values || [])
-      : (src.values || []);
-
+    const rawValues = ch.type === 0 ? (src.avg || src.values || []) : (src.values || []);
     const normValues = normalize(rawValues);
-
-    // Основная линия
     datasets.push({
-      label:           ch.label,
-      data:            normValues,
-      borderColor:     ch.color,
-      backgroundColor: ch.color + '22',
-      borderWidth:     1.5,
-      pointRadius:     0,
-      pointHoverRadius:4,
-      tension:         0.3,
-      fill:            false,
-      _raw:            rawValues,
-      _unit:           ch.unit,
-      _chType:         ch.type,
+      label: ch.label, data: normValues,
+      borderColor: ch.color, backgroundColor: ch.color + '22',
+      borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4,
+      tension: 0.3, fill: false,
+      _raw: rawValues, _unit: ch.unit, _chType: ch.type,
     });
-
-    // Полоса диапазона min/max для CH_FLOAT
     if (showRange && ch.type === 0 && src.min && src.max) {
-      const normMin = normalize(src.min);
-      const normMax = normalize(src.max);
-
       datasets.push({
-        label:           ch.label + ' min',
-        data:            normMin,
-        borderColor:     'transparent',
-        backgroundColor: ch.color + '18',
-        borderWidth:     0,
-        pointRadius:     0,
-        fill:            '+1',  // fill до следующего dataset (max)
-        tension:         0.3,
-        _hidden:         true,
+        label: ch.label + ' min', data: normalize(src.min),
+        borderColor: 'transparent', backgroundColor: ch.color + '18',
+        borderWidth: 0, pointRadius: 0, fill: '+1', tension: 0.3, _hidden: true,
       });
       datasets.push({
-        label:           ch.label + ' max',
-        data:            normMax,
-        borderColor:     'transparent',
-        backgroundColor: ch.color + '18',
-        borderWidth:     0,
-        pointRadius:     0,
-        fill:            false,
-        tension:         0.3,
-        _hidden:         true,
+        label: ch.label + ' max', data: normalize(src.max),
+        borderColor: 'transparent', backgroundColor: ch.color + '18',
+        borderWidth: 0, pointRadius: 0, fill: false, tension: 0.3, _hidden: true,
       });
     }
   });
-
-  const ctx = document.getElementById('hist-chart').getContext('2d');
-
+ 
   if (chart) { chart.destroy(); }
-
-  chart = new Chart(ctx, {
+  chart = new Chart(document.getElementById('hist-chart').getContext('2d'), {
     type: 'line',
     data: { labels, datasets },
     options: {
-      responsive:          true,
-      maintainAspectRatio: false,
-      animation:           { duration: 200 },
+      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
       interaction: { mode: 'index', intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1a1d23',
-          borderColor:     '#2a2d35',
-          borderWidth:     1,
-          titleColor:      '#aaa',
-          bodyColor:       '#eee',
-          padding:         10,
+          backgroundColor: '#1a1d23', borderColor: '#2a2d35', borderWidth: 1,
+          titleColor: '#aaa', bodyColor: '#eee', padding: 10,
           callbacks: {
             label: ctx => {
               const ds = ctx.dataset;
@@ -554,79 +529,17 @@ function drawChart(data) {
         }
       },
       scales: {
-        x: {
-          ticks: {
-            color:    '#666',
-            font:     { size: 10 },
-            maxTicksLimit: 8,
-            maxRotation: 0,
-          },
-          grid: { color: '#1e2128' }
-        },
-        y: {
-          display: false,   // ось Y скрыта — данные нормализованы
-          min: -0.05,
-          max:  1.05,
-        }
+        x: { ticks: { color: '#666', font: { size: 10 }, maxTicksLimit: 8, maxRotation: 0 }, grid: { color: '#1e2128' } },
+        y: { display: false, min: -0.05, max: 1.05 }
       }
     }
   });
 }
-
+ 
 })();
 </script>
-
-</div>
-
-<script>
-function fmt(v, dec) {
-  return (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toFixed(dec);
-}
-
-async function brrUpdate() {
-  try {
-    const d = await (await fetch('/api/brr/data')).json();
-
-    // Теплосчётчик
-    document.getElementById('brr_power').textContent  = fmt(d.heat_power_kw, 1);
-    document.getElementById('brr_energy').textContent = fmt(d.heat_energy_kwh, 1);
-    document.getElementById('brr_vol').textContent    = fmt(d.heat_volume_m3, 2);
-    document.getElementById('brr_ts').textContent     = fmt(d.heat_t_supply, 1);
-    document.getElementById('brr_tr').textContent     = fmt(d.heat_t_return, 1);
-    document.getElementById('brr_dt').textContent     = fmt(d.heat_t_delta, 1);
-    document.getElementById('brr_flow').textContent   = fmt(d.heat_flow_m3h, 3);
-
-    // Возраст данных теплосчётчика
-    const ageEl = document.getElementById('brr_heat_age');
-    if (d.heat_valid && d.heat_age_sec !== undefined) {
-      const age = d.heat_age_sec;
-      ageEl.textContent = 'Обновлено ' + age + ' с назад';
-      ageEl.className   = 'brr-age' + (age > 120 ? ' stale' : '');
-    } else {
-      ageEl.textContent = 'Нет данных с теплосчётчика';
-      ageEl.className   = 'brr-age stale';
-    }
-
-    // Давление
-    document.getElementById('brr_ph').textContent = fmt(d.p_heat, 2);
-    document.getElementById('brr_pw').textContent = fmt(d.p_water, 2);
-
-    // Вода
-    document.getElementById('brr_wlpm').textContent   = fmt(d.water_rate_lpm, 2);
-    document.getElementById('brr_wtotal').textContent = fmt(d.water_total_m3, 3);
-
-    // Газ
-    document.getElementById('brr_gm3h').textContent   = fmt(d.gas_rate_m3h, 3);
-    document.getElementById('brr_gtotal').textContent = fmt(d.gas_total_m3, 3);
-
-  } catch(e) {}
-}
-
-brrUpdate();
-setInterval(brrUpdate, 3000);
-</script>
 )html";
-
+ 
 // ============================================================
 //  HTML — вкладка настроек
 // ============================================================
@@ -655,7 +568,7 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
   text-align: right;
 }
 </style>
-
+ 
 <div class="brs-card">
   <div class="brs-label">⚙️ КОЭФФИЦИЕНТЫ СЧЁТЧИКОВ</div>
   <div class="brs-row">
@@ -667,7 +580,7 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="gas_kf" step="0.001" min="0.001">
   </div>
 </div>
-
+ 
 <div class="brs-card">
   <div class="brs-label">⚙️ ДАВЛЕНИЕ ОТОПЛЕНИЯ (4-20мА)</div>
   <div class="brs-row">
@@ -679,7 +592,7 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="ph_max" step="0.1">
   </div>
 </div>
-
+ 
 <div class="brs-card">
   <div class="brs-label">⚙️ ДАВЛЕНИЕ ВОДЫ ХВС (4-20мА)</div>
   <div class="brs-row">
@@ -691,7 +604,7 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="pw_max" step="0.1">
   </div>
 </div>
-
+ 
 <div class="brs-card">
   <div class="brs-label">⚙️ ОБЩИЕ</div>
   <div class="brs-row">
@@ -699,22 +612,22 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="pub_interval" step="1" min="5">
   </div>
 </div>
-
+ 
 <button onclick="brsSave()">💾 Сохранить</button>
 <div class="info-row" id="brs_msg"></div>
-
+ 
 <script>
 async function brsLoad() {
   const d = await (await fetch('/api/brr/config')).json();
-  document.getElementById('water_kf').value    = d.water_m3_per_pulse;
-  document.getElementById('gas_kf').value      = d.gas_m3_per_pulse;
-  document.getElementById('ph_min').value      = d.p_heat_min;
-  document.getElementById('ph_max').value      = d.p_heat_max;
-  document.getElementById('pw_min').value      = d.p_water_min;
-  document.getElementById('pw_max').value      = d.p_water_max;
+  document.getElementById('water_kf').value     = d.water_m3_per_pulse;
+  document.getElementById('gas_kf').value       = d.gas_m3_per_pulse;
+  document.getElementById('ph_min').value       = d.p_heat_min;
+  document.getElementById('ph_max').value       = d.p_heat_max;
+  document.getElementById('pw_min').value       = d.p_water_min;
+  document.getElementById('pw_max').value       = d.p_water_max;
   document.getElementById('pub_interval').value = Math.round(d.pub_interval / 1000);
 }
-
+ 
 async function brsSave() {
   const body = {
     water_m3_per_pulse: +document.getElementById('water_kf').value,
@@ -733,7 +646,7 @@ async function brsSave() {
   document.getElementById('brs_msg').textContent = r.ok ? '✅ Сохранено' : '❌ Ошибка';
   setTimeout(() => document.getElementById('brs_msg').textContent = '', 3000);
 }
-
+ 
 brsLoad();
 </script>
 )html";

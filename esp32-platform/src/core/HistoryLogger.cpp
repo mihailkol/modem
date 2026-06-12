@@ -379,39 +379,75 @@ void HistoryLogger::_sendL0(AsyncWebServerRequest* req, uint16_t last) {
     }
 
     uint16_t count = min((uint16_t)_l0count, last);
+    if (count == 0) {
+        req->send(200, "application/json", "{\"ts\":[],\"channels\":[]}");
+        return;
+    }
 
-    // Собираем в JSON (L0 небольшой — до 720 × nCh float)
+    // Прореживание: не более MAX_POINTS точек на выходе
+    // Для каждого бакета берём avg, и запоминаем min/max
+    const uint16_t MAX_POINTS = 500;
+    uint16_t stride = max((uint16_t)1, (uint16_t)(count / MAX_POINTS));
+    uint16_t outCount = (count + stride - 1) / stride;
+
     JsonDocument doc;
     JsonArray tsArr = doc["ts"].to<JsonArray>();
     JsonArray chArr = doc["channels"].to<JsonArray>();
 
-    // Подготавливаем массивы значений
-    JsonArray vals[nCh];
+    JsonArray avgArr[nCh], minArr[nCh], maxArr[nCh];
     for (uint8_t i = 0; i < nCh; i++) {
         JsonObject chObj = chArr.add<JsonObject>();
         chObj["id"]    = _channels[i]->id;
         chObj["label"] = _channels[i]->label();
         chObj["unit"]  = _channels[i]->unit;
         chObj["type"]  = (uint8_t)_channels[i]->type;
-        vals[i] = chObj["values"].to<JsonArray>();
+        avgArr[i] = chObj["values"].to<JsonArray>();
+        if (_channels[i]->type == CH_FLOAT) {
+            minArr[i] = chObj["min"].to<JsonArray>();
+            maxArr[i] = chObj["max"].to<JsonArray>();
+        }
     }
 
-    // Читаем в хронологическом порядке
-    // head указывает на следующую запись (самую старую в буфере)
-    uint16_t startIdx = (_l0count < HISTORY_L0_SIZE)
-        ? 0
-        : _l0head;  // буфер полон — oldest = head
-
+    // Стартовая позиция в кольцевом буфере
+    uint16_t startIdx = (_l0count < HISTORY_L0_SIZE) ? 0 : _l0head;
     uint16_t skip = (_l0count > count) ? (_l0count - count) : 0;
-
-    for (uint16_t n = 0; n < _l0count; n++) {
-        if (n < skip) { startIdx = (startIdx + 1) % HISTORY_L0_SIZE; continue; }
-        uint16_t idx = startIdx % HISTORY_L0_SIZE;
-        tsArr.add(_l0ts[idx]);
-        float* slot = &_l0buf[idx * nCh];
-        for (uint8_t i = 0; i < nCh; i++)
-            vals[i].add(slot[i]);
+    // Пропускаем лишние
+    for (uint16_t n = 0; n < skip; n++)
         startIdx = (startIdx + 1) % HISTORY_L0_SIZE;
+
+    // Читаем бакетами по stride записей
+    for (uint16_t b = 0; b < outCount; b++) {
+        uint16_t bStart = b * stride;
+        uint16_t bEnd   = min((uint16_t)(bStart + stride), count);
+        uint32_t bTs    = 0;
+
+        // Аккумуляторы бакета
+        float bSum[nCh]; float bMin[nCh]; float bMax[nCh];
+        for (uint8_t i = 0; i < nCh; i++) {
+            bSum[i] = 0; bMin[i] = FLT_MAX; bMax[i] = -FLT_MAX;
+        }
+
+        for (uint16_t r = bStart; r < bEnd; r++) {
+            uint16_t idx = startIdx % HISTORY_L0_SIZE;
+            if (r == bStart) bTs = _l0ts[idx];  // ts первой точки бакета
+            float* slot = &_l0buf[idx * nCh];
+            for (uint8_t i = 0; i < nCh; i++) {
+                bSum[i] += slot[i];
+                if (slot[i] < bMin[i]) bMin[i] = slot[i];
+                if (slot[i] > bMax[i]) bMax[i] = slot[i];
+            }
+            startIdx = (startIdx + 1) % HISTORY_L0_SIZE;
+        }
+
+        uint16_t bCount = bEnd - bStart;
+        tsArr.add(bTs);
+        for (uint8_t i = 0; i < nCh; i++) {
+            avgArr[i].add(bSum[i] / bCount);
+            if (_channels[i]->type == CH_FLOAT) {
+                minArr[i].add(bMin[i] == FLT_MAX  ? 0.0f : bMin[i]);
+                maxArr[i].add(bMax[i] == -FLT_MAX ? 0.0f : bMax[i]);
+            }
+        }
     }
 
     String out;
@@ -456,30 +492,68 @@ void HistoryLogger::_sendFile(AsyncWebServerRequest* req,
     uint32_t count = min((uint32_t)last, total);
     uint32_t skip  = total - count;
 
+    // Прореживание
+    const uint16_t MAX_POINTS = 200;
+    uint32_t stride   = max((uint32_t)1, count / MAX_POINTS);
+    uint32_t outCount = (count + stride - 1) / stride;
+
     // Формируем JSON
     JsonDocument doc;
     JsonArray tsArr = doc["ts"].to<JsonArray>();
     JsonArray chArr = doc["channels"].to<JsonArray>();
 
-    JsonArray vals[nCh];
+    JsonArray avgArr[nCh], minArr[nCh], maxArr[nCh];
     for (uint8_t i = 0; i < nCh; i++) {
         JsonObject chObj = chArr.add<JsonObject>();
         chObj["id"]    = _channels[i]->id;
         chObj["label"] = _channels[i]->label();
         chObj["unit"]  = _channels[i]->unit;
         chObj["type"]  = (uint8_t)_channels[i]->type;
-        // Для CH_FLOAT передаём avg; min/max в отдельных массивах
         if (_channels[i]->type == CH_FLOAT) {
-            vals[i]       = chObj["avg"].to<JsonArray>();
-            chObj["min"].to<JsonArray>();
-            chObj["max"].to<JsonArray>();
+            avgArr[i] = chObj["avg"].to<JsonArray>();
+            minArr[i] = chObj["min"].to<JsonArray>();
+            maxArr[i] = chObj["max"].to<JsonArray>();
         } else {
-            vals[i] = chObj["values"].to<JsonArray>();
+            avgArr[i] = chObj["values"].to<JsonArray>();
         }
     }
 
     std::vector<uint8_t> recBuf(_recordSize);
-    uint32_t globalIdx = 0;
+    uint32_t globalIdx = 0;  // индекс среди всех записей обоих файлов
+    uint32_t readIdx   = 0;  // индекс среди count записей (после skip)
+
+    // Аккумуляторы текущего бакета
+    float bSum[nCh]; float bMin[nCh]; float bMax[nCh];
+    float bCounter[nCh]; uint32_t bBool[nCh];
+    uint32_t bTs    = 0;
+    uint32_t bCount = 0;
+    uint32_t curBucket = 0;
+
+    auto resetBucket = [&]() {
+        for (uint8_t i = 0; i < nCh; i++) {
+            bSum[i] = 0; bMin[i] = FLT_MAX; bMax[i] = -FLT_MAX;
+            bCounter[i] = 0; bBool[i] = 0;
+        }
+        bTs = 0; bCount = 0;
+    };
+
+    auto flushBucket = [&]() {
+        if (bCount == 0) return;
+        tsArr.add(bTs);
+        for (uint8_t i = 0; i < nCh; i++) {
+            if (_channels[i]->type == CH_FLOAT) {
+                avgArr[i].add(bSum[i] / bCount);
+                minArr[i].add(bMin[i] == FLT_MAX  ? 0.0f : bMin[i]);
+                maxArr[i].add(bMax[i] == -FLT_MAX ? 0.0f : bMax[i]);
+            } else if (_channels[i]->type == CH_COUNTER) {
+                avgArr[i].add(bCounter[i]);  // последнее значение
+            } else if (_channels[i]->type == CH_BOOL) {
+                avgArr[i].add((uint8_t)(bBool[i] * 100 / bCount));
+            }
+        }
+    };
+
+    resetBucket();
 
     for (uint8_t fi = 0; fi < nFiles; fi++) {
         File f = LittleFS.open(files[fi].p, "r");
@@ -489,37 +563,50 @@ void HistoryLogger::_sendFile(AsyncWebServerRequest* req,
             f.read(recBuf.data(), _recordSize);
             if (globalIdx < skip) continue;
 
+            // Определяем в какой бакет попадает эта запись
+            uint32_t bucket = readIdx / stride;
+            if (bucket != curBucket) {
+                flushBucket();
+                resetBucket();
+                curBucket = bucket;
+            }
+
             // Парсим запись
             uint32_t ts = (uint32_t)recBuf[0]
                         | ((uint32_t)recBuf[1] << 8)
                         | ((uint32_t)recBuf[2] << 16)
                         | ((uint32_t)recBuf[3] << 24);
-            tsArr.add(ts);
+            if (bCount == 0) bTs = ts;  // ts первой точки бакета
 
             uint16_t offset = 4;
             for (uint8_t i = 0; i < nCh; i++) {
                 if (_channels[i]->type == CH_FLOAT) {
-                    int16_t avg = (int16_t)(recBuf[offset] | (recBuf[offset+1] << 8));
+                    int16_t avg = (int16_t)(recBuf[offset]   | (recBuf[offset+1] << 8));
                     int16_t mn  = (int16_t)(recBuf[offset+2] | (recBuf[offset+3] << 8));
                     int16_t mx  = (int16_t)(recBuf[offset+4] | (recBuf[offset+5] << 8));
                     float sc = _channels[i]->scale;
-                    vals[i].add(avg / sc);
-                    doc["channels"][i]["min"].as<JsonArray>().add(mn / sc);
-                    doc["channels"][i]["max"].as<JsonArray>().add(mx / sc);
+                    float fAvg = avg / sc;
+                    float fMn  = mn  / sc;
+                    float fMx  = mx  / sc;
+                    bSum[i] += fAvg;
+                    if (fMn < bMin[i]) bMin[i] = fMn;
+                    if (fMx > bMax[i]) bMax[i] = fMx;
                     offset += 6;
                 } else if (_channels[i]->type == CH_COUNTER) {
-                    float v;
-                    memcpy(&v, &recBuf[offset], 4);
-                    vals[i].add(v);
+                    float v; memcpy(&v, &recBuf[offset], 4);
+                    bCounter[i] = v;  // берём последнее
                     offset += 4;
                 } else if (_channels[i]->type == CH_BOOL) {
-                    vals[i].add(recBuf[offset]);
+                    bBool[i] += recBuf[offset];
                     offset += 1;
                 }
             }
+            bCount++;
+            readIdx++;
         }
         f.close();
     }
+    flushBucket();  // последний бакет
 
     String out;
     serializeJson(doc, out);

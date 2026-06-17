@@ -60,6 +60,10 @@ struct DataChannel {
     bool     _enabled         = true;   // runtime override из channels.json
     float    _lastMqttValue   = NAN;    // последнее опубликованное значение
     uint32_t _lastMqttTime    = 0;      // millis() последней публикации
+    float    y_min            = NAN;    // min для нормализации (NAN = авто)
+    float    y_max            = NAN;    // max для нормализации (NAN = авто)
+    int16_t  _lastLoggedInt   = INT16_MIN; // последнее записанное int16 значение
+                                           // INT16_MIN = первая запись всегда проходит
 
     // ── Саморегистрация ──────────────────────────────────────
     DataChannel() { _register(this); }

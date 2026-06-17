@@ -103,101 +103,37 @@ uint32_t BoilerRoomDevice::_lastPub  = 0;
 static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
 <style>
 .brr-page { display:flex; flex-direction:column; gap:10px; }
- 
-.brr-card {
-  background: var(--card);
-  border-radius: 10px;
-  padding: 16px;
-  border: 1px solid var(--border);
-}
-.brr-label {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: .12em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 12px;
-}
- 
-.brr-grid2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-}
-.brr-cell {
-  background: #111318;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-.brr-cell-lbl {
-  font-size: 10px; color: var(--muted);
-  margin-bottom: 4px;
-}
-.brr-val {
-  font-size: 22px; font-weight: 800; color: var(--accent);
-  line-height: 1.1;
-}
-.brr-val.cool  { color: var(--cool); }
-.brr-val.hot   { color: var(--hot); }
-.brr-val.ok    { color: var(--ok); }
-.brr-unit {
-  font-size: 11px; color: var(--muted); margin-left: 2px;
-}
- 
-.brr-big {
-  text-align: center; padding: 4px 0 8px;
-}
-.brr-big-val {
-  font-size: 52px; font-weight: 900;
-  color: var(--accent); line-height: 1;
-}
-.brr-big-unit {
-  font-size: 14px; color: var(--muted);
-}
-.brr-big-sub {
-  font-size: 12px; color: var(--muted);
-  margin-top: 6px;
-}
- 
-.brr-row {
-  display: flex; justify-content: space-between;
-  align-items: baseline;
-  padding: 5px 0;
-  border-bottom: 1px solid var(--border);
-  font-size: 13px;
-}
-.brr-row:last-child { border-bottom: none; }
-.brr-row-lbl { color: var(--muted); }
-.brr-row-val { font-weight: 700; }
- 
-.brr-age {
-  font-size: 11px; color: var(--muted);
-  text-align: right; margin-top: 8px;
-}
-.brr-age.stale { color: var(--danger); }
- 
-.hist-scale-btn {
-  background: #111318; border: 1px solid var(--border);
-  color: var(--muted); border-radius: 6px;
-  padding: 4px 12px; font-size: 12px; cursor: pointer;
-  transition: background .15s, color .15s;
-  width: auto !important;
-}
-.hist-scale-btn.active {
-  background: var(--accent); color: #000;
-  border-color: var(--accent);
-}
-.hist-ch-row {
-  display: flex; align-items: center; gap:8px;
-  font-size: 12px; color: var(--text); cursor: pointer;
-}
-.hist-ch-dot {
-  width: 10px; height: 10px; border-radius: 50%;
-  flex-shrink: 0;
-}
+.brr-card { background:var(--card); border-radius:10px; padding:16px; border:1px solid var(--border); }
+.brr-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+.brr-grid2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.brr-cell { background:#111318; border:1px solid var(--border); border-radius:8px; padding:10px 12px; }
+.brr-cell-lbl { font-size:10px; color:var(--muted); margin-bottom:4px; }
+.brr-val { font-size:22px; font-weight:800; color:var(--accent); line-height:1.1; }
+.brr-val.cool { color:var(--cool); }
+.brr-val.hot  { color:var(--hot); }
+.brr-val.ok   { color:var(--ok); }
+.brr-unit { font-size:11px; color:var(--muted); margin-left:2px; }
+.brr-big { text-align:center; padding:4px 0 8px; }
+.brr-big-val { font-size:52px; font-weight:900; color:var(--accent); line-height:1; }
+.brr-big-unit { font-size:14px; color:var(--muted); }
+.brr-big-sub { font-size:12px; color:var(--muted); margin-top:6px; }
+.brr-row { display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; border-bottom:1px solid var(--border); font-size:13px; }
+.brr-row:last-child { border-bottom:none; }
+.brr-row-lbl { color:var(--muted); }
+.brr-row-val { font-weight:700; }
+.brr-age { font-size:11px; color:var(--muted); text-align:right; margin-top:8px; }
+.brr-age.stale { color:var(--danger); }
+.hist-scale-btn { background:#111318; border:1px solid var(--border); color:var(--muted); border-radius:6px; padding:4px 12px; font-size:12px; cursor:pointer; transition:background .15s,color .15s; width:auto!important; }
+.hist-scale-btn.active { background:var(--accent); color:#000; border-color:var(--accent); }
+#hist-tbody tr:nth-child(even) { background:#0d1017; }
+#hist-tbody td { padding:4px 8px; border-bottom:1px solid #1a1d23; color:var(--text); }
+#hist-tbody td:first-child { color:var(--muted); white-space:nowrap; }
+#hist-tbody td:not(:first-child) { text-align:right; font-variant-numeric:tabular-nums; }
 </style>
- 
+
 <div class="brr-page">
- 
-  <!-- Теплосчётчик: мощность крупно -->
+
+  <!-- Теплосчётчик -->
   <div class="brr-card">
     <div class="brr-label">🔥 ТЕПЛОВАЯ ЭНЕРГИЯ</div>
     <div class="brr-big">
@@ -206,9 +142,7 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
         <span class="brr-big-unit"> кВт</span>
       </div>
       <div class="brr-big-sub">
-        Накоплено: <b id="brr_energy">--</b> кВт·ч
-        &nbsp;|&nbsp;
-        Объём: <b id="brr_vol">--</b> м³
+        Накоплено: <b id="brr_energy">--</b> кВт·ч &nbsp;|&nbsp; Объём: <b id="brr_vol">--</b> м³
       </div>
     </div>
     <div class="brr-grid2" style="margin-top:10px">
@@ -231,7 +165,7 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
     </div>
     <div class="brr-age" id="brr_heat_age">—</div>
   </div>
- 
+
   <!-- Давление -->
   <div class="brr-card">
     <div class="brr-label">🌡 ДАВЛЕНИЕ</div>
@@ -246,8 +180,8 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
       </div>
     </div>
   </div>
- 
-  <!-- Счётчики -->
+
+  <!-- Водоснабжение -->
   <div class="brr-card">
     <div class="brr-label">💧 ВОДОСНАБЖЕНИЕ</div>
     <div class="brr-row">
@@ -259,7 +193,8 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
       <span class="brr-row-val"><span id="brr_wtotal">--</span> м³</span>
     </div>
   </div>
- 
+
+  <!-- Газ -->
   <div class="brr-card">
     <div class="brr-label">🔵 ГАЗ</div>
     <div class="brr-row">
@@ -271,39 +206,52 @@ static const char BRR_MONITOR_HTML[] PROGMEM = R"html(
       <span class="brr-row-val"><span id="brr_gtotal">--</span> м³</span>
     </div>
   </div>
- 
-  <!-- История -->
+
+  <!-- Журнал -->
   <div class="brr-card" id="hist-panel">
     <div class="brr-label" id="hist-toggle" style="cursor:pointer;user-select:none;margin-bottom:0;display:flex;justify-content:space-between;align-items:center;">
-      <span>📈 ИСТОРИЯ</span>
+      <span>📋 ЖУРНАЛ</span>
       <span id="hist-arrow" style="font-size:14px;transition:transform .2s">▼</span>
     </div>
     <div id="hist-body" style="display:none;margin-top:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px;">
-        <div style="display:flex;gap:4px;">
-          <button class="hist-scale-btn active" data-level="0" data-last="720">2ч</button>
-          <button class="hist-scale-btn" data-level="1" data-last="1440">24ч</button>
-          <button class="hist-scale-btn" data-level="2" data-last="2016">2нед</button>
-        </div>
-        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);cursor:pointer;">
-          <input type="checkbox" id="hist-range-cb" style="cursor:pointer;"> диапазон
-        </label>
+
+      <!-- Управление -->
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:10px;">
+        <button class="hist-scale-btn active" data-level="0" data-last="720">2ч</button>
+        <button class="hist-scale-btn" data-level="1" data-last="1440">24ч</button>
+        <button class="hist-scale-btn" data-level="2" data-last="2016">2нед</button>
+        <select id="hist-ch-select" style="margin-left:8px;background:#111318;border:1px solid var(--border);border-radius:6px;padding:4px 8px;color:var(--text);font-size:12px;flex:1;min-width:0;"></select>
       </div>
-      <div id="hist-channels" style="display:flex;flex-direction:column;gap:4px;margin-bottom:12px;"></div>
-      <div style="position:relative;height:220px;">
-        <canvas id="hist-chart"></canvas>
-        <div id="hist-empty" style="display:none;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;">Нет данных</div>
+
+      <!-- Статистика -->
+      <div id="hist-stat" style="font-size:11px;color:var(--muted);margin-bottom:8px;">—</div>
+
+      <!-- Таблица -->
+      <div style="overflow-x:auto;max-height:400px;overflow-y:auto;">
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead style="position:sticky;top:0;background:var(--card);z-index:1;">
+            <tr style="color:var(--muted);border-bottom:1px solid var(--border);">
+              <th style="text-align:left;padding:4px 8px;font-weight:600">Дата/время</th>
+              <th style="text-align:right;padding:4px 8px;font-weight:600" id="hist-th-avg">Среднее</th>
+              <th style="text-align:right;padding:4px 8px;font-weight:600" id="hist-th-min">Мин</th>
+              <th style="text-align:right;padding:4px 8px;font-weight:600" id="hist-th-max">Макс</th>
+            </tr>
+          </thead>
+          <tbody id="hist-tbody"></tbody>
+        </table>
+        <div id="hist-empty" style="display:none;padding:20px;text-align:center;color:var(--muted);font-size:13px;">Нет данных</div>
       </div>
+
     </div>
   </div>
- 
+
 </div>
- 
+
 <script>
 function fmt(v, dec) {
   return (v === null || v === undefined || isNaN(v)) ? '—' : Number(v).toFixed(dec);
 }
- 
+
 async function brrUpdate() {
   try {
     const d = await (await fetch('/api/brr/data')).json();
@@ -323,252 +271,170 @@ async function brrUpdate() {
       ageEl.textContent = 'Нет данных с теплосчётчика';
       ageEl.className   = 'brr-age stale';
     }
-    document.getElementById('brr_ph').textContent    = fmt(d.p_heat, 2);
-    document.getElementById('brr_pw').textContent    = fmt(d.p_water, 2);
-    document.getElementById('brr_wlpm').textContent  = fmt(d.water_rate_lpm, 2);
-    document.getElementById('brr_wtotal').textContent= fmt(d.water_total_m3, 3);
-    document.getElementById('brr_gm3h').textContent  = fmt(d.gas_rate_m3h, 3);
-    document.getElementById('brr_gtotal').textContent= fmt(d.gas_total_m3, 3);
+    document.getElementById('brr_ph').textContent     = fmt(d.p_heat, 2);
+    document.getElementById('brr_pw').textContent     = fmt(d.p_water, 2);
+    document.getElementById('brr_wlpm').textContent   = fmt(d.water_rate_lpm, 2);
+    document.getElementById('brr_wtotal').textContent = fmt(d.water_total_m3, 3);
+    document.getElementById('brr_gm3h').textContent   = fmt(d.gas_rate_m3h, 3);
+    document.getElementById('brr_gtotal').textContent = fmt(d.gas_total_m3, 3);
   } catch(e) {}
 }
 brrUpdate();
 setInterval(brrUpdate, 3000);
- 
-// ── История ──────────────────────────────────────────────────
+
+// ── Журнал ───────────────────────────────────────────────────
 (function() {
-const COLORS = [
-  '#4fc3f7','#ef5350','#66bb6a','#ffa726',
-  '#ab47bc','#26c6da','#d4e157','#ff7043',
-  '#42a5f5','#ec407a','#26a69a','#8d6e63'
-];
- 
-let chart        = null;
-let chartJsPromise = null;
-let _drawTimer   = null;
-let channels     = [];
-let currentLevel = 0;
-let currentLast  = 720;
-let showRange    = false;
-let panelOpen    = false;
- 
-document.getElementById('hist-toggle').addEventListener('click', () => {
-  panelOpen = !panelOpen;
-  document.getElementById('hist-body').style.display = panelOpen ? 'block' : 'none';
-  document.getElementById('hist-arrow').style.transform = panelOpen ? 'rotate(180deg)' : '';
-  if (panelOpen && channels.length === 0) initHistory();
-  else if (panelOpen) debouncedDraw();
-});
- 
-document.querySelectorAll('.hist-scale-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('.hist-scale-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentLevel = +btn.dataset.level;
-    currentLast  = +btn.dataset.last;
-    debouncedDraw();
-  });
-});
- 
-document.getElementById('hist-range-cb').addEventListener('change', e => {
-  showRange = e.target.checked;
-  debouncedDraw();
-});
- 
-function debouncedDraw() {
-  clearTimeout(_drawTimer);
-  _drawTimer = setTimeout(loadAndDraw, 300);
-}
- 
-function loadChartJs() {
-  if (chartJsPromise) return chartJsPromise;
-  chartJsPromise = new Promise((resolve) => {
-    if (window.Chart) { resolve(); return; }
-    const s = document.createElement('script');
-    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js';
-    s.onload = resolve;
-    s.onerror = () => console.error('[HIST] Chart.js load failed');
-    document.head.appendChild(s);
-  });
-  return chartJsPromise;
-}
- 
-async function initHistory() {
-  try {
-    const list = await (await fetch('/api/history/channels')).json();
-    channels = list
-      .filter(ch => ch.history && ch.enabled)
-      .map((ch, i) => ({ ...ch, color: COLORS[i % COLORS.length], visible: ch.type === 0 }));
-    renderChannelList();
-    loadAndDraw();
-  } catch(e) {
-    console.error('[HIST] init error', e);
-  }
-}
- 
-function renderChannelList() {
-  const el = document.getElementById('hist-channels');
-  el.innerHTML = '';
-  channels.forEach((ch, i) => {
-    const row = document.createElement('label');
-    row.className = 'hist-ch-row';
-    row.innerHTML = `
-      <input type="checkbox" ${ch.visible ? 'checked' : ''} style="cursor:pointer;">
-      <span class="hist-ch-dot" style="background:${ch.color}"></span>
-      <span>${ch.label}</span>
-      <span style="color:var(--muted);font-size:11px;margin-left:auto">${ch.unit}</span>
-    `;
-    row.querySelector('input').addEventListener('change', e => {
-      channels[i].visible = e.target.checked;
-      debouncedDraw();
-    });
-    el.appendChild(row);
-  });
-}
- 
-let dataCache = {};  // { 0: data, 1: data, 2: data }
+  let channels     = [];
+  let currentLevel = 0;
+  let currentLast  = 720;
+  let panelOpen    = false;
+  let _loading     = false;
 
-async function loadAndDraw() {
-  await loadChartJs();
-  try {
-    if (!dataCache[currentLevel]) {
-      dataCache[currentLevel] = await (await fetch(`/api/history?level=${currentLevel}&last=${currentLast}`)).json();
-    }
-    drawChart(dataCache[currentLevel]);
-  } catch(e) {
-    console.error('[HIST] load error', e);
-  }
-}
-
-// Сбрасывать кеш при смене масштаба
-function onScaleChange(level, last) {
-  currentLevel = level;
-  currentLast  = last;
-  delete dataCache[currentLevel];  // ← перед обновлением currentLevel
-  loadAndDraw();
-}
- 
-function normalize(arr) {
-  const valid = arr.filter(v => v !== null && !isNaN(v));
-  if (valid.length === 0) return arr.map(() => null);
-  const mn = Math.min(...valid);
-  const mx = Math.max(...valid);
-  const range = mx - mn;
-  if (range === 0) return arr.map(v => v === null ? null : 0.5);
-  return arr.map(v => v === null ? null : (v - mn) / range);
-}
- 
-function fmtTs(ts) {
-  if (!ts) return '?';
-  const d = new Date(ts * 1000);
-  const pad = n => String(n).padStart(2,'0');
-  if (currentLevel === 2)
-    return `${pad(d.getDate())}.${pad(d.getMonth()+1)} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
-  return `${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
- 
-function drawChart(data) {
-  const emptyEl = document.getElementById('hist-empty');
-  if (!data.ts || data.ts.length === 0) {
-    emptyEl.style.display = 'flex';
-    if (chart) { chart.destroy(); chart = null; }
-    return;
-  }
-  emptyEl.style.display = 'none';
- 
-  const labels = data.ts.map(fmtTs);
-  const datasets = [];
- 
-  channels.forEach(ch => {
-    if (!ch.visible) return;
-    const src = data.channels.find(c => c.id === ch.id);
-    if (!src) return;
-    const rawValues = ch.type === 0 ? (src.avg || src.values || []) : (src.values || []);
-    const normValues = normalize(rawValues);
-    datasets.push({
-      label: ch.label, data: normValues,
-      borderColor: ch.color, backgroundColor: ch.color + '22',
-      borderWidth: 1.5, pointRadius: 0, pointHoverRadius: 4,
-      tension: 0.3, fill: false,
-      _raw: rawValues, _unit: ch.unit, _chType: ch.type,
-    });
-    if (showRange && ch.type === 0 && src.min && src.max) {
-      datasets.push({
-        label: ch.label + ' min', data: normalize(src.min),
-        borderColor: 'transparent', backgroundColor: ch.color + '18',
-        borderWidth: 0, pointRadius: 0, fill: '+1', tension: 0.3, _hidden: true,
-      });
-      datasets.push({
-        label: ch.label + ' max', data: normalize(src.max),
-        borderColor: 'transparent', backgroundColor: ch.color + '18',
-        borderWidth: 0, pointRadius: 0, fill: false, tension: 0.3, _hidden: true,
-      });
-    }
+  // Переключатель панели
+  document.getElementById('hist-toggle').addEventListener('click', () => {
+    panelOpen = !panelOpen;
+    document.getElementById('hist-body').style.display = panelOpen ? 'block' : 'none';
+    document.getElementById('hist-arrow').style.transform = panelOpen ? 'rotate(180deg)' : '';
+    if (panelOpen && channels.length === 0) initJournal();
+    else if (panelOpen) loadAndShow();
   });
- 
-  if (chart) { chart.destroy(); }
-  chart = new Chart(document.getElementById('hist-chart').getContext('2d'), {
-    type: 'line',
-    data: { labels, datasets },
-    options: {
-      responsive: true, maintainAspectRatio: false, animation: { duration: 0 },
-      interaction: { mode: 'index', intersect: false },
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1a1d23', borderColor: '#2a2d35', borderWidth: 1,
-          titleColor: '#aaa', bodyColor: '#eee', padding: 10,
-          callbacks: {
-            label: ctx => {
-              const ds = ctx.dataset;
-              if (ds._hidden) return null;
-              const raw = ds._raw ? ds._raw[ctx.dataIndex] : null;
-              if (raw === null || raw === undefined) return null;
-              return ` ${ds.label}: ${Number(raw).toFixed(2)} ${ds._unit || ''}`;
-            }
-          }
-        }
-      },
-      scales: {
-        x: { ticks: { color: '#666', font: { size: 10 }, maxTicksLimit: 8, maxRotation: 0 }, grid: { color: '#1e2128' } },
-        y: { display: false, min: -0.05, max: 1.05 }
+
+  // Кнопки масштаба
+  document.querySelectorAll('.hist-scale-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.hist-scale-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentLevel = +btn.dataset.level;
+      currentLast  = +btn.dataset.last;
+      loadAndShow();
+    });
+  });
+
+  // Смена канала
+  document.getElementById('hist-ch-select').addEventListener('change', () => loadAndShow());
+
+  // Инициализация: загрузить список каналов
+  async function initJournal() {
+    try {
+      const list = await (await fetch('/api/history/channels')).json();
+      channels = list.filter(ch => ch.history && ch.enabled);
+      const sel = document.getElementById('hist-ch-select');
+      sel.innerHTML = '';
+      channels.forEach(ch => {
+        const opt = document.createElement('option');
+        opt.value = ch.id;
+        opt.textContent = ch.label + (ch.unit ? ' (' + ch.unit + ')' : '');
+        sel.appendChild(opt);
+      });
+      loadAndShow();
+    } catch(e) {
+      console.error('[HIST] init error', e);
+    }
+  }
+
+  // Формат даты/времени
+  function fmtTs(ts) {
+    if (!ts) return '?';
+    const d = new Date(ts * 1000);
+    const pad = n => String(n).padStart(2, '0');
+    const date = `${pad(d.getDate())}.${pad(d.getMonth()+1)}`;
+    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}`;
+    return currentLevel === 0 ? time : `${date} ${time}`;
+  }
+
+  // Загрузить данные и отобразить таблицу
+  async function loadAndShow() {
+    if (_loading) return;
+    _loading = true;
+    const emptyEl = document.getElementById('hist-empty');
+    const tbody   = document.getElementById('hist-tbody');
+    const statEl  = document.getElementById('hist-stat');
+    tbody.innerHTML = '';
+    statEl.textContent = 'Загрузка...';
+
+    try {
+      const url  = `/api/history?level=${currentLevel}&last=${currentLast}`;
+      const data = await (await fetch(url)).json();
+
+      if (!data.ts || data.ts.length === 0) {
+        emptyEl.style.display = 'block';
+        statEl.textContent = 'Нет данных';
+        _loading = false;
+        return;
       }
+      emptyEl.style.display = 'none';
+
+      // Найти выбранный канал
+      const selId = document.getElementById('hist-ch-select').value;
+      const src   = data.channels.find(c => c.id === selId);
+      const ch    = channels.find(c => c.id === selId);
+      if (!src || !ch) {
+        statEl.textContent = 'Канал не найден в данных';
+        _loading = false;
+        return;
+      }
+
+      const isFloat   = ch.type === 0;
+      const dec       = ch.unit === 'бар' ? 3 : (ch.unit === 'м³/ч' ? 3 : 2);
+      const avgArr    = src.avg || src.values || [];
+      const minArr    = src.min || [];
+      const maxArr    = src.max || [];
+
+      // Заголовки — скрыть мин/макс для CH_COUNTER и CH_BOOL
+      document.getElementById('hist-th-min').style.display = isFloat ? '' : 'none';
+      document.getElementById('hist-th-max').style.display = isFloat ? '' : 'none';
+      document.getElementById('hist-th-avg').textContent   = isFloat ? 'Среднее' : 'Значение';
+
+      // Статистика
+      const n     = data.ts.length;
+      const tFrom = fmtTs(data.ts[0]);
+      const tTo   = fmtTs(data.ts[n-1]);
+      const valid = avgArr.filter(v => v !== null && !isNaN(v));
+      const vMin  = valid.length ? Math.min(...valid) : null;
+      const vMax  = valid.length ? Math.max(...valid) : null;
+      statEl.innerHTML = `${n} записей &nbsp;·&nbsp; ${tFrom} — ${tTo}` +
+        (isFloat && vMin !== null ? ` &nbsp;·&nbsp; диапазон: ${vMin.toFixed(dec)}–${vMax.toFixed(dec)} ${ch.unit}` : '');
+
+      // Строки таблицы — в обратном порядке (новые сверху)
+      const frag = document.createDocumentFragment();
+      for (let i = n - 1; i >= 0; i--) {
+        const tr = document.createElement('tr');
+        const avg = avgArr[i];
+        const mn  = minArr[i];
+        const mx  = maxArr[i];
+        tr.innerHTML = `
+          <td>${fmtTs(data.ts[i])}</td>
+          <td>${avg !== null && avg !== undefined && !isNaN(avg) ? Number(avg).toFixed(dec) : '—'}</td>
+          ${isFloat ? `<td>${mn !== null && mn !== undefined && !isNaN(mn) ? Number(mn).toFixed(dec) : '—'}</td>
+          <td>${mx !== null && mx !== undefined && !isNaN(mx) ? Number(mx).toFixed(dec) : '—'}</td>` : ''}
+        `;
+        frag.appendChild(tr);
+      }
+      tbody.appendChild(frag);
+
+    } catch(e) {
+      statEl.textContent = 'Ошибка загрузки';
+      console.error('[HIST] load error', e);
+    } finally {
+      _loading = false;
     }
-  });
-}
- 
+  }
+
 })();
 </script>
 )html";
- 
+
 // ============================================================
 //  HTML — вкладка настроек
 // ============================================================
 static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
 <style>
-.brs-card {
-  background: var(--card); border-radius: 10px;
-  padding: 16px; border: 1px solid var(--border);
-  margin-bottom: 10px;
-}
-.brs-label {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: .12em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 12px;
-}
-.brs-row {
-  display: flex; align-items: center;
-  justify-content: space-between;
-  color: var(--text); font-size: 14px;
-  margin-bottom: 10px;
-}
-.brs-row input {
-  width: 110px; background: #111318;
-  border: 1px solid var(--border); border-radius: 6px;
-  padding: 6px 8px; color: var(--text); font-size: 13px;
-  text-align: right;
-}
+.brs-card { background:var(--card); border-radius:10px; padding:16px; border:1px solid var(--border); margin-bottom:10px; }
+.brs-label { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+.brs-row { display:flex; align-items:center; justify-content:space-between; color:var(--text); font-size:14px; margin-bottom:10px; }
+.brs-row input { width:110px; background:#111318; border:1px solid var(--border); border-radius:6px; padding:6px 8px; color:var(--text); font-size:13px; text-align:right; }
 </style>
- 
+
 <div class="brs-card">
   <div class="brs-label">⚙️ КОЭФФИЦИЕНТЫ СЧЁТЧИКОВ</div>
   <div class="brs-row">
@@ -580,7 +446,7 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="gas_kf" step="0.001" min="0.001">
   </div>
 </div>
- 
+
 <div class="brs-card">
   <div class="brs-label">⚙️ ДАВЛЕНИЕ ОТОПЛЕНИЯ (4-20мА)</div>
   <div class="brs-row">
@@ -592,7 +458,7 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="ph_max" step="0.1">
   </div>
 </div>
- 
+
 <div class="brs-card">
   <div class="brs-label">⚙️ ДАВЛЕНИЕ ВОДЫ ХВС (4-20мА)</div>
   <div class="brs-row">
@@ -604,7 +470,7 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="pw_max" step="0.1">
   </div>
 </div>
- 
+
 <div class="brs-card">
   <div class="brs-label">⚙️ ОБЩИЕ</div>
   <div class="brs-row">
@@ -612,10 +478,10 @@ static const char BRR_SETTINGS_HTML[] PROGMEM = R"html(
     <input type="number" id="pub_interval" step="1" min="5">
   </div>
 </div>
- 
+
 <button onclick="brsSave()">💾 Сохранить</button>
 <div class="info-row" id="brs_msg"></div>
- 
+
 <script>
 async function brsLoad() {
   const d = await (await fetch('/api/brr/config')).json();
@@ -627,7 +493,7 @@ async function brsLoad() {
   document.getElementById('pw_max').value       = d.p_water_max;
   document.getElementById('pub_interval').value = Math.round(d.pub_interval / 1000);
 }
- 
+
 async function brsSave() {
   const body = {
     water_m3_per_pulse: +document.getElementById('water_kf').value,
@@ -646,7 +512,7 @@ async function brsSave() {
   document.getElementById('brs_msg').textContent = r.ok ? '✅ Сохранено' : '❌ Ошибка';
   setTimeout(() => document.getElementById('brs_msg').textContent = '', 3000);
 }
- 
+
 brsLoad();
 </script>
 )html";

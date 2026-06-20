@@ -8,6 +8,10 @@
 #include "core/NetworkManager.h"
 #include "core/WebHandler.h"
 
+#include <esp_arduino_version.h>
+#include <esp_task_wdt.h>
+#include "core/CrashLog.h"
+
 #ifdef APP_BOILER_ROOM
 #include "apps/boiler-room/BoilerRoomDevice.h"
 #endif
@@ -48,11 +52,21 @@
 #include "modules/time/TimeManager.h"
 #endif
 
+#ifdef MODULE_HISTORY
+#include "core/HistoryLogger.h"
+#endif
+
 AsyncWebServer server(80);
 
 void setup() {
     Serial.begin(115200);
     Serial.println("\n[BOOT] esp32-platform starting...");
+
+    esp_task_wdt_init(8, true);
+    esp_task_wdt_add(NULL);
+
+    CrashLog::begin();
+
 
     // 1. Файловая система и конфиги
     ConfigManager::begin();
@@ -108,6 +122,10 @@ void setup() {
 
     #if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM)
       BoilerRoomDevice::init();
+    #endif
+
+    #ifdef MODULE_HISTORY
+        HistoryLogger::begin(server);
     #endif
 
     // Вкладка настроек сети — всегда последняя
@@ -351,9 +369,13 @@ void loop() {
     ArduinoOTA.handle();
     #endif
 
+    esp_task_wdt_reset();
+
+    CrashLog::mark(TAG_NET);
     NetworkManager::loop();
 
     #ifdef MODULE_MQTT
+    CrashLog::mark(TAG_MQTT);
     MqttHandler::loop();
     #endif
 
@@ -366,6 +388,7 @@ void loop() {
     #endif
 
     #ifdef DEVICE_KC868_A16
+    CrashLog::mark(TAG_A16);
     A16Device::loop();
     #endif
 
@@ -382,10 +405,12 @@ void loop() {
     #endif
 
     #ifdef MODULE_RS485
+        CrashLog::mark(TAG_RS485);
         Rs485Handler::loop();
     #endif
 
     #ifdef DEVICE_EKONOM
+    CrashLog::mark(TAG_EKONOM);
         EkoNomDevice::loop();
     #endif
 
@@ -395,6 +420,11 @@ void loop() {
 
     #if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM)
     BoilerRoomDevice::loop();
+    #endif
+
+    #ifdef MODULE_HISTORY
+    CrashLog::mark(TAG_HIST_TICK);
+        HistoryLogger::loop();
     #endif
 
     // Перезагрузка по запросу из веб-интерфейса

@@ -67,23 +67,21 @@ void HistoryLogger::begin(AsyncWebServer& server) {
         _saveOverrides();
     }
 
-    _recordSize = _calcRecordSize();
     uint8_t nCh = _channels.size();
-
-    _l0vals = new int16_t[HISTORY_L0_SIZE * nCh]();
-    _l1agg  = new ChannelAgg[nCh]();
-    _l2agg  = new ChannelAgg[nCh]();
+    _l1agg = new ChannelAgg[nCh]();
+    _l2agg = new ChannelAgg[nCh]();
 
     _registerRoutes(server);
 
     uint32_t now = millis();
-    _lastL0tick = now;
-    _lastL1tick = now;
-    _lastL2tick = now;
-    _lastFlush  = now;
+    _lastSampleMs = now;
+    _lastL1Ms     = now;
+    _lastL2Ms     = now;
+    _lastFlushMs  = now;
     _ready = true;
 
-    Serial.printf("[HIST] Ready: %u channels, record=%u bytes\n", nCh, _recordSize);
+    Serial.printf("[HIST] Ready: %u channels, L0=%u events\n",
+                  nCh, HISTORY_L0_SIZE);
 }
 
 // ============================================================
@@ -93,153 +91,148 @@ void HistoryLogger::loop() {
     if (!_ready) return;
     uint32_t now = millis();
 
-    if (now - _lastL0tick >= (uint32_t)HISTORY_L0_INTERVAL_SEC * 1000u) {
-        _lastL0tick = now;
-        _tickL0();
+    if (now - _lastSampleMs >= SAMPLE_INTERVAL_MS) {
+        _lastSampleMs = now;
+        _tickSample();
     }
-    if (now - _lastL1tick >= (uint32_t)HISTORY_L1_INTERVAL_SEC * 1000u) {
-        _lastL1tick = now;
+    if (now - _lastL1Ms >= (uint32_t)HISTORY_L1_INTERVAL_SEC * 1000u) {
+        _lastL1Ms = now;
         _finalizeL1();
     }
-    if (now - _lastL2tick >= (uint32_t)HISTORY_L2_INTERVAL_SEC * 1000u) {
-        _lastL2tick = now;
+    if (now - _lastL2Ms >= (uint32_t)HISTORY_L2_INTERVAL_SEC * 1000u) {
+        _lastL2Ms = now;
         _finalizeL2();
     }
-    if (now - _lastFlush >= HISTORY_FLUSH_INTERVAL_MS) {
-        _lastFlush = now;
+    if (now - _lastFlushMs >= HISTORY_FLUSH_INTERVAL_MS) {
+        _lastFlushMs = now;
         _flushPending();
     }
 }
 
 // ============================================================
-//  L0 ТИК
-//  Опрашиваем геттеры, конвертируем в int16.
-//  Пишем в L0 буфер только если значение изменилось.
-//  Всегда пушим в l1agg независимо от изменения.
+//  ОПРОС ГЕТТЕРОВ — пишем событие только при изменении
 // ============================================================
-void HistoryLogger::_tickL0() {
+void HistoryLogger::_tickSample() {
     uint8_t  nCh  = _channels.size();
-    uint32_t ts   = (time(nullptr) > 1000000) ? (uint32_t)time(nullptr) : 0;
-    uint32_t dtMs = (uint32_t)HISTORY_L0_INTERVAL_SEC * 1000u;
-
-    bool anyChanged = false;
-    int16_t newVals[nCh];
+    uint32_t ts   = _now();
+    uint32_t dtMs = SAMPLE_INTERVAL_MS;
 
     for (uint8_t i = 0; i < nCh; i++) {
         DataChannel* ch = _channels[i];
         float fval = ch->getter ? ch->getter() : 0.0f;
+        if (isnan(fval)) continue;   // нет данных — этот тик просто не учитываем
 
-        // Конвертируем в int16 для CH_FLOAT, для остальных храним как есть
+        // Конвертируем в int16 для сравнения и хранения
         int16_t ival;
         if (ch->type == CH_FLOAT) {
             ival = (int16_t)(fval * ch->scale);
         } else if (ch->type == CH_COUNTER) {
-            // counter: храним float-as-int16 с потерей точности не критично для deadband
-            ival = (int16_t)(fval); // целая часть для сравнения
+            ival = (int16_t)fval;  // целая часть для сравнения
         } else {
             ival = fval > 0.5f ? 1 : 0;
         }
-        newVals[i] = ival;
-        if (ival != ch->_lastLoggedInt) anyChanged = true;
 
-        // Пушим в l1agg всегда
+        // Пушим в аккумулятор L1 всегда
         _l1agg[i].push(fval, dtMs, ch->type);
-    }
 
-    // В L0 буфер пишем только если хоть один канал изменился
-    if (anyChanged) {
-        int16_t* slot = &_l0vals[_l0head * nCh];
-        for (uint8_t i = 0; i < nCh; i++) {
-            slot[i] = newVals[i];
-            if (newVals[i] != _channels[i]->_lastLoggedInt)
-                _channels[i]->_lastLoggedInt = newVals[i];
-        }
-        _l0ts[_l0head] = ts;
-        _l0head  = (_l0head + 1) % HISTORY_L0_SIZE;
+        // В L0 пишем только если изменилось
+        if (ival == ch->_lastLoggedInt) continue;
+        ch->_lastLoggedInt = ival;
+
+        // Записываем событие в L0 кольцевой буфер
+        uint8_t* slot = &_l0buf[_l0head * HISTORY_L0_EVENT_SIZE];
+        slot[0] = (ts >> 0)  & 0xFF;
+        slot[1] = (ts >> 8)  & 0xFF;
+        slot[2] = (ts >> 16) & 0xFF;
+        slot[3] = (ts >> 24) & 0xFF;
+        slot[4] = i;  // индекс канала
+        slot[5] = (ival >> 0) & 0xFF;
+        slot[6] = (ival >> 8) & 0xFF;
+
+        _l0head = (_l0head + 1) % HISTORY_L0_SIZE;
         if (_l0count < HISTORY_L0_SIZE) _l0count++;
     }
 }
 
 // ============================================================
-//  ФИНАЛИЗАЦИЯ L1 — по таймеру раз в минуту
+//  ФИНАЛИЗАЦИЯ L1 — раз в минуту
 // ============================================================
 void HistoryLogger::_finalizeL1() {
     uint8_t  nCh = _channels.size();
-    uint32_t ts  = (time(nullptr) > 1000000) ? (uint32_t)time(nullptr) : 0;
+    uint32_t ts  = _now();
+    uint32_t dtMs = (uint32_t)HISTORY_L1_INTERVAL_SEC * 1000u;
 
-    // Если за минуту не было ни одного значения — не пишем
-    bool hasData = false;
-    for (uint8_t i = 0; i < nCh; i++)
-        if (_l1agg[i].count > 0) { hasData = true; break; }
+    for (uint8_t i = 0; i < nCh; i++) {
+        if (_l1agg[i].count == 0) { _l1agg[i].reset(); continue; }
 
-    if (hasData) {
-        _l1pending.push_back(_serializeRecord(ts, _l1agg, nCh));
-
-        // Пушим в l2agg
-        uint32_t dtMs = (uint32_t)HISTORY_L1_INTERVAL_SEC * 1000u;
-        for (uint8_t i = 0; i < nCh; i++) {
-            float representative = 0.0f;
-            if (_channels[i]->type == CH_FLOAT)
-                representative = _l1agg[i].avg();
-            else if (_channels[i]->type == CH_COUNTER)
-                representative = _l1agg[i].counterLast;
-            else
-                representative = _l1agg[i].boolPct() > 50 ? 1.0f : 0.0f;
-            _l2agg[i].push(representative, dtMs, _channels[i]->type);
+        int16_t avg, mn, mx;
+        if (_channels[i]->type == CH_FLOAT) {
+            avg = (int16_t)(_l1agg[i].avg()      * _channels[i]->scale);
+            mn  = (int16_t)(_l1agg[i].floatMin() * _channels[i]->scale);
+            mx  = (int16_t)(_l1agg[i].floatMax() * _channels[i]->scale);
+        } else if (_channels[i]->type == CH_COUNTER) {
+            avg = (int16_t)_l1agg[i].last;
+            mn = mx = 0;
+        } else {
+            avg = _l1agg[i].boolPct();
+            mn = mx = 0;
         }
-    }
 
-    for (uint8_t i = 0; i < nCh; i++) _l1agg[i].reset();
+        _l1pending.push_back(_serializeEvent(ts, i, avg, mn, mx));
+
+        // Пушим в L2 аккумулятор
+        float representative = (_channels[i]->type == CH_FLOAT)
+            ? _l1agg[i].avg()
+            : (_channels[i]->type == CH_COUNTER)
+                ? _l1agg[i].last
+                : (_l1agg[i].boolPct() > 50 ? 1.0f : 0.0f);
+        _l2agg[i].push(representative, dtMs, _channels[i]->type);
+
+        _l1agg[i].reset();
+    }
 }
 
 // ============================================================
-//  ФИНАЛИЗАЦИЯ L2 — по таймеру раз в 10 минут
+//  ФИНАЛИЗАЦИЯ L2 — раз в 10 минут
 // ============================================================
 void HistoryLogger::_finalizeL2() {
     uint8_t  nCh = _channels.size();
-    uint32_t ts  = (time(nullptr) > 1000000) ? (uint32_t)time(nullptr) : 0;
+    uint32_t ts  = _now();
 
-    bool hasData = false;
-    for (uint8_t i = 0; i < nCh; i++)
-        if (_l2agg[i].count > 0) { hasData = true; break; }
+    for (uint8_t i = 0; i < nCh; i++) {
+        if (_l2agg[i].count == 0) { _l2agg[i].reset(); continue; }
 
-    if (hasData)
-        _l2pending.push_back(_serializeRecord(ts, _l2agg, nCh));
+        int16_t avg, mn, mx;
+        if (_channels[i]->type == CH_FLOAT) {
+            avg = (int16_t)(_l2agg[i].avg()      * _channels[i]->scale);
+            mn  = (int16_t)(_l2agg[i].floatMin() * _channels[i]->scale);
+            mx  = (int16_t)(_l2agg[i].floatMax() * _channels[i]->scale);
+        } else if (_channels[i]->type == CH_COUNTER) {
+            avg = (int16_t)_l2agg[i].last;
+            mn = mx = 0;
+        } else {
+            avg = _l2agg[i].boolPct();
+            mn = mx = 0;
+        }
 
-    for (uint8_t i = 0; i < nCh; i++) _l2agg[i].reset();
+        _l2pending.push_back(_serializeEvent(ts, i, avg, mn, mx));
+        _l2agg[i].reset();
+    }
 }
 
 // ============================================================
-//  СЕРИАЛИЗАЦИЯ
+//  СЕРИАЛИЗАЦИЯ СОБЫТИЯ
 // ============================================================
-std::vector<uint8_t> HistoryLogger::_serializeRecord(
-    uint32_t ts, ChannelAgg* aggs, uint8_t nCh)
+std::vector<uint8_t> HistoryLogger::_serializeEvent(
+    uint32_t ts, uint8_t ch, int16_t avg, int16_t mn, int16_t mx)
 {
-    std::vector<uint8_t> buf;
-    buf.reserve(_recordSize);
-
-    buf.push_back((ts >> 0)  & 0xFF);
-    buf.push_back((ts >> 8)  & 0xFF);
-    buf.push_back((ts >> 16) & 0xFF);
-    buf.push_back((ts >> 24) & 0xFF);
-
-    for (uint8_t i = 0; i < nCh; i++) {
-        if (_channels[i]->type == CH_FLOAT) {
-            int16_t avg = (int16_t)(aggs[i].avg()      * _channels[i]->scale);
-            int16_t mn  = (int16_t)(aggs[i].floatMin() * _channels[i]->scale);
-            int16_t mx  = (int16_t)(aggs[i].floatMax() * _channels[i]->scale);
-            buf.push_back((avg >> 0) & 0xFF); buf.push_back((avg >> 8) & 0xFF);
-            buf.push_back((mn  >> 0) & 0xFF); buf.push_back((mn  >> 8) & 0xFF);
-            buf.push_back((mx  >> 0) & 0xFF); buf.push_back((mx  >> 8) & 0xFF);
-        } else if (_channels[i]->type == CH_COUNTER) {
-            float v = aggs[i].counterLast;
-            uint8_t* p = (uint8_t*)&v;
-            buf.push_back(p[0]); buf.push_back(p[1]);
-            buf.push_back(p[2]); buf.push_back(p[3]);
-        } else {
-            buf.push_back(aggs[i].boolPct());
-        }
-    }
+    std::vector<uint8_t> buf(HISTORY_FILE_EVENT_SIZE);
+    buf[0] = (ts  >> 0)  & 0xFF; buf[1] = (ts  >> 8)  & 0xFF;
+    buf[2] = (ts  >> 16) & 0xFF; buf[3] = (ts  >> 24) & 0xFF;
+    buf[4] = ch;
+    buf[5] = (avg >> 0) & 0xFF;  buf[6] = (avg >> 8) & 0xFF;
+    buf[7] = (mn  >> 0) & 0xFF;  buf[8] = (mn  >> 8) & 0xFF;
+    buf[9] = (mx  >> 0) & 0xFF;  buf[10]= (mx  >> 8) & 0xFF;
     return buf;
 }
 

@@ -5,29 +5,42 @@
 #include <ArduinoJson.h>
 #include <AsyncJson.h>
 #include <time.h>
+#include "CrashLog.h"
+#include <esp_task_wdt.h>
+
+#ifdef MODULE_TIME
+#include "../modules/time/TimeManager.h"
+#endif
 
 // ============================================================
 //  СТАТИЧЕСКИЕ ЧЛЕНЫ
 // ============================================================
-std::vector<DataChannel*>              HistoryLogger::_channels;
-uint16_t                               HistoryLogger::_recordSize   = 0;
+std::vector<DataChannel*>             HistoryLogger::_channels;
+uint8_t   HistoryLogger::_l0buf[HISTORY_L0_SIZE * HISTORY_L0_EVENT_SIZE] = {};
+uint16_t  HistoryLogger::_l0head  = 0;
+uint16_t  HistoryLogger::_l0count = 0;
+ChannelAgg* HistoryLogger::_l1agg = nullptr;
+ChannelAgg* HistoryLogger::_l2agg = nullptr;
+std::vector<std::vector<uint8_t>> HistoryLogger::_l1pending;
+std::vector<std::vector<uint8_t>> HistoryLogger::_l2pending;
+uint32_t  HistoryLogger::_lastSampleMs = 0;
+uint32_t  HistoryLogger::_lastL1Ms    = 0;
+uint32_t  HistoryLogger::_lastL2Ms    = 0;
+uint32_t  HistoryLogger::_lastFlushMs = 0;
+bool      HistoryLogger::_ready       = false;
 
-int16_t*                               HistoryLogger::_l0vals       = nullptr;
-uint32_t                               HistoryLogger::_l0ts[HISTORY_L0_SIZE] = {};
-uint16_t                               HistoryLogger::_l0head       = 0;
-uint16_t                               HistoryLogger::_l0count      = 0;
-
-ChannelAgg*                            HistoryLogger::_l1agg        = nullptr;
-ChannelAgg*                            HistoryLogger::_l2agg        = nullptr;
-
-std::vector<std::vector<uint8_t>>      HistoryLogger::_l1pending;
-std::vector<std::vector<uint8_t>>      HistoryLogger::_l2pending;
-
-uint32_t                               HistoryLogger::_lastL0tick   = 0;
-uint32_t                               HistoryLogger::_lastL1tick   = 0;
-uint32_t                               HistoryLogger::_lastL2tick   = 0;
-uint32_t                               HistoryLogger::_lastFlush    = 0;
-bool                                   HistoryLogger::_ready        = false;
+// ============================================================
+//  ТЕКУЩИЙ TIMESTAMP
+// ============================================================
+uint32_t HistoryLogger::_now() {
+#ifdef MODULE_TIME
+    int32_t offset = TimeManager::tsOffset();
+    return (uint32_t)(millis() / 1000) + (uint32_t)offset;
+#else
+    time_t t = time(nullptr);
+    return (t > 1000000) ? (uint32_t)t : (uint32_t)(millis() / 1000);
+#endif
+}
 
 // ============================================================
 //  BEGIN
@@ -234,53 +247,57 @@ std::vector<uint8_t> HistoryLogger::_serializeRecord(
 //  СБРОС НА ДИСК
 // ============================================================
 void HistoryLogger::_flushPending() {
+    CrashLog::mark(TAG_HIST_FLUSH);
+    uint32_t t0 = millis();
     if (!_l1pending.empty()) {
-        _flushLevel("/history/l1.bin", "/history/l1.bin.prev",
-                    _l1pending, HISTORY_L1_SIZE);
+        _flushLevel("/history/l1.bin", "/history/l1.bin.prev", _l1pending);
+        CrashLog::mark(TAG_HIST_ROTATE);
+        _rotateIfNeeded("/history/l1.bin", "/history/l1.bin.prev",
+                        (uint32_t)HISTORY_L1_HOURS * 3600 / HISTORY_L1_INTERVAL_SEC
+                        * _channels.size() * 2);  // с запасом ×2
         _l1pending.clear();
     }
     yield();
+    esp_task_wdt_reset();
     if (!_l2pending.empty()) {
-        _flushLevel("/history/l2.bin", "/history/l2.bin.prev",
-                    _l2pending, HISTORY_L2_SIZE);
+        _flushLevel("/history/l2.bin", "/history/l2.bin.prev", _l2pending);
+        CrashLog::mark(TAG_HIST_ROTATE);
+        _rotateIfNeeded("/history/l2.bin", "/history/l2.bin.prev",
+                        (uint32_t)HISTORY_L2_DAYS * 86400 / HISTORY_L2_INTERVAL_SEC
+                        * _channels.size() * 2);
         _l2pending.clear();
     }
+    uint32_t dt = millis() - t0;
+    if (dt > 250) Serial.printf("[HIST] SLOW flush: %u ms\n", dt);
 }
 
 void HistoryLogger::_flushLevel(const char* path, const char* prevPath,
-                                 std::vector<std::vector<uint8_t>>& pending,
-                                 uint32_t maxRecords)
+                                 std::vector<std::vector<uint8_t>>& pending)
 {
     File f = LittleFS.open(path, "a");
     if (!f) { Serial.printf("[HIST] Failed to open %s\n", path); return; }
-    for (auto& rec : pending) {
-        f.write(rec.data(), rec.size());
-        yield();
-    }
-    uint32_t fileRecords = f.size() / _recordSize;
+    for (auto& rec : pending) { f.write(rec.data(), rec.size()); yield(); }
     f.close();
-    if (fileRecords >= maxRecords)
-        _rotateFile(path, prevPath);
 }
 
-void HistoryLogger::_rotateFile(const char* path, const char* prevPath) {
-    if (LittleFS.exists(prevPath)) LittleFS.remove(prevPath);
-    LittleFS.rename(path, prevPath);
-    Serial.printf("[HIST] Rotated %s\n", path);
-}
-
-// ============================================================
-//  ВЫЧИСЛЕНИЕ РАЗМЕРА ЗАПИСИ
-// ============================================================
-uint16_t HistoryLogger::_calcRecordSize() {
-    uint16_t sz = 4;
-    for (auto* ch : _channels) {
-        if      (ch->type == CH_FLOAT)   sz += 6;
-        else if (ch->type == CH_COUNTER) sz += 4;
-        else if (ch->type == CH_BOOL)    sz += 1;
-    }
-    return sz;
-}
+ void HistoryLogger::_rotateIfNeeded(const char* path, const char* prevPath,
+                                      uint32_t maxEvents)
+ {
+     File f = LittleFS.open(path, "r");
+     if (!f) return;
+     uint32_t events = f.size() / HISTORY_FILE_EVENT_SIZE;
+     f.close();
+     if (events >= maxEvents) {
+        if (LittleFS.exists(prevPath)) {
+            LittleFS.remove(prevPath);
+            yield();
+            esp_task_wdt_reset();
+        }
+         LittleFS.rename(path, prevPath);
+        yield();
+         Serial.printf("[HIST] Rotated %s (%u events)\n", path, events);
+     }
+ }
 
 // ============================================================
 //  FINGERPRINT
@@ -324,8 +341,8 @@ void HistoryLogger::_loadOverrides() {
         if (!chans.containsKey(ch->id)) continue;
         JsonObject o = chans[ch->id].as<JsonObject>();
         if (o.containsKey("enabled")) ch->_enabled = o["enabled"].as<bool>();
-        const char* savedLabel = o["label"] | "";
-        if (savedLabel && strlen(savedLabel) > 0) ch->setLabel(savedLabel);
+        const char* lbl = o["label"] | "";
+        if (lbl && strlen(lbl) > 0) ch->setLabel(lbl);
         if (o.containsKey("y_min")) ch->y_min = o["y_min"].as<float>();
         if (o.containsKey("y_max")) ch->y_max = o["y_max"].as<float>();
     }
@@ -356,81 +373,57 @@ void HistoryLogger::_buildActiveList() {
             _channels.push_back(ch);
 }
 
-// ============================================================
-//  ПУБЛИЧНЫЙ ДОСТУП
-// ============================================================
 uint8_t HistoryLogger::channelCount() { return _channels.size(); }
 DataChannel* HistoryLogger::channel(uint8_t idx) {
     return (idx < _channels.size()) ? _channels[idx] : nullptr;
 }
 
 // ============================================================
-//  REST — L0
+//  REST — L0 из RAM
+//  Отдаём события за последние `seconds` секунд
 // ============================================================
-void HistoryLogger::_sendL0(AsyncWebServerRequest* req, uint16_t last) {
+void HistoryLogger::_sendL0(AsyncWebServerRequest* req, uint32_t seconds) {
     uint8_t nCh = _channels.size();
-    if (nCh == 0 || _l0count == 0) {
+
+    if (_l0count == 0) {
         req->send(200, "application/json", "{\"ts\":[],\"channels\":[]}");
         return;
     }
 
-    const uint16_t MAX_POINTS = 500;
-    uint16_t count  = min((uint16_t)_l0count, last);
-    uint16_t stride = max((uint16_t)1, (uint16_t)(count / MAX_POINTS));
-    uint16_t outCount = (count + stride - 1) / stride;
+    uint32_t cutoff = (_now() > seconds) ? (_now() - seconds) : 0;
 
+    // Формируем ответ: для каждого канала массив {ts, val}
     JsonDocument doc;
-    JsonArray tsArr = doc["ts"].to<JsonArray>();
     JsonArray chArr = doc["channels"].to<JsonArray>();
+    JsonArray tsPerCh[nCh];  // массивы ts для каждого канала
+    JsonArray valPerCh[nCh]; // массивы val
 
-    JsonArray avgArr[nCh], minArr[nCh], maxArr[nCh];
     for (uint8_t i = 0; i < nCh; i++) {
         JsonObject chObj = chArr.add<JsonObject>();
         chObj["id"]    = _channels[i]->id;
         chObj["label"] = _channels[i]->label();
         chObj["unit"]  = _channels[i]->unit;
         chObj["type"]  = (uint8_t)_channels[i]->type;
-        avgArr[i] = chObj["values"].to<JsonArray>();
-        if (_channels[i]->type == CH_FLOAT) {
-            minArr[i] = chObj["min"].to<JsonArray>();
-            maxArr[i] = chObj["max"].to<JsonArray>();
-        }
+        tsPerCh[i]  = chObj["ts"].to<JsonArray>();
+        valPerCh[i] = chObj["values"].to<JsonArray>();
     }
 
+    // Читаем буфер в хронологическом порядке
     uint16_t startIdx = (_l0count < HISTORY_L0_SIZE) ? 0 : _l0head;
-    uint16_t skip = (_l0count > count) ? (_l0count - count) : 0;
-    for (uint16_t n = 0; n < skip; n++)
-        startIdx = (startIdx + 1) % HISTORY_L0_SIZE;
-
-    for (uint16_t b = 0; b < outCount; b++) {
-        uint16_t bStart = b * stride;
-        uint16_t bEnd   = min((uint16_t)(bStart + stride), count);
-        uint32_t bTs = 0;
-        float bSum[nCh]; float bMin[nCh]; float bMax[nCh];
-        for (uint8_t i = 0; i < nCh; i++) {
-            bSum[i] = 0; bMin[i] = FLT_MAX; bMax[i] = -FLT_MAX;
-        }
-        for (uint16_t r = bStart; r < bEnd; r++) {
-            uint16_t idx = startIdx % HISTORY_L0_SIZE;
-            if (r == bStart) bTs = _l0ts[idx];
-            int16_t* slot = &_l0vals[idx * nCh];
-            for (uint8_t i = 0; i < nCh; i++) {
-                float fval = (float)slot[i] / _channels[i]->scale;
-                bSum[i] += fval;
-                if (fval < bMin[i]) bMin[i] = fval;
-                if (fval > bMax[i]) bMax[i] = fval;
-            }
-            startIdx = (startIdx + 1) % HISTORY_L0_SIZE;
-        }
-        uint16_t bCount = bEnd - bStart;
-        tsArr.add(bTs);
-        for (uint8_t i = 0; i < nCh; i++) {
-            avgArr[i].add(bSum[i] / bCount);
-            if (_channels[i]->type == CH_FLOAT) {
-                minArr[i].add(bMin[i] == FLT_MAX  ? 0.0f : bMin[i]);
-                maxArr[i].add(bMax[i] == -FLT_MAX ? 0.0f : bMax[i]);
-            }
-        }
+    for (uint16_t n = 0; n < _l0count; n++) {
+        uint16_t idx = (startIdx + n) % HISTORY_L0_SIZE;
+        uint8_t* slot = &_l0buf[idx * HISTORY_L0_EVENT_SIZE];
+        uint32_t ts = (uint32_t)slot[0] | ((uint32_t)slot[1]<<8)
+                    | ((uint32_t)slot[2]<<16) | ((uint32_t)slot[3]<<24);
+        if (ts < cutoff) continue;
+        uint8_t  ch  = slot[4];
+        int16_t  val = (int16_t)(slot[5] | (slot[6]<<8));
+        if (ch >= nCh) continue;
+        tsPerCh[ch].add(ts);
+        float fval = (_channels[ch]->type == CH_FLOAT)
+            ? (float)val / _channels[ch]->scale
+            : (float)val;
+        valPerCh[ch].add(fval);
     }
 
     String out;
@@ -440,121 +433,65 @@ void HistoryLogger::_sendL0(AsyncWebServerRequest* req, uint16_t last) {
 
 // ============================================================
 //  REST — L1/L2 из файла
+//  Отдаём события за последние `seconds` секунд
 // ============================================================
 void HistoryLogger::_sendFile(AsyncWebServerRequest* req,
                                const char* path, const char* prevPath,
-                               uint16_t last)
+                               uint32_t seconds)
 {
     uint8_t nCh = _channels.size();
+    uint32_t cutoff = (_now() > seconds) ? (_now() - seconds) : 0;
 
-    struct FileInfo { const char* p; uint32_t records; };
-    FileInfo files[2]; uint8_t nFiles = 0;
-    auto addFile = [&](const char* p) {
-        if (LittleFS.exists(p)) {
-            File f = LittleFS.open(p, "r");
-            if (f) { uint32_t r = f.size() / _recordSize; f.close(); if (r > 0) files[nFiles++] = {p, r}; }
-        }
-    };
-    addFile(prevPath); addFile(path);
-
-    uint32_t total = 0;
-    for (uint8_t i = 0; i < nFiles; i++) total += files[i].records;
-    if (total == 0) {
-        req->send(200, "application/json", "{\"ts\":[],\"channels\":[]}");
-        return;
-    }
-
-    uint32_t count = min((uint32_t)last, total);
-    const uint16_t MAX_POINTS = 100;
-    uint32_t stride   = max((uint32_t)1, count / MAX_POINTS);
-    uint32_t outCount = (count + stride - 1) / stride;
-    uint32_t skip     = total - count;
-
+    // Формируем ответ
     JsonDocument doc;
-    JsonArray tsArr = doc["ts"].to<JsonArray>();
     JsonArray chArr = doc["channels"].to<JsonArray>();
+    JsonArray tsPerCh[nCh], avgPerCh[nCh], mnPerCh[nCh], mxPerCh[nCh];
 
-    JsonArray avgArr[nCh], minArr[nCh], maxArr[nCh];
     for (uint8_t i = 0; i < nCh; i++) {
         JsonObject chObj = chArr.add<JsonObject>();
         chObj["id"]    = _channels[i]->id;
         chObj["label"] = _channels[i]->label();
         chObj["unit"]  = _channels[i]->unit;
         chObj["type"]  = (uint8_t)_channels[i]->type;
+        tsPerCh[i]  = chObj["ts"].to<JsonArray>();
         if (_channels[i]->type == CH_FLOAT) {
-            avgArr[i] = chObj["avg"].to<JsonArray>();
-            minArr[i] = chObj["min"].to<JsonArray>();
-            maxArr[i] = chObj["max"].to<JsonArray>();
+            avgPerCh[i] = chObj["avg"].to<JsonArray>();
+            mnPerCh[i]  = chObj["min"].to<JsonArray>();
+            mxPerCh[i]  = chObj["max"].to<JsonArray>();
         } else {
-            avgArr[i] = chObj["values"].to<JsonArray>();
+            avgPerCh[i] = chObj["values"].to<JsonArray>();
         }
     }
 
-    std::vector<uint8_t> recBuf(_recordSize);
-    uint32_t globalIdx = 0, readIdx = 0;
-    float bSum[nCh]; float bMin[nCh]; float bMax[nCh];
-    float bCounter[nCh]; uint32_t bBool[nCh];
-    uint32_t bTs = 0, bCount = 0, curBucket = 0;
+    // Читаем файлы: сначала .prev (старые), потом основной
+    const char* files[2] = {prevPath, path};
+    uint8_t buf[HISTORY_FILE_EVENT_SIZE];
 
-    auto resetBucket = [&]() {
-        for (uint8_t i = 0; i < nCh; i++) {
-            bSum[i]=0; bMin[i]=FLT_MAX; bMax[i]=-FLT_MAX;
-            bCounter[i]=0; bBool[i]=0;
-        }
-        bTs=0; bCount=0;
-    };
-    auto flushBucket = [&]() {
-        if (bCount == 0) return;
-        tsArr.add(bTs);
-        for (uint8_t i = 0; i < nCh; i++) {
-            if (_channels[i]->type == CH_FLOAT) {
-                avgArr[i].add(bSum[i] / bCount);
-                minArr[i].add(bMin[i] == FLT_MAX  ? 0.0f : bMin[i]);
-                maxArr[i].add(bMax[i] == -FLT_MAX ? 0.0f : bMax[i]);
-            } else if (_channels[i]->type == CH_COUNTER) {
-                avgArr[i].add(bCounter[i]);
-            } else {
-                avgArr[i].add((uint8_t)(bBool[i] * 100 / bCount));
-            }
-        }
-    };
-    resetBucket();
-
-    for (uint8_t fi = 0; fi < nFiles; fi++) {
-        File f = LittleFS.open(files[fi].p, "r");
+    for (uint8_t fi = 0; fi < 2; fi++) {
+        if (!LittleFS.exists(files[fi])) continue;
+        File f = LittleFS.open(files[fi], "r");
         if (!f) continue;
-        for (uint32_t r = 0; r < files[fi].records; r++, globalIdx++) {
-            f.read(recBuf.data(), _recordSize);
-            if (globalIdx < skip) continue;
-            uint32_t bucket = readIdx / stride;
-            if (bucket != curBucket) { flushBucket(); resetBucket(); curBucket = bucket; }
-            uint32_t ts = (uint32_t)recBuf[0] | ((uint32_t)recBuf[1]<<8)
-                        | ((uint32_t)recBuf[2]<<16) | ((uint32_t)recBuf[3]<<24);
-            if (bCount == 0) bTs = ts;
-            uint16_t offset = 4;
-            for (uint8_t i = 0; i < nCh; i++) {
-                if (_channels[i]->type == CH_FLOAT) {
-                    int16_t avg = (int16_t)(recBuf[offset]   | (recBuf[offset+1]<<8));
-                    int16_t mn  = (int16_t)(recBuf[offset+2] | (recBuf[offset+3]<<8));
-                    int16_t mx  = (int16_t)(recBuf[offset+4] | (recBuf[offset+5]<<8));
-                    float sc = _channels[i]->scale;
-                    float fAvg = avg/sc, fMn = mn/sc, fMx = mx/sc;
-                    bSum[i] += fAvg;
-                    if (fMn < bMin[i]) bMin[i] = fMn;
-                    if (fMx > bMax[i]) bMax[i] = fMx;
-                    offset += 6;
-                } else if (_channels[i]->type == CH_COUNTER) {
-                    float v; memcpy(&v, &recBuf[offset], 4);
-                    bCounter[i] = v; offset += 4;
-                } else {
-                    bBool[i] += recBuf[offset]; offset += 1;
-                }
+        while (f.read(buf, HISTORY_FILE_EVENT_SIZE) == HISTORY_FILE_EVENT_SIZE) {
+            uint32_t ts = (uint32_t)buf[0] | ((uint32_t)buf[1]<<8)
+                        | ((uint32_t)buf[2]<<16) | ((uint32_t)buf[3]<<24);
+            if (ts < cutoff) continue;
+            uint8_t  ch  = buf[4];
+            int16_t  avg = (int16_t)(buf[5] | (buf[6]<<8));
+            int16_t  mn  = (int16_t)(buf[7] | (buf[8]<<8));
+            int16_t  mx  = (int16_t)(buf[9] | (buf[10]<<8));
+            if (ch >= nCh) continue;
+            float sc = _channels[ch]->scale;
+            tsPerCh[ch].add(ts);
+            if (_channels[ch]->type == CH_FLOAT) {
+                avgPerCh[ch].add(avg / sc);
+                mnPerCh[ch].add(mn / sc);
+                mxPerCh[ch].add(mx / sc);
+            } else {
+                avgPerCh[ch].add((float)avg);
             }
-            bCount++; readIdx++;
         }
         f.close();
     }
-    flushBucket();
 
     String out;
     serializeJson(doc, out);
@@ -566,6 +503,7 @@ void HistoryLogger::_sendFile(AsyncWebServerRequest* req,
 // ============================================================
 void HistoryLogger::_registerRoutes(AsyncWebServer& server) {
 
+    // GET /api/history/channels
     server.on("/api/history/channels", HTTP_GET, [](AsyncWebServerRequest* req) {
         JsonDocument doc;
         JsonArray arr = doc.to<JsonArray>();
@@ -587,26 +525,37 @@ void HistoryLogger::_registerRoutes(AsyncWebServer& server) {
         req->send(200, "application/json", out);
     });
 
+    // GET /api/history?level=0&hours=2
+    //                  level=1&hours=24
+    //                  level=2&days=14
     server.on("/api/history", HTTP_GET, [](AsyncWebServerRequest* req) {
-        uint8_t  level = req->hasParam("level") ? req->getParam("level")->value().toInt() : 1;
-        uint16_t last  = req->hasParam("last")  ? req->getParam("last")->value().toInt()  : 100;
-        if (level == 0) _sendL0(req, last);
-        else if (level == 1) _sendFile(req, "/history/l1.bin", "/history/l1.bin.prev", last);
-        else _sendFile(req, "/history/l2.bin", "/history/l2.bin.prev", last);
+        uint8_t level = req->hasParam("level") ? req->getParam("level")->value().toInt() : 1;
+        uint32_t seconds = 7200;  // default 2 часа
+
+        if (req->hasParam("hours"))
+            seconds = req->getParam("hours")->value().toInt() * 3600u;
+        else if (req->hasParam("days"))
+            seconds = req->getParam("days")->value().toInt() * 86400u;
+
+        if (level == 0)
+            _sendL0(req, seconds);
+        else if (level == 1)
+            _sendFile(req, "/history/l1.bin", "/history/l1.bin.prev", seconds);
+        else
+            _sendFile(req, "/history/l2.bin", "/history/l2.bin.prev", seconds);
     });
 
+    // POST /api/history/reset
     server.on("/api/history/reset", HTTP_POST, [](AsyncWebServerRequest* req) {
         _invalidateFiles();
         LittleFS.remove("/history/channels.json");
-        // Сбросить L0 буфер
-        uint8_t nCh = _channels.size();
-        if (_l0vals) memset(_l0vals, 0, HISTORY_L0_SIZE * nCh * sizeof(int16_t));
+        memset(_l0buf, 0, sizeof(_l0buf));
         _l0head = 0; _l0count = 0;
-        // Сбросить lastLoggedInt
         for (auto* ch : _channels) ch->_lastLoggedInt = INT16_MIN;
         req->send(200, "application/json", "{\"ok\":true}");
     });
 
+    // POST /api/history/channels — сохранить overrides
     auto* saveHandler = new AsyncCallbackJsonWebHandler("/api/history/channels",
         [](AsyncWebServerRequest* req, JsonVariant& json) {
             JsonArray arr = json.as<JsonArray>();
@@ -614,14 +563,14 @@ void HistoryLogger::_registerRoutes(AsyncWebServer& server) {
                 const char* id = o["id"] | "";
                 for (auto* ch : DataChannel::all()) {
                     if (strcmp(ch->id, id) != 0) continue;
-                    if (o.containsKey("enabled"))       ch->_enabled      = o["enabled"];
-                    if (o.containsKey("label"))         ch->setLabel(o["label"] | "");
-                    if (o.containsKey("history"))       ch->history       = o["history"];
-                    if (o.containsKey("mqtt"))          ch->mqtt          = o["mqtt"];
-                    if (o.containsKey("mqtt_interval")) ch->mqtt_interval = o["mqtt_interval"];
-                    if (o.containsKey("mqtt_threshold"))ch->mqtt_threshold= o["mqtt_threshold"];
-                    if (o.containsKey("y_min"))         ch->y_min         = o["y_min"].as<float>();
-                    if (o.containsKey("y_max"))         ch->y_max         = o["y_max"].as<float>();
+                    if (o.containsKey("enabled"))        ch->_enabled      = o["enabled"];
+                    if (o.containsKey("label"))          ch->setLabel(o["label"] | "");
+                    if (o.containsKey("history"))        ch->history       = o["history"];
+                    if (o.containsKey("mqtt"))           ch->mqtt          = o["mqtt"];
+                    if (o.containsKey("mqtt_interval"))  ch->mqtt_interval = o["mqtt_interval"];
+                    if (o.containsKey("mqtt_threshold")) ch->mqtt_threshold= o["mqtt_threshold"];
+                    if (o.containsKey("y_min"))          ch->y_min         = o["y_min"].as<float>();
+                    if (o.containsKey("y_max"))          ch->y_max         = o["y_max"].as<float>();
                     break;
                 }
             }

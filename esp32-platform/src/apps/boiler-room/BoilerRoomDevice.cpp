@@ -58,11 +58,11 @@ DECLARE_CHANNEL(brr_heat_volume,
  
 // ── Давление ─────────────────────────────────────────────────
 DECLARE_CHANNEL(brr_p_heat,
-    "brr.p_heat",  "Давление отопления", "бар", CH_FLOAT, 100,
+    "brr.p_heat",  "Давление отопления", "бар", CH_FLOAT, 10,
     []() -> float { return brrState.p_heat; }
 );
 DECLARE_CHANNEL(brr_p_water,
-    "brr.p_water", "Давление ХВС",       "бар", CH_FLOAT, 100,
+    "brr.p_water", "Давление ХВС",       "бар", CH_FLOAT, 10,
     []() -> float { return brrState.p_water; }
 );
  
@@ -342,8 +342,7 @@ setInterval(brrUpdate, 3000);
     return currentLevel === 0 ? time : `${date} ${time}`;
   }
 
-  // Загрузить данные и отобразить таблицу
-  async function loadAndShow() {
+async function loadAndShow() {
     if (_loading) return;
     _loading = true;
     const emptyEl = document.getElementById('hist-empty');
@@ -353,10 +352,19 @@ setInterval(brrUpdate, 3000);
     statEl.textContent = 'Загрузка...';
 
     try {
-      const url  = `/api/history?level=${currentLevel}&last=${currentLast}`;
+      // Новый API: hours/days вместо last
+      const params = currentLevel === 0 ? `hours=2`
+                   : currentLevel === 1 ? `hours=24`
+                   : `days=14`;
+      const url  = `/api/history?level=${currentLevel}&${params}`;
       const data = await (await fetch(url)).json();
 
-      if (!data.ts || data.ts.length === 0) {
+      // Найти выбранный канал — теперь у каждого канала свой ts[]
+      const selId = document.getElementById('hist-ch-select').value;
+      const src   = data.channels ? data.channels.find(c => c.id === selId) : null;
+      const ch    = channels.find(c => c.id === selId);
+
+      if (!src || !ch || !src.ts || src.ts.length === 0) {
         emptyEl.style.display = 'block';
         statEl.textContent = 'Нет данных';
         _loading = false;
@@ -364,49 +372,45 @@ setInterval(brrUpdate, 3000);
       }
       emptyEl.style.display = 'none';
 
-      // Найти выбранный канал
-      const selId = document.getElementById('hist-ch-select').value;
-      const src   = data.channels.find(c => c.id === selId);
-      const ch    = channels.find(c => c.id === selId);
-      if (!src || !ch) {
-        statEl.textContent = 'Канал не найден в данных';
-        _loading = false;
-        return;
-      }
+      const isFloat = ch.type === 0;
+      const dec     = ch.unit === 'бар' || ch.unit === 'м³/ч' ? 3 : 2;
+      const tsArr   = src.ts;
+      const avgArr  = src.avg || src.values || [];
+      const minArr  = src.min || [];
+      const maxArr  = src.max || [];
+      const n       = tsArr.length;
 
-      const isFloat   = ch.type === 0;
-      const dec       = ch.unit === 'бар' ? 3 : (ch.unit === 'м³/ч' ? 3 : 2);
-      const avgArr    = src.avg || src.values || [];
-      const minArr    = src.min || [];
-      const maxArr    = src.max || [];
-
-      // Заголовки — скрыть мин/макс для CH_COUNTER и CH_BOOL
+      // Заголовки
       document.getElementById('hist-th-min').style.display = isFloat ? '' : 'none';
       document.getElementById('hist-th-max').style.display = isFloat ? '' : 'none';
       document.getElementById('hist-th-avg').textContent   = isFloat ? 'Среднее' : 'Значение';
 
       // Статистика
-      const n     = data.ts.length;
-      const tFrom = fmtTs(data.ts[0]);
-      const tTo   = fmtTs(data.ts[n-1]);
+      const tFrom = fmtTs(tsArr[0]);
+      const tTo   = fmtTs(tsArr[n-1]);
       const valid = avgArr.filter(v => v !== null && !isNaN(v));
       const vMin  = valid.length ? Math.min(...valid) : null;
       const vMax  = valid.length ? Math.max(...valid) : null;
       statEl.innerHTML = `${n} записей &nbsp;·&nbsp; ${tFrom} — ${tTo}` +
-        (isFloat && vMin !== null ? ` &nbsp;·&nbsp; диапазон: ${vMin.toFixed(dec)}–${vMax.toFixed(dec)} ${ch.unit}` : '');
+        (isFloat && vMin !== null
+          ? ` &nbsp;·&nbsp; диапазон: ${vMin.toFixed(dec)}–${vMax.toFixed(dec)} ${ch.unit}`
+          : '');
 
-      // Строки таблицы — в обратном порядке (новые сверху)
+      // Строки таблицы — новые сверху
       const frag = document.createDocumentFragment();
       for (let i = n - 1; i >= 0; i--) {
-        const tr = document.createElement('tr');
+        const tr  = document.createElement('tr');
         const avg = avgArr[i];
         const mn  = minArr[i];
         const mx  = maxArr[i];
+        const fmtVal = v => (v !== null && v !== undefined && !isNaN(v))
+          ? Number(v).toFixed(dec) : '—';
         tr.innerHTML = `
-          <td>${fmtTs(data.ts[i])}</td>
-          <td>${avg !== null && avg !== undefined && !isNaN(avg) ? Number(avg).toFixed(dec) : '—'}</td>
-          ${isFloat ? `<td>${mn !== null && mn !== undefined && !isNaN(mn) ? Number(mn).toFixed(dec) : '—'}</td>
-          <td>${mx !== null && mx !== undefined && !isNaN(mx) ? Number(mx).toFixed(dec) : '—'}</td>` : ''}
+          <td>${fmtTs(tsArr[i])}</td>
+          <td>${fmtVal(avg)}</td>
+          ${isFloat
+            ? `<td>${fmtVal(mn)}</td><td>${fmtVal(mx)}</td>`
+            : ''}
         `;
         frag.appendChild(tr);
       }

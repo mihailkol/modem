@@ -290,10 +290,18 @@ async function updateStatus() {
     set('dot_eth',  d.eth);
       const ethIp = document.getElementById('eth_ip');
       if (ethIp) ethIp.textContent = d.eth ? '(' + (d.eth_ip || '') + ')' : '';
+    const showGroup = (dotId, present) => {
+      const dot = document.getElementById(dotId);
+      const group = dot ? dot.closest('.status-dot') : null;
+      if (group) group.style.display = present ? '' : 'none';
+    };
+    showGroup('dot_mqtt', d.mqtt_present);
+    showGroup('dot_tg',   d.tg_present);
+    showGroup('dot_modem', d.modem_present);
     set('dot_mqtt', d.mqtt);
     set('dot_tg',   d.tg);
       const dotModem = document.getElementById('dot_modem');
-      if (dotModem) {
+      if (dotModem && d.modem_present) {
         if (!d.modem_enabled) {
           dotModem.classList.remove('on', 'off');  // серый — дефолт
         } else {

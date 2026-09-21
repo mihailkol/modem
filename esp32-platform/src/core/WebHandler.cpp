@@ -80,9 +80,27 @@ void WebHandler::init(AsyncWebServer& server) {
         doc["uptime"] = millis() / 1000;
         doc["build"] = BUILD_TIME;
         xSemaphoreGive(coreMutex);
+
+        // Флаги "модуль скомпилирован в прошивку" — статус-бар на фронтенде
+        // статический HTML и не знает, какие модули реально включены сборкой
+        // (-D MODULE_*). Без этих флагов он показывает точки MQTT/Telegram/
+        // Модем всегда, в том числе для прошивок без этих модулей.
+        #ifdef MODULE_MQTT
+        doc["mqtt_present"] = true;
+        #else
+        doc["mqtt_present"] = false;
+        #endif
+        #ifdef MODULE_TELEGRAM
+        doc["tg_present"] = true;
+        #else
+        doc["tg_present"] = false;
+        #endif
         #ifdef MODULE_MODEM
+        doc["modem_present"] = true;
         doc["modem_enabled"] = _modemEnabled;
         doc["modem_creg"]    = _modemCreg;
+        #else
+        doc["modem_present"] = false;
         #endif
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
@@ -218,6 +236,10 @@ void WebHandler::init(AsyncWebServer& server) {
         }
     );
     server.addHandler(restoreH);
+
+    server.on("/api/crashlog", HTTP_GET, [](AsyncWebServerRequest* req) {
+        req->send(LittleFS, "/crashlog.json", "application/json");
+    });
 
     // ── OTA Update ────────────────────────────────────────────
 #ifdef MODULE_OTA

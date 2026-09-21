@@ -5,6 +5,7 @@
 #include "../../core/WebHandler.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <esp_task_wdt.h>
 
 #ifdef MODULE_TIME
 #include "../time/TimeManager.h"
@@ -141,9 +142,15 @@ void MqttHandler::reconnect() {
     _lastRetry = millis();
 
     String clientId = String(baseCfg.device_name) + "-" + String(WiFi.macAddress());
+    // _client.connect() блокирует на TCP-коннект (+ DNS-резолв, если сервер задан
+    // хостнеймом) — на плохой сети это может занять несколько секунд. Сбрасываем
+    // вотчдог прямо перед вызовом, чтобы отдать ему полный таймаут, а не остаток
+    // от того, что уже накопился за этот проход loop().
+    esp_task_wdt_reset();
     bool ok = (strlen(mqttCfg.user) > 0)
               ? _client.connect(clientId.c_str(), mqttCfg.user, mqttCfg.pass)
               : _client.connect(clientId.c_str());
+    esp_task_wdt_reset();
 
     xSemaphoreTake(coreMutex, portMAX_DELAY);
     sysState.mqttConnected = ok;

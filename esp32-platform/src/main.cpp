@@ -40,6 +40,15 @@
 #include "devices/ekonom/EkoNomDevice.h"
 #endif
 
+#ifdef DEVICE_MASTERGAS
+#include "devices/mastergas/MasterGasDevice.h"
+#endif
+
+#ifdef DEVICE_CLOCKINFO
+#include "devices/clockinfo/ClockInfoDevice.h"
+#include "apps/clockinfo/ClockInfoApp.h"
+#endif
+
 #ifdef MODULE_MODEM
 #include "modules/modem/ModemHandler.h"
 #endif
@@ -65,12 +74,11 @@ void setup() {
     esp_task_wdt_init(8, true);
     esp_task_wdt_add(NULL);
 
-    CrashLog::begin();
-
-
     // 1. Файловая система и конфиги
     ConfigManager::begin();
     ConfigManager::loadBase();
+      
+    CrashLog::begin();
 
     // 2. Сеть
     NetworkManager::begin();
@@ -100,6 +108,11 @@ void setup() {
     BoilerAppDevice::init();
     #endif
 
+    #ifdef DEVICE_CLOCKINFO
+    ClockInfoDevice::init();
+    ClockInfoApp::init();
+    #endif
+
     #ifdef MODULE_MQTT
     MqttHandler::init();
     #endif
@@ -118,6 +131,10 @@ void setup() {
 
     #ifdef DEVICE_EKONOM
         EkoNomDevice::init(30);   // опрос каждые 30 сек
+    #endif
+
+    #ifdef DEVICE_MASTERGAS
+        MasterGasDevice::init();
     #endif
 
     #if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM)
@@ -352,6 +369,15 @@ void setup() {
     ArduinoOTA.setHostname(baseCfg.device_name);
     ArduinoOTA.onStart([]() { Serial.println("[OTA] Start"); });
     ArduinoOTA.onError([](ota_error_t e) { Serial.printf("[OTA] Error: %u\n", e); });
+    // ArduinoOTA.handle() блокирует выполнение целиком на время реальной
+    // передачи данных прошивки — не возвращает управление в loop() до конца
+    // очередного куска. esp_task_wdt_reset() в loop() (после handle()) из-за
+    // этого не успевает выполняться во время передачи, и task watchdog
+    // (8 сек, см. esp_task_wdt_init выше) паникует и перезагружает плату
+    // где-то посередине заливки. onProgress() — единственный колбэк, который
+    // ArduinoOTA дёргает прямо ВНУТРИ этой блокирующей передачи, поэтому
+    // кормим вотчдог отсюда.
+    ArduinoOTA.onProgress([](unsigned int, unsigned int) { esp_task_wdt_reset(); });
     ArduinoOTA.begin();
     #endif
 
@@ -380,10 +406,12 @@ void loop() {
     #endif
 
     #ifdef MODULE_TELEGRAM
+    CrashLog::mark(TAG_TELEGRAM);
     TgHandler::loop();
     #endif
 
     #ifdef DEVICE_BOILER
+    CrashLog::mark(TAG_BOILER);
     BoilerDevice::loop();
     #endif
 
@@ -397,10 +425,17 @@ void loop() {
     #endif
 
     #if defined(DEVICE_KC868_A16) && defined(APP_BOILER)
+    CrashLog::mark(TAG_BOILER_APP);
     BoilerAppDevice::loop();
     #endif
 
+    #ifdef DEVICE_CLOCKINFO
+    CrashLog::mark(TAG_CLOCKINFO);
+    ClockInfoApp::loop();
+    #endif
+
     #ifdef MODULE_MODEM
+    CrashLog::mark(TAG_MODEM);
     ModemHandler::loop();
     #endif
 
@@ -414,11 +449,17 @@ void loop() {
         EkoNomDevice::loop();
     #endif
 
+    #ifdef DEVICE_MASTERGAS
+    CrashLog::mark(TAG_MASTERGAS);
+        MasterGasDevice::loop();
+    #endif
+
     #ifdef MODULE_TIME
         TimeManager::loop();
     #endif
 
     #if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM)
+    CrashLog::mark(TAG_BOILER_ROOM);
     BoilerRoomDevice::loop();
     #endif
 

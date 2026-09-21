@@ -4,6 +4,7 @@
 #include "../../core/WebHandler.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <esp_task_wdt.h>
 
 TgConfig tgCfg;
 void (*TgHandler::onCommand)(const String&, const String&) = nullptr;
@@ -111,7 +112,10 @@ void TgHandler::init() {
 
     _secClient.setInsecure();
     _bot.updateToken(tgCfg.token);
-    _secClient.setHandshakeTimeout(10000);
+    // 10с здесь были ближе к task watchdog timeout (8с), чем к запасу — на
+    // плохой сети один только TLS handshake мог съесть весь бюджет вотчдога
+    // ещё до собственно HTTP-обмена с Telegram API.
+    _secClient.setHandshakeTimeout(5000);
     _bot.getUpdates(_bot.last_message_received + 1);
     Serial.println("[TG] Init OK");
 }
@@ -176,7 +180,12 @@ void TgHandler::loop() {
     if (!hasNet) return;
 
     if (millis() - _lastCheck > 5000) {
+        // getUpdates() — блокирующий HTTPS-запрос (TLS handshake + чтение
+        // ответа). Сбрасываем вотчдог перед вызовом, чтобы отдать ему полный
+        // таймаут, а не остаток от того, что уже накопился за этот проход loop().
+        esp_task_wdt_reset();
         int n = _bot.getUpdates(_bot.last_message_received + 1);
+        esp_task_wdt_reset();
         if (n > 0) handleMessages(n);
         _lastCheck = millis();
         _secClient.stop(); // освобождаем TCP соединение

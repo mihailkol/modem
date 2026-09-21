@@ -18,7 +18,10 @@ extern RTC_NOINIT_ATTR CrashBreadcrumb g_crumb;
 enum CrashTag : uint16_t {
     TAG_NET = 1, TAG_OTA = 2, TAG_MQTT = 3, TAG_RS485 = 4,
     TAG_EKONOM = 5, TAG_HIST_TICK = 6, TAG_HIST_FLUSH = 7,
-    TAG_HIST_ROTATE = 8, TAG_A16 = 9, TAG_TIME = 10
+    TAG_HIST_ROTATE = 8, TAG_A16 = 9, TAG_TIME = 10,
+    TAG_TELEGRAM = 11, TAG_MODEM = 12, TAG_BOILER = 13,
+    TAG_BOILER_APP = 14, TAG_BOILER_ROOM = 15, TAG_CLOCKINFO = 16,
+    TAG_MASTERGAS = 17
 };
 
 namespace CrashLog {

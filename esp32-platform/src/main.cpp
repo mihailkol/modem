@@ -172,7 +172,9 @@ void setup() {
       <input type="password" name="wifi_pass" placeholder="WiFi Password" style="margin-top:8px">
       <input type="text" name="device_name" placeholder="Имя устройства">
     </div>
-
+    )html"
+#ifdef MODULE_TIME
+    R"html(
     <div class="settings-group" id="time_settings">
       <h3>🕐 Время</h3>
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
@@ -191,7 +193,9 @@ void setup() {
         <label><input type="checkbox" id="mqtt_time_enabled"> MQTT</label>
       </div>
     </div>
-
+    )html"
+#endif
+    R"html(
     <div class="settings-group">
       <h3>🔒 Веб-интерфейс</h3>
       <input type="text"     name="web_user" placeholder="Пользователь">
@@ -302,6 +306,9 @@ void setup() {
         document.getElementById('eth_dhcp').checked ? 'none' : 'block';
     }
 
+    )html"
+#ifdef MODULE_TIME
+    R"html(
     // Время
     fetch('/api/time/config').then(r=>r.json()).then(d=>{
       document.querySelector('[name="tz_offset_min"]').value = d.tz_offset_min || 180;
@@ -317,9 +324,14 @@ void setup() {
       document.getElementById('st_time').textContent = d.time_str || '--:--:--';
       document.getElementById('st_src').textContent  = srcs[d.source] || '';
     });
+    )html"
+#endif
+    R"html(
 
     async function saveSettings() {
-
+    )html"
+#ifdef MODULE_TIME
+    R"html(
     const timeData = {
       tz_offset_min: +document.querySelector('[name="tz_offset_min"]').value,
       ntp_server:    document.querySelector('[name="ntp_server"]').value,
@@ -329,6 +341,9 @@ void setup() {
     };
     fetch('/api/time/save', {method:'POST',
       headers:{'Content-Type':'application/json'}, body:JSON.stringify(timeData)});
+    )html"
+#endif
+    R"html(
       const data = Object.assign({}, _currentCfg);
       data.eth_dhcp = document.getElementById('eth_dhcp').checked;
       const fields = ['eth_ip','eth_mask','eth_gw','eth_dns',

@@ -113,6 +113,10 @@ void setup() {
     ClockInfoApp::init();
     #endif
 
+    #ifdef DEVICE_MASTERGAS
+    MasterGasDevice::init();
+    #endif
+
     #ifdef MODULE_MQTT
     MqttHandler::init();
     #endif
@@ -131,10 +135,6 @@ void setup() {
 
     #ifdef DEVICE_EKONOM
         EkoNomDevice::init(30);   // опрос каждые 30 сек
-    #endif
-
-    #ifdef DEVICE_MASTERGAS
-        MasterGasDevice::init();
     #endif
 
     #if defined(DEVICE_KC868_A16) && defined(APP_BOILER_ROOM)

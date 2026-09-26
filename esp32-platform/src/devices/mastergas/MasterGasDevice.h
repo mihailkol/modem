@@ -19,6 +19,7 @@ private:
     static void    _sendReply();
     static void    _publishMqtt();
     static void    _ledTick();
+    static void    _onMqtt(const char* topic, const char* payload, unsigned int len);
 
     static uint32_t _lastPub;
 };

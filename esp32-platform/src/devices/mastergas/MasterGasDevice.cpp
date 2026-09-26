@@ -4,6 +4,8 @@
 #include "../../core/WebHandler.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
+#include <memory>
+#include "soc/uart_struct.h"   // UART1.int_raw.frm_err — аппаратный framing error, см. ниже
 
 #ifdef MODULE_MQTT
 #include "../../modules/mqtt/MqttHandler.h"
@@ -13,6 +15,25 @@ MasterGasConfig masterGasCfg;
 MasterGasState  masterGasState;
 
 uint32_t MasterGasDevice::_lastPub = 0;
+
+// ── Framing error UART1 (boilerRead) — проверка гипотезы про рассинхрон такта ──
+// Стабильные ~99% "CRC-ошибок" именно у remote reply (F9/80) при работающей
+// горелке — порча данных или уход частоты передатчика (пульта)? У UART-
+// периферии ESP32 framing error — отдельный от нашей checksum, чисто
+// аппаратный признак (стоп-бит не там, где ждали). Считаем независимо: если
+// он коррелирует с CRC-ошибками — это подтверждает версию про уход такта;
+// если framing error нет вообще — данные дошли чисто, просто другие по
+// смыслу (наша исходная версия).
+static volatile uint32_t _boilerFrmErrOn  = 0;
+static volatile uint32_t _boilerFrmErrOff = 0;
+
+static void _checkFrmErr() {
+    if (UART1.int_raw.frm_err) {
+        if (masterGasState.burner_on) _boilerFrmErrOn++;
+        else                          _boilerFrmErrOff++;
+        UART1.int_clr.frm_err = 1;
+    }
+}
 
 // ── Тестовый импульс remoteEn (диагностика) ──────────────────────────────────
 // Только дёргает remoteEn в LOW и обратно — НЕ включает override целиком,
@@ -97,7 +118,10 @@ static void IRAM_ATTR _onAnswer32Edge() {
 // заголовком 0xF9/0xFA, который мы не понимаем, а не о случайной порче битов.
 // Раньше не было видно, что именно внутри забракованных пакетов — теперь
 // сохраняем последние N целиком, вместе с тем, какую checksum мы ожидали.
-#define MASTERGAS_CRCFAIL_BUF_LEN 20
+// 2000 записей — с запасом на сутки сбора данных для офлайн-анализа
+// (см. /api/mastergas/crcfails-export), ~32КБ RAM, не проблема при ~270КБ
+// свободных на ESP32.
+#define MASTERGAS_CRCFAIL_BUF_LEN 2000
 
 struct MasterGasCrcFail {
     uint32_t ts;
@@ -107,8 +131,8 @@ struct MasterGasCrcFail {
 };
 
 static MasterGasCrcFail _crcFailBuf[MASTERGAS_CRCFAIL_BUF_LEN];
-static uint8_t _crcFailHead  = 0;
-static uint8_t _crcFailCount = 0;
+static uint16_t _crcFailHead  = 0;
+static uint16_t _crcFailCount = 0;
 
 // ── Счётчики OK/CRC-fail по ТИПУ пакета (крест с горелкой) ──────────────────
 // Общие pkt_ok/pkt_crc_err мешают в одну кучу статус котла (0xF9/0x00),
@@ -196,28 +220,19 @@ static void _trackUnknown(uint8_t slot, uint8_t value, const uint8_t* packet) {
 }
 
 // ── HTML вкладки ─────────────────────────────────────────────────────────────
+// "Котёл" — повседневное управление; "Диагностика" — вся техническая часть,
+// накопленная за отладку протокола (см. вторую вкладку ниже).
 static const char MASTERGAS_TAB_HTML[] PROGMEM = R"html(
+<div class="settings-group" id="mg_mode_banner" style="text-align:center;font-weight:700;font-size:15px;padding:14px">
+  ...
+</div>
+
 <div class="settings-group">
   <h3>🔥 Котёл</h3>
   <div id="mg_boiler" style="font-size:13px;line-height:1.8">загрузка...</div>
-</div>
-
-<div class="settings-group">
-  <h3>🎛 Пульт</h3>
+  <hr style="border:none;border-top:1px solid var(--border);margin:12px 0">
+  <h3 style="margin-top:0">🎛 Пульт</h3>
   <div id="mg_remote" style="font-size:13px;line-height:1.8">загрузка...</div>
-</div>
-
-<div class="settings-group">
-  <h3>📊 Ошибки: горелка вкл vs выкл</h3>
-  <div id="mg_burner_stats" style="font-size:13px;line-height:1.9">...</div>
-  <button onclick="mgResetDiag()" class="btn-secondary" style="margin-top:8px">🔄 Сбросить счётчики</button>
-  <div class="info-row">
-    Одни и те же счётчики пакетов boilerRead, но в разрезе состояния горелки
-    на момент приёма — чтобы подтвердить/опровергнуть на цифрах, что горелка
-    шумит на шину, без ручного сравнения скриншотов.
-  </div>
-  <h4 style="margin:12px 0 4px">По типу пакета</h4>
-  <div id="mg_type_stats" style="font-size:12px;line-height:1.8">...</div>
 </div>
 
 <div class="settings-group">
@@ -231,90 +246,29 @@ static const char MASTERGAS_TAB_HTML[] PROGMEM = R"html(
       <span>Питание (override)</span>
       <input type="checkbox" id="mg_o_power">
     </label>
-    <label>Уставка температуры, °C</label>
-    <input type="number" id="mg_o_temp" min="30" max="85">
+    <label>Уставка температуры: <b id="mg_o_temp_val">50</b>°C</label>
+    <input type="range" id="mg_o_temp" min="30" max="85" step="1"
+      style="width:100%;margin:6px 0 12px"
+      oninput="document.getElementById('mg_o_temp_val').textContent=this.value">
   </div>
   <button onclick="mgSave()" style="margin-top:8px">💾 Сохранить</button>
   <div class="info-row">
     В override штатный пульт отключается от шины (remoteEn), и ESP отвечает
     котлу сам заданными power/temp. 0xFA (расширенные данные) в этом режиме
-    остаются неотвеченными — see README OpenMasterGas.
+    остаются неотвеченными.
   </div>
 </div>
 
 <div class="settings-group">
-  <h3>📶 Сигнал на ногах (сырой, без UART)</h3>
-  <div id="mg_edges" style="font-size:14px;line-height:2">...</div>
+  <h3>📡 Здоровье шины</h3>
+  <div id="mg_health" style="font-size:13px;line-height:1.8">...</div>
   <div class="info-row">
-    Считает любые перепады на GPIO напрямую, в обход UART — если счётчик
-    растёт, сигнал физически доходит до пина (дальше уже вопрос бода/
-    инверсии/пайки). Если стоит на нуле при работающем котле — сигнал не
-    доходит до этой ноги вообще.
-  </div>
-  <h4 style="margin:12px 0 4px">🔍 Щупы "не перепутаны ли ноги" (временно)</h4>
-  <div id="mg_probe_edges" style="font-size:13px;line-height:1.9">...</div>
-  <div class="info-row">
-    14/15 свободны, 33/32 — наши же remoteEn/boilerAnswer. Если реальный
-    сигнал по ошибке заведён не туда — фронты вылезут тут, а не на
-    boilerRead/remoteRead выше.
-  </div>
-  <h4 style="margin:12px 0 4px">🧪 Тест remoteEn</h4>
-  <div id="mg_test_pulse_status" class="info-row">не запущен</div>
-  <button onclick="mgTestPulse()" class="btn-secondary">⏱ Дёрнуть remoteEn на 3с</button>
-  <div class="info-row">
-    Отключает штатный пульт от шины на 3 секунды (только remoteEn — БЕЗ
-    попытки ответить котлу подменным пакетом), чтобы проверить, появляется
-    ли что-то на GPIO39/других щупах именно в момент отключения.
-  </div>
-</div>
-
-<div class="settings-group">
-  <h3>📋 Диагностика</h3>
-  <div id="mg_diag" style="font-size:12px;color:var(--muted);line-height:1.7">...</div>
-  <div style="margin-top:8px">
-    <div class="info-row">raw status (0xF9/0x00):</div>
-    <pre id="mg_raw_status" style="font-size:11px;color:var(--muted);background:var(--bg);
-      padding:6px;border-radius:6px;border:1px solid var(--border)">—</pre>
-    <div class="info-row">raw extended (0xFA):</div>
-    <pre id="mg_raw_ext" style="font-size:11px;color:var(--muted);background:var(--bg);
-      padding:6px;border-radius:6px;border:1px solid var(--border);word-break:break-all">—</pre>
-    <div class="info-row">raw ответа пульта (buf[2]+buf[4]):</div>
-    <pre id="mg_raw_remote" style="font-size:11px;color:var(--muted);background:var(--bg);
-      padding:6px;border-radius:6px;border:1px solid var(--border)">—</pre>
-  </div>
-</div>
-
-<div class="settings-group">
-  <h3>🕵️ Анализ неизвестных байт протокола</h3>
-  <div id="mg_anomaly_status" style="font-size:13px;margin-bottom:8px">...</div>
-  <div id="mg_anomaly_list" style="font-size:11px;color:var(--muted);line-height:1.6;
-    max-height:260px;overflow-y:auto;background:var(--bg);padding:6px;
-    border-radius:6px;border:1px solid var(--border)">—</div>
-  <button onclick="mgResetAnomalies()" class="btn-secondary" style="margin-top:8px">
-    🔄 Сбросить baseline и начать обучение заново
-  </button>
-  <div class="info-row">
-    Первые сутки после сброса — обучение (копим все увиденные значения байт,
-    которые сейчас нигде не расшифрованы). Дальше любое новое значение —
-    аномалия, попадает в список ниже с полным пакетом для разбора.
-  </div>
-</div>
-
-<div class="settings-group">
-  <h3>❌ Забракованные по CRC пакеты (последние 20)</h3>
-  <div id="mg_crcfail_list" style="font-size:11px;color:var(--muted);line-height:1.6;
-    max-height:260px;overflow-y:auto;background:var(--bg);padding:6px;
-    border-radius:6px;border:1px solid var(--border)">—</div>
-  <div class="info-row">
-    Пакет целиком + какую checksum мы ожидали в последнем байте (буквально
-    седьмой байт пакета — то, что реально пришло, не подошло под неё).
-    Полезно смотреть, когда % CRC-ошибок подозрительно высокий/стабильный —
-    мусор это или второй, нераспознанный тип пакета.
+    Подробный разбор по типам пакетов, raw-дампы, счётчики фронтов и прочие
+    инструменты отладки протокола — на вкладке "Диагностика".
   </div>
 </div>
 
 <script>
-let _mgCfg = {};
 let _mgFormInited = false;
 
 function mgToggle() {
@@ -331,7 +285,17 @@ async function loadMgStatus() {
   try {
     const r = await fetch('/api/mastergas/status');
     const d = await r.json();
-    _mgCfg = d;
+
+    const banner = document.getElementById('mg_mode_banner');
+    if (d.passthrough) {
+      banner.innerHTML = '🟢 PASSTHROUGH — пульт управляет сам';
+      banner.style.background = 'rgba(46,204,113,.12)';
+      banner.style.color = 'var(--ok)';
+    } else {
+      banner.innerHTML = '🟠 OVERRIDE — плата управляет котлом';
+      banner.style.background = 'rgba(230,126,34,.18)';
+      banner.style.color = '#e67e22';
+    }
 
     document.getElementById('mg_boiler').innerHTML =
       `<b>Горелка:</b> ${d.burner ? '🔥 работает' : '⚪ выкл'}<br>
@@ -345,16 +309,156 @@ async function loadMgStatus() {
 
     // Поля формы синхронизируем с сервером ТОЛЬКО один раз при первой
     // загрузке — иначе периодический опрос (раз в 2с) затирает то, что
-    // пользователь только что поменял в форме, но ещё не сохранил (галка
-    // открывает override-поля → через пару секунд опрос статуса тянет ещё
-    // старое значение с сервера → закрывает их обратно).
+    // пользователь только что поменял в форме, но ещё не сохранил.
     if (!_mgFormInited) {
       document.getElementById('mg_passthrough').checked = d.passthrough;
       document.getElementById('mg_o_power').checked = !!d.o_power;
       document.getElementById('mg_o_temp').value = d.o_target_t;
+      document.getElementById('mg_o_temp_val').textContent = d.o_target_t;
       mgToggle();
       _mgFormInited = true;
     }
+
+    const total = d.pkt_ok + d.pkt_crc_err;
+    const errPct = total > 0 ? (100 * d.pkt_crc_err / total).toFixed(1) : '—';
+    const fresh = d.boiler_age_ms >= 0 && d.boiler_age_ms < 10000;
+    document.getElementById('mg_health').innerHTML =
+      `<span style="color:${fresh ? 'var(--ok)' : 'var(--danger)'}">●</span>
+       Последний пакет от котла: ${mgAge(d.boiler_age_ms)} &nbsp;
+       Ошибок всего: ${d.pkt_crc_err} из ${total} (${errPct}%)`;
+  } catch(e) {}
+}
+
+async function mgSave() {
+  const data = {
+    passthrough:    document.getElementById('mg_passthrough').checked,
+    override_power: document.getElementById('mg_o_power').checked,
+    override_temp:  +document.getElementById('mg_o_temp').value,
+  };
+  const r = await fetch('/api/mastergas/save', {method:'POST',
+    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
+  if (r.ok) alert('Сохранено');
+}
+
+loadMgStatus();
+setInterval(loadMgStatus, 2000);
+</script>
+)html";
+
+static const char MASTERGAS_DIAG_HTML[] PROGMEM = R"html(
+<div class="settings-group">
+  <h3>📊 Ошибки: горелка вкл vs выкл</h3>
+  <div id="mg_burner_stats" style="font-size:13px;line-height:1.9">...</div>
+  <button onclick="mgResetDiag()" class="btn-secondary" style="margin-top:8px">🔄 Сбросить счётчики</button>
+  <div class="info-row">
+    Одни и те же счётчики пакетов boilerRead, но в разрезе состояния горелки
+    на момент приёма.
+  </div>
+  <h4 style="margin:12px 0 4px">По типу пакета</h4>
+  <div id="mg_type_stats" style="font-size:12px;line-height:1.8">...</div>
+  <h4 style="margin:12px 0 4px">Аппаратные framing error (UART1/boilerRead)</h4>
+  <div id="mg_frm_err" style="font-size:12px;line-height:1.8">...</div>
+  <div class="info-row">
+    Независимо от нашей checksum — это чисто аппаратный признак UART
+    (стоп-бит не там, где ждали). Если растёт вместе с CRC-ошибками —
+    похоже на уход тактовой частоты передатчика (гипотеза Егора). Если
+    остаётся на нуле, а CRC всё равно не бьётся — данные дошли чисто,
+    просто другие по смыслу.
+  </div>
+</div>
+
+<div class="settings-group">
+  <h3>📋 Пакеты и raw-дампы</h3>
+  <div id="mg_diag" style="font-size:12px;color:var(--muted);line-height:1.7">...</div>
+  <div style="margin-top:8px">
+    <div class="info-row">raw status (0xF9/0x00):</div>
+    <pre id="mg_raw_status" style="font-size:11px;color:var(--muted);background:var(--bg);
+      padding:6px;border-radius:6px;border:1px solid var(--border)">—</pre>
+    <div class="info-row">raw extended (0xFA):</div>
+    <pre id="mg_raw_ext" style="font-size:11px;color:var(--muted);background:var(--bg);
+      padding:6px;border-radius:6px;border:1px solid var(--border);word-break:break-all">—</pre>
+    <div class="info-row">raw ответа пульта (buf[2]+buf[4]):</div>
+    <pre id="mg_raw_remote" style="font-size:11px;color:var(--muted);background:var(--bg);
+      padding:6px;border-radius:6px;border:1px solid var(--border)">—</pre>
+  </div>
+</div>
+
+<details class="settings-group">
+  <summary style="cursor:pointer;font-weight:700;font-size:14px">📶 Сигнал на ногах / щупы (не перепутаны ли пины)</summary>
+  <div style="margin-top:10px">
+    <div id="mg_edges" style="font-size:14px;line-height:2">...</div>
+    <div class="info-row">
+      Считает любые перепады на GPIO напрямую, в обход UART — если счётчик
+      растёт, сигнал физически доходит до пина. Если на нуле при работающем
+      котле — сигнал не доходит до этой ноги вообще.
+    </div>
+    <h4 style="margin:12px 0 4px">🔍 Щупы "не перепутаны ли ноги" (временно)</h4>
+    <div id="mg_probe_edges" style="font-size:13px;line-height:1.9">...</div>
+    <div class="info-row">
+      14/15 свободны, 33/32 — наши же remoteEn/boilerAnswer. Если реальный
+      сигнал по ошибке заведён не туда — фронты вылезут тут, а не на
+      boilerRead/remoteRead выше.
+    </div>
+    <h4 style="margin:12px 0 4px">🧪 Тест remoteEn</h4>
+    <div id="mg_test_pulse_status" class="info-row">не запущен</div>
+    <button onclick="mgTestPulse()" class="btn-secondary">⏱ Дёрнуть remoteEn на 3с</button>
+    <div class="info-row">
+      Отключает штатный пульт от шины на 3 секунды (только remoteEn — БЕЗ
+      попытки ответить котлу подменным пакетом).
+    </div>
+  </div>
+</details>
+
+<details class="settings-group">
+  <summary style="cursor:pointer;font-weight:700;font-size:14px">🕵️ Анализ неизвестных байт протокола</summary>
+  <div style="margin-top:10px">
+    <div id="mg_anomaly_status" style="font-size:13px;margin-bottom:8px">...</div>
+    <div id="mg_anomaly_list" style="font-size:11px;color:var(--muted);line-height:1.6;
+      max-height:260px;overflow-y:auto;background:var(--bg);padding:6px;
+      border-radius:6px;border:1px solid var(--border)">—</div>
+    <button onclick="mgResetAnomalies()" class="btn-secondary" style="margin-top:8px">
+      🔄 Сбросить baseline и начать обучение заново
+    </button>
+    <div class="info-row">
+      Первые сутки после сброса — обучение. Дальше любое новое значение —
+      аномалия, попадает в список с полным пакетом для разбора.
+    </div>
+  </div>
+</details>
+
+<details class="settings-group">
+  <summary style="cursor:pointer;font-weight:700;font-size:14px">❌ Забракованные по CRC пакеты</summary>
+  <div style="margin-top:10px">
+    <div id="mg_crcfail_count" class="info-row">...</div>
+    <div id="mg_crcfail_list" style="font-size:11px;color:var(--muted);line-height:1.6;
+      max-height:260px;overflow-y:auto;background:var(--bg);padding:6px;
+      border-radius:6px;border:1px solid var(--border)">—</div>
+    <div class="info-row">Показаны только последние 20 — буфер держит до 2000.</div>
+    <a href="/api/mastergas/crcfails-export" download="mastergas_crcfails.csv">
+      <button type="button" class="btn-secondary" style="margin-top:8px">📥 Скачать весь буфер (CSV)</button>
+    </a>
+    <div class="info-row">
+      Пакет целиком + какую checksum мы ожидали в последнем байте. Время в CSV —
+      реальное (если NTP синхронизован), иначе "boot+Nms".
+    </div>
+  </div>
+</details>
+
+<script>
+function mgAge(ms) {
+  if (ms < 0) return 'нет данных';
+  return (ms / 1000).toFixed(0) + ' с назад';
+}
+function mgAgeShort(ms) {
+  if (ms < 60000) return (ms/1000).toFixed(0) + 'с назад';
+  if (ms < 3600000) return (ms/60000).toFixed(0) + 'мин назад';
+  return (ms/3600000).toFixed(1) + 'ч назад';
+}
+
+async function loadMgDiagStatus() {
+  try {
+    const r = await fetch('/api/mastergas/status');
+    const d = await r.json();
 
     document.getElementById('mg_diag').innerHTML =
       `Пакетов OK: ${d.pkt_ok} &nbsp; CRC ошибок: ${d.pkt_crc_err}<br>
@@ -386,6 +490,10 @@ async function loadMgStatus() {
         (${errPct(d.pkt_ok_burner_on, d.pkt_crc_err_burner_on)}%)<br>
        <b>⚪ Горелка ВЫКЛ:</b> ${d.pkt_ok_burner_off} OK / ${d.pkt_crc_err_burner_off} ошибок
         (${errPct(d.pkt_ok_burner_off, d.pkt_crc_err_burner_off)}%)`;
+
+    document.getElementById('mg_frm_err').innerHTML =
+      `<b>🔥 Горелка ВКЛ:</b> ${d.frm_err_burner_on}<br>
+       <b>⚪ Горелка ВЫКЛ:</b> ${d.frm_err_burner_off}`;
   } catch(e) {}
 }
 
@@ -404,18 +512,17 @@ async function loadMgTypeStats() {
 
 async function mgResetDiag() {
   await fetch('/api/mastergas/diag/reset', {method:'POST'});
-  loadMgStatus();
+  loadMgDiagStatus();
 }
 
 async function mgTestPulse() {
   if (!confirm('Отключить штатный пульт от шины на 3 секунды (без ответа котлу)?')) return;
   const r = await fetch('/api/mastergas/test/remote-en-pulse', {method:'POST'});
   if (!r.ok) { alert('Уже идёт другой тест'); return; }
-  // Чаще опрашиваем статус на время импульса, чтобы видеть live-реакцию щупов
   let ticks = 0;
   const fast = setInterval(() => {
-    loadMgStatus();
-    if (++ticks > 8) clearInterval(fast);   // ~4с на 500мс — с запасом
+    loadMgDiagStatus();
+    if (++ticks > 8) clearInterval(fast);
   }, 500);
 }
 
@@ -427,12 +534,6 @@ async function loadMgRaw() {
     document.getElementById('mg_raw_ext').textContent = d.raw_ext || '—';
     document.getElementById('mg_raw_remote').textContent = d.raw_remote || '—';
   } catch(e) {}
-}
-
-function mgAgeShort(ms) {
-  if (ms < 60000) return (ms/1000).toFixed(0) + 'с назад';
-  if (ms < 3600000) return (ms/60000).toFixed(0) + 'мин назад';
-  return (ms/3600000).toFixed(1) + 'ч назад';
 }
 
 async function loadMgAnomalies() {
@@ -459,6 +560,7 @@ async function loadMgCrcFails() {
   try {
     const r = await fetch('/api/mastergas/crcfails');
     const d = await r.json();
+    document.getElementById('mg_crcfail_count').textContent = `Всего в буфере: ${d.count}`;
     const list = document.getElementById('mg_crcfail_list');
     if (!d.items || !d.items.length) {
       list.textContent = 'ошибок не было';
@@ -479,23 +581,12 @@ async function mgResetAnomalies() {
   loadMgAnomalies();
 }
 
-async function mgSave() {
-  const data = {
-    passthrough:    document.getElementById('mg_passthrough').checked,
-    override_power: document.getElementById('mg_o_power').checked,
-    override_temp:  +document.getElementById('mg_o_temp').value,
-  };
-  const r = await fetch('/api/mastergas/save', {method:'POST',
-    headers:{'Content-Type':'application/json'}, body:JSON.stringify(data)});
-  if (r.ok) alert('Сохранено');
-}
-
-loadMgStatus();
+loadMgDiagStatus();
 loadMgRaw();
 loadMgAnomalies();
 loadMgCrcFails();
 loadMgTypeStats();
-setInterval(loadMgStatus, 2000);
+setInterval(loadMgDiagStatus, 2000);
 setInterval(loadMgRaw, 5000);
 setInterval(loadMgAnomalies, 15000);
 setInterval(loadMgCrcFails, 5000);
@@ -707,6 +798,7 @@ void MasterGasDevice::init() {
     attachInterrupt(digitalPinToInterrupt(MASTERGAS_ANSWER_TX_PIN), _onAnswer32Edge, CHANGE);
 
     WebHandler::registerTab({"mastergas", "Котёл 🔥", "🔥", MASTERGAS_TAB_HTML});
+    WebHandler::registerTab({"mastergas-diag", "Диагностика", "🔧", MASTERGAS_DIAG_HTML});
 
     extern AsyncWebServer server;
 
@@ -765,6 +857,8 @@ void MasterGasDevice::init() {
         doc["pkt_ok_burner_off"]      = masterGasState.pkt_ok_burner_off;
         doc["pkt_crc_err_burner_on"]  = masterGasState.pkt_crc_err_burner_on;
         doc["pkt_crc_err_burner_off"] = masterGasState.pkt_crc_err_burner_off;
+        doc["frm_err_burner_on"]  = _boilerFrmErrOn;
+        doc["frm_err_burner_off"] = _boilerFrmErrOff;
 
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
@@ -779,6 +873,8 @@ void MasterGasDevice::init() {
         masterGasState.pkt_crc_err_burner_off = 0;
         memset(_typeOk, 0, sizeof(_typeOk));
         memset(_typeCrcErr, 0, sizeof(_typeCrcErr));
+        _boilerFrmErrOn  = 0;
+        _boilerFrmErrOff = 0;
         req->send(200, "application/json", "{\"status\":\"ok\"}");
     });
 
@@ -855,12 +951,16 @@ void MasterGasDevice::init() {
     });
 
     server.on("/api/mastergas/crcfails", HTTP_GET, [](AsyncWebServerRequest* req) {
+        // Живой предпросмотр для UI — только последние 20, независимо от
+        // размера буфера (2000, см. объявление выше). Полный дамп — через
+        // /api/mastergas/crcfails-export (CSV).
         static const char* H = "0123456789ABCDEF";
+        const uint16_t showCount = _crcFailCount < 20 ? _crcFailCount : 20;
         JsonDocument doc;
-        doc["count"] = _crcFailCount;
+        doc["count"] = _crcFailCount;   // сколько всего накоплено в буфере
         JsonArray arr = doc["items"].to<JsonArray>();
-        for (uint8_t i = 0; i < _crcFailCount; i++) {
-            uint8_t idx = (_crcFailHead + MASTERGAS_CRCFAIL_BUF_LEN - 1 - i) % MASTERGAS_CRCFAIL_BUF_LEN;
+        for (uint16_t i = 0; i < showCount; i++) {
+            uint16_t idx = (_crcFailHead + MASTERGAS_CRCFAIL_BUF_LEN - 1 - i) % MASTERGAS_CRCFAIL_BUF_LEN;
             const MasterGasCrcFail& f = _crcFailBuf[idx];
             JsonObject o = arr.add<JsonObject>();
             o["age_ms"]  = (int32_t)(millis() - f.ts);
@@ -873,6 +973,63 @@ void MasterGasDevice::init() {
         }
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
+    });
+
+    server.on("/api/mastergas/crcfails-export", HTTP_GET, [](AsyncWebServerRequest* req) {
+        // Полный дамп буфера (до 2000 записей) в CSV — для офлайн-анализа.
+        // Стримим построчно (chunked response), НЕ собирая весь CSV одной
+        // String в памяти разом — на полном буфере это давало ~100КБ+
+        // одномоментной аллокации и запрос молча проваливался (0 байт).
+        // Время — реальное (wall-clock), если NTP синхронизован; иначе
+        // "boot+Nms", чтобы сразу было видно, что часы ещё не устаканились.
+        uint16_t total   = _crcFailCount;
+        uint16_t headIdx = _crcFailHead;
+        auto nextRow = std::make_shared<uint16_t>(0);   // 0 = заголовок, 1..total = данные
+
+        AsyncWebServerResponse* resp = req->beginChunkedResponse("text/csv",
+            [total, headIdx, nextRow](uint8_t* buffer, size_t maxLen, size_t /*index*/) -> size_t {
+                static const char* H = "0123456789ABCDEF";
+                const size_t MAX_ROW = 64;   // реальная строка ~50 байт, с запасом
+                size_t written = 0;
+
+                while (written + MAX_ROW <= maxLen) {
+                    if (*nextRow > total) break;   // всё уже отдано
+
+                    char row[MAX_ROW];
+                    int n;
+
+                    if (*nextRow == 0) {
+                        n = snprintf(row, sizeof(row), "time,burner,b0,b1,b2,b3,b4,b5,b6,expected_crc\n");
+                    } else {
+                        uint16_t i   = *nextRow - 1;
+                        uint16_t idx = (headIdx + MASTERGAS_CRCFAIL_BUF_LEN - total + i) % MASTERGAS_CRCFAIL_BUF_LEN;
+                        const MasterGasCrcFail& f = _crcFailBuf[idx];
+
+                        uint32_t ageMs = millis() - f.ts;
+                        time_t nowSec = time(nullptr);
+                        char tbuf[24];
+                        if (nowSec > 1700000000) {   // разумная эпоха — NTP синхронизирован
+                            time_t evtSec = nowSec - ageMs / 1000;
+                            struct tm* tmv = localtime(&evtSec);
+                            strftime(tbuf, sizeof(tbuf), "%Y-%m-%d %H:%M:%S", tmv);
+                        } else {
+                            snprintf(tbuf, sizeof(tbuf), "boot+%lums", (unsigned long)f.ts);
+                        }
+
+                        n = snprintf(row, sizeof(row), "%s,%d,%02X,%02X,%02X,%02X,%02X,%02X,%02X,%02X\n",
+                            tbuf, f.burnerOn ? 1 : 0,
+                            f.packet[0], f.packet[1], f.packet[2], f.packet[3],
+                            f.packet[4], f.packet[5], f.packet[6], f.expectedCrc);
+                    }
+
+                    if (n > 0) { memcpy(buffer + written, row, (size_t)n); written += (size_t)n; }
+                    (*nextRow)++;
+                }
+                return written;
+            });
+        resp->addHeader("Content-Disposition", "attachment; filename=\"mastergas_crcfails.csv\"");
+        resp->addHeader("Cache-Control", "no-store");
+        req->send(resp);
     });
 
     server.on("/api/mastergas/type-stats", HTTP_GET, [](AsyncWebServerRequest* req) {
@@ -902,6 +1059,19 @@ void MasterGasDevice::init() {
     );
     server.addHandler(hSave);
 
+#ifdef MODULE_MQTT
+    // Команды через уже подписанный <device>/set/# (см. MqttHandler::reconnect):
+    //   <device>/set/mastergas/passthrough    — "1"/"0"
+    //   <device>/set/mastergas/override_power — "1"/"0"
+    //   <device>/set/mastergas/override_temp  — число, °C
+    // ВНИМАНИЕ: MqttHandler::onMessage — общий колбэк на одну прошивку (не
+    // мультиплексируется), так что если когда-нибудь mastergas будет собран
+    // вместе с другим устройством, которое тоже его использует (сейчас
+    // такого нет — используется только ClockInfoApp, на другой плате),
+    // один из двух молча перестанет получать сообщения.
+    MqttHandler::onMessage = MasterGasDevice::_onMqtt;
+#endif
+
     Serial.println("[MASTERGAS] Init OK");
 }
 
@@ -916,6 +1086,7 @@ void MasterGasDevice::loop() {
     }
 
     _ledTick();
+    _checkFrmErr();
 
     static uint8_t buf[7];
 
@@ -969,9 +1140,39 @@ void MasterGasDevice::_publishMqtt() {
     doc["r_power"]    = masterGasState.remote_power;
     doc["r_target_t"] = masterGasState.remote_target_temp;
     doc["r_air_t"]    = masterGasState.remote_air_temp;
+    doc["passthrough"]    = masterGasCfg.passthrough;
+    doc["override_power"] = masterGasCfg.override_power;
+    doc["override_temp"]  = masterGasCfg.override_temp;
     String payload; serializeJson(doc, payload);
     String topic = String(baseCfg.device_name) + "/mastergas/state";
     MqttHandler::publish(topic.c_str(), payload.c_str(), true);
+}
+
+// Команды: <device>/set/mastergas/{passthrough,override_power,override_temp}
+void MasterGasDevice::_onMqtt(const char* topic, const char* payload, unsigned int len) {
+    String t(topic);
+    String prefix = String(baseCfg.device_name) + "/set/mastergas/";
+    if (!t.startsWith(prefix)) return;
+    String field = t.substring(prefix.length());
+    String val(payload);
+
+    bool changed = false;
+    if (field == "passthrough") {
+        masterGasCfg.passthrough = (val == "1" || val == "true");
+        changed = true;
+    } else if (field == "override_power") {
+        masterGasCfg.override_power = (val == "1" || val == "true");
+        changed = true;
+    } else if (field == "override_temp") {
+        int tempVal = val.toInt();
+        if (tempVal >= 30 && tempVal <= 85) { masterGasCfg.override_temp = (uint8_t)tempVal; changed = true; }
+    }
+
+    if (changed) {
+        MasterGasDevice::saveConfig();
+        Serial.printf("[MASTERGAS] MQTT set %s = %s\n", field.c_str(), val.c_str());
+        MasterGasDevice::_publishMqtt();   // сразу отразить новое состояние
+    }
 }
 #endif
 

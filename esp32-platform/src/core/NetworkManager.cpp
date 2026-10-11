@@ -6,7 +6,26 @@
 #include "../devices/boiler-monitor/BMonTypes.h"
 #endif
 
+// Есть ли на этой плате Ethernet вообще. DEVICE_KC868_A16 и
+// DEVICE_BOILER_MONITOR несут свои ETH-пины сами; остальные платы с
+// Ethernet передают их через ETH_ADDR/ETH_POWER_PIN/... в build_flags
+// (см. [env:wt32-eth01]). Платы без Ethernet (например обычный esp32dev
+// под clockinfo) ничего из этого не определяют — тогда работаем только
+// по WiFi.
+#if defined(DEVICE_KC868_A16) || defined(DEVICE_BOILER_MONITOR) || defined(ETH_ADDR)
+#define NET_HAS_ETH 1
+#endif
+
 RTC_DATA_ATTR static uint8_t _ethRebootCount = 0;
+
+// Перезапуски из-за ETH.begin()==false. RTC_DATA_ATTR тут не годится: при
+// ESP.restart() он инициализируется заново, а RTC_NOINIT переживает программный
+// сброс. Счётчик обнуляем только при включении питания (или если в памяти мусор).
+#define ETH_INIT_MAGIC         0xE7E70001u
+#define ETH_INIT_MAX_RESTARTS  5
+RTC_NOINIT_ATTR static uint32_t _ethInitMagic;
+RTC_NOINIT_ATTR static uint8_t  _ethInitRestarts;
+static bool _ethDriverFailed = false;
 
 DNSServer  NetworkManager::_dns;
 uint32_t   NetworkManager::_lastEthCheck = 0;
@@ -30,17 +49,49 @@ void NetworkManager::begin() {
     }
 
     // Режим тактирования ETH зависит от платы — каждый device определяет свой
-    #ifdef DEVICE_KC868_A16
-        ETH.begin(A16_ETH_ADDR, A16_ETH_POWER_PIN, A16_ETH_MDC_PIN, A16_ETH_MDIO_PIN,
-                ETH_PHY_LAN8720, A16_ETH_CLK_MODE);
-    #elif defined(DEVICE_BOILER_MONITOR)
-        pinMode(16, OUTPUT);
-        digitalWrite(16, HIGH);
-        delay(500);
-        ETH.begin(BMON_ETH_ADDR, BMON_ETH_POWER_PIN, BMON_ETH_MDC_PIN, BMON_ETH_MDIO_PIN, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
+    #ifdef NET_HAS_ETH
+        if (esp_reset_reason() == ESP_RST_POWERON || _ethInitMagic != ETH_INIT_MAGIC) {
+            _ethInitMagic    = ETH_INIT_MAGIC;
+            _ethInitRestarts = 0;
+        }
+        sysState.ethInitRestarts = _ethInitRestarts;
+
+        bool ethOk;
+        #ifdef DEVICE_KC868_A16
+            ethOk = ETH.begin(A16_ETH_ADDR, A16_ETH_POWER_PIN, A16_ETH_MDC_PIN, A16_ETH_MDIO_PIN,
+                    ETH_PHY_LAN8720, A16_ETH_CLK_MODE);
+        #elif defined(DEVICE_BOILER_MONITOR)
+            pinMode(16, OUTPUT);
+            digitalWrite(16, HIGH);
+            delay(500);
+            ethOk = ETH.begin(BMON_ETH_ADDR, BMON_ETH_POWER_PIN, BMON_ETH_MDC_PIN, BMON_ETH_MDIO_PIN, ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
+        #else
+            // На WT32-ETH01 этот же пин питает генератор 50 МГц для PHY. Драйвер
+            // инициализирует EMAC (ему нужен внешний такт) раньше, чем сам дёрнет
+            // пин, поэтому включаем генератор заранее и даём ему запуститься.
+            #if ETH_POWER_PIN >= 0
+            pinMode(ETH_POWER_PIN, OUTPUT);
+            digitalWrite(ETH_POWER_PIN, HIGH);
+            delay(500);
+            #endif
+            ethOk = ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN,
+                    ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
+        #endif
+
+        if (!ethOk) {
+            _ethDriverFailed = true;
+            sysState.ethDriverOk = false;
+            Serial.printf("[NET] ETH.begin() FAILED (restart attempts used: %u/%d)\n",
+                          _ethInitRestarts, ETH_INIT_MAX_RESTARTS);
+        } else {
+            Serial.println("[NET] ETH driver started");
+        }
     #else
-        ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN,
-                ETH_PHY_LAN8720, ETH_CLOCK_GPIO0_IN);
+        // Плата без Ethernet — сразу поднимаем WiFi, ETH-события никогда не придут
+        if (strlen(baseCfg.wifi_ssid) > 0) {
+            WiFi.mode(WIFI_STA);
+            WiFi.begin(baseCfg.wifi_ssid, baseCfg.wifi_pass);
+        }
     #endif
 
     Serial.printf("[NET] Device name: %s\n", baseCfg.device_name);
@@ -59,7 +110,23 @@ void NetworkManager::loop() {
     bool apActive       = sysState.apMode;
     xSemaphoreGive(coreMutex);
 
-    // ETH watchdog
+    // ETH watchdog (нет смысла на плате без Ethernet — sysState.ethConnected
+    // там никогда не станет true, и мы бы просто дёргали несуществующие пины)
+    #ifdef NET_HAS_ETH
+    // Драйвер Ethernet не поднялся (PHY/генератор не успели после включения
+    // питания) — перезапускаемся с нарастающей паузой, до ETH_INIT_MAX_RESTARTS
+    // раз за одно включение питания. Дальше остаётся AP-fallback.
+    if (_ethDriverFailed && _ethInitRestarts < ETH_INIT_MAX_RESTARTS) {
+        uint32_t wait = 5000UL * (_ethInitRestarts + 1);
+        if (millis() > wait) {
+            _ethInitRestarts++;
+            Serial.printf("[NET] ETH init failed, restarting (%u/%d)\n",
+                          _ethInitRestarts, ETH_INIT_MAX_RESTARTS);
+            Serial.flush();
+            ESP.restart();
+        }
+    }
+
     if (_ethWdArmed) {
         if (sysState.ethConnected) {
             _ethWdArmed    = false;
@@ -89,6 +156,7 @@ void NetworkManager::loop() {
             Serial.printf("[NET] ETH watchdog: PHY reset attempt %d failed\n", _ethRebootCount);
         }
     }
+    #endif // NET_HAS_ETH
 
     // Runtime watchdog — если сеть пропала надолго, перезагружаемся
     static uint32_t _netLostTimer    = 0;

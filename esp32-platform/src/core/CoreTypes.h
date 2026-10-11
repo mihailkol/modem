@@ -33,6 +33,9 @@ struct SystemState {
     bool ethConnected   = false;
     bool wifiConnected  = false;
     bool apMode         = false;
+    // false — ETH.begin() вернул ошибку (драйвер/PHY не поднялись), см. NetworkManager
+    bool    ethDriverOk      = true;
+    uint8_t ethInitRestarts  = 0;   // сколько перезапусков из-за этого уже было с последнего включения питания
 
     // Модули
     bool mqttConnected  = false;

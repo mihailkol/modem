@@ -1189,9 +1189,15 @@ void MasterGasDevice::_onMqtt(const char* topic, const char* payload, unsigned i
 #define MASTERGAS_LED_STALE_MS      5000   // нет свежего пакета — считаем шину подвисшей
 #define MASTERGAS_LED_ERR_PCT       3      // % CRC-ошибок, выше которого зелёный мигает
 #define MASTERGAS_LED_BLINK_MS      300    // период мигания зелёного/синего
+#define MASTERGAS_LED_BOOT_GRACE_MS 3000    // не дёргаем светодиоды, пока не осядет бросок
+                                             // тока от инициализации Ethernet-PHY при старте
 
 void MasterGasDevice::_ledTick() {
     uint32_t now = millis();
+    // Пины и так LOW (выключены) сразу после pinMode() в init() — просто не
+    // трогаем их первые секунды, чтобы не добавлять свою нагрузку поверх
+    // броска тока ETH.begin()/автосогласования PHY на старте.
+    if (now < MASTERGAS_LED_BOOT_GRACE_MS) return;
 
     // Красный — heartbeat/override
     static bool     ledR         = false;

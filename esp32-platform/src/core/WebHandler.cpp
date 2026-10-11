@@ -111,6 +111,8 @@ void WebHandler::init(AsyncWebServer& server) {
         doc["eth_connected"]  = sysState.ethConnected;
         doc["wifi_connected"] = sysState.wifiConnected;
         doc["ap_mode"]        = sysState.apMode;
+        doc["eth_driver_ok"]  = sysState.ethDriverOk;
+        doc["eth_init_restarts"] = sysState.ethInitRestarts;
         doc["eth_ip"]         = sysState.ethConnected ? ETH.localIP().toString() : "";
         doc["wifi_ip"]        = sysState.wifiConnected ? WiFi.localIP().toString() : "";
         doc["ap_ip"]          = sysState.apMode ? WiFi.softAPIP().toString() : "";

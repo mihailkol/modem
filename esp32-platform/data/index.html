@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>ESP32 Platform</title>
+<title>Котельная</title>
 <style>
 :root {
   --bg:       #1a1c22;
@@ -73,65 +73,11 @@ nav::-webkit-scrollbar { display: none; }
 .tab-pane.active { display: block; }
 #loading { text-align: center; color: var(--muted); padding: 40px 0; }
 
-/* ─── MONITOR CARDS ───────────────────────────────────────── */
-.monitor-page { display: flex; flex-direction: column; gap: 10px; }
-
-.m-card {
-  background: var(--card);
-  border-radius: 10px;
-  padding: 16px;
-  border: 1px solid var(--border);
-}
-.m-card-label {
-  font-size: 10px; font-weight: 700;
-  letter-spacing: .12em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 12px;
-}
-
-/* Power card */
-.m-power-big {
-  text-align: center;
-  font-size: 52px; font-weight: 800;
-  color: var(--accent); line-height: 1;
-  margin-bottom: 6px;
-}
-.m-power-big .unit { font-size: 22px; font-weight: 600; margin-left: 4px; }
-.m-power-sub { text-align: center; color: var(--muted); font-size: 13px; margin-bottom: 2px; }
-.m-power-sub b { color: var(--text); }
-
-/* Sensors row */
-.m-sensors-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-}
-.m-sensors-row.two { grid-template-columns: repeat(2, 1fr); }
-
-.m-sensor {
-  background: #1a1c22;
-  border-radius: 8px;
-  padding: 12px 10px;
-  text-align: center;
-  border: 1px solid var(--border);
-}
-.m-sensor-label {
-  font-size: 9px; font-weight: 700;
-  letter-spacing: .1em; text-transform: uppercase;
-  color: var(--muted); margin-bottom: 6px;
-}
-.m-sensor-val {
-  font-size: 24px; font-weight: 800;
-  line-height: 1; margin-bottom: 4px;
-}
-.m-sensor-val.hot    { color: var(--hot); }
-.m-sensor-val.cool   { color: var(--cool); }
-.m-sensor-val.warm   { color: var(--warm); }
-.m-sensor-val.accent { color: var(--accent); }
-.m-sensor-icon { font-size: 12px; color: var(--hot); }
-.m-sensor-icon.cool { color: var(--cool); }
-.m-sensor-sub { font-size: 11px; color: var(--muted); }
-
-canvas#powerChart { width: 100%; display: block; }
+/* ─── MONITOR CARDS (используются вкладкой "Мониторинг") ──── */
+.monitor-page { display: flex; flex-direction: column; gap: 4px; }
+.m-card { background: var(--card); border-radius: 10px; padding: 16px; border: 1px solid var(--border); }
+.m-card-label { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 12px; }
 
 /* ─── SETTINGS ────────────────────────────────────────────── */
 .settings-group {
@@ -196,8 +142,6 @@ button.btn-secondary { background: var(--border); color: var(--text); }
   <div class="status-dot"><div class="dot" id="dot_wifi"></div>Wi-Fi</div>
   <div class="status-dot"><div class="dot" id="dot_eth"></div>ETH <span id="eth_ip" style="font-size:10px;color:var(--muted)"></span></div>
   <div class="status-dot"><div class="dot" id="dot_mqtt"></div>MQTT</div>
-  <div class="status-dot"><div class="dot" id="dot_tg"></div>Telegram</div>
-  <div class="status-dot"><div class="dot" id="dot_modem"></div>Модем</div>
   <div id="sys_time" style="font-size:11px;color:var(--muted);font-family:monospace;padding:0 8px">--:--:--</div>
   <div class="status-online" id="status_online">●</div>
   <div style="font-size:10px;color:var(--muted);margin-left:8px" id="status_build"></div>
@@ -217,7 +161,6 @@ async function initUI() {
     const tabs = await r.json();
     if (!tabs.length) return;
 
-    // Строим nav
     const nav = document.getElementById('navBar');
     nav.innerHTML = '';
     tabs.forEach((t, i) => {
@@ -228,7 +171,6 @@ async function initUI() {
       nav.appendChild(btn);
     });
 
-    // Строим пустые panes
     const container = document.getElementById('tabsContainer');
     container.innerHTML = '';
     tabs.forEach((t, i) => {
@@ -239,7 +181,6 @@ async function initUI() {
       container.appendChild(pane);
     });
 
-    // Загружаем первую вкладку
     await loadTab(tabs[0].id);
     _activeTab = tabs[0].id;
   } catch(e) {
@@ -248,7 +189,7 @@ async function initUI() {
   }
 }
 
-// ── Загрузка HTML вкладки ──────────────────────────────────
+// ── Загрузка HTML вкладки (+запуск встроенных <script>) ────
 async function loadTab(id) {
   const pane = document.getElementById('tab_' + id);
   if (!pane || pane.dataset.loaded) return;
@@ -256,7 +197,6 @@ async function loadTab(id) {
     const r = await fetch('/api/tab?id=' + id);
     pane.innerHTML = await r.text();
     pane.dataset.loaded = '1';
-    // Запускаем скрипты внутри вкладки
     pane.querySelectorAll('script').forEach(s => {
       const ns = document.createElement('script');
       ns.textContent = s.textContent;
@@ -288,28 +228,9 @@ async function updateStatus() {
     };
     set('dot_wifi', d.wifi);
     set('dot_eth',  d.eth);
-      const ethIp = document.getElementById('eth_ip');
-      if (ethIp) ethIp.textContent = d.eth ? '(' + (d.eth_ip || '') + ')' : '';
-    const showGroup = (dotId, present) => {
-      const dot = document.getElementById(dotId);
-      const group = dot ? dot.closest('.status-dot') : null;
-      if (group) group.style.display = present ? '' : 'none';
-    };
-    showGroup('dot_mqtt', d.mqtt_present);
-    showGroup('dot_tg',   d.tg_present);
-    showGroup('dot_modem', d.modem_present);
+    const ethIp = document.getElementById('eth_ip');
+    if (ethIp) ethIp.textContent = d.eth ? '(' + (d.eth_ip || '') + ')' : '';
     set('dot_mqtt', d.mqtt);
-    set('dot_tg',   d.tg);
-      const dotModem = document.getElementById('dot_modem');
-      if (dotModem && d.modem_present) {
-        if (!d.modem_enabled) {
-          dotModem.classList.remove('on', 'off');  // серый — дефолт
-        } else {
-          const reg = d.modem_creg == 1 || d.modem_creg == 5;
-          dotModem.classList.toggle('on', reg);
-          dotModem.classList.toggle('off', !reg);
-        }
-      }
     const online = d.eth || d.wifi;
     const el = document.getElementById('status_online');
     if (el) { el.textContent = online ? 'ONLINE' : 'OFFLINE';
@@ -322,7 +243,7 @@ async function updateStatus() {
 async function updateTime() {
   try {
     const d = await (await fetch('/api/time')).json();
-    const srcs = {ntp:'🛰',mqtt:'🏠',gsm:'📡',rtc:'⏱',none:''};
+    const srcs = {ntp:'🛰',mqtt:'🏠',none:''};
     document.getElementById('sys_time').textContent =
       (srcs[d.source] || '') + ' ' + (d.time_str || '--:--:--');
     document.getElementById('sys_time').style.color =
@@ -331,7 +252,6 @@ async function updateTime() {
 }
 updateTime();
 setInterval(updateTime, 5000);
- 
 
 initUI();
 updateStatus();

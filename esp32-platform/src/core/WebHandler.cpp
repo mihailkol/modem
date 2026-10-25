@@ -1,14 +1,10 @@
 #include "WebHandler.h"
 #include "ConfigManager.h"
+#include "Bus.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
 #include <ETH.h>
 #include <WiFi.h>
-
-#ifdef MODULE_MODEM
-extern int  _modemCreg;
-extern bool _modemEnabled;
-#endif
 
 static const char BUILD_TIME[] = __DATE__ " " __TIME__;
 
@@ -19,23 +15,6 @@ void WebHandler::registerTab(const WebTab& tab) {
     Serial.printf("[WEB] Tab registered: %s\n", tab.id);
 }
 
-// Генерирует nav из зарегистрированных вкладок
-String WebHandler::buildNav() {
-    String nav = "";
-    for (size_t i = 0; i < _tabs.size(); i++) {
-        String cls = (i == 0) ? "tab-btn active" : "tab-btn";
-        nav += "<button class=\"" + String(cls) + "\" onclick=\"openTab(event,'";
-        nav += _tabs[i].id;
-        nav += "')\">";
-        if (_tabs[i].icon && strlen(_tabs[i].icon) > 0) {
-            nav += String(_tabs[i].icon) + " ";
-        }
-        nav += _tabs[i].label;
-        nav += "</button>";
-    }
-    return nav;
-}
-
 void WebHandler::init(AsyncWebServer& server) {
 
     // ── /api/nav — список вкладок для фронтенда ──────────────
@@ -43,6 +22,7 @@ void WebHandler::init(AsyncWebServer& server) {
         JsonDocument doc;
         JsonArray arr = doc.to<JsonArray>();
         for (size_t i = 0; i < _tabs.size(); i++) {
+            if (_tabs[i].visibleFlag && !*(_tabs[i].visibleFlag)) continue;
             JsonObject t = arr.add<JsonObject>();
             t["id"]    = _tabs[i].id;
             t["label"] = _tabs[i].label;
@@ -67,41 +47,51 @@ void WebHandler::init(AsyncWebServer& server) {
         req->send(404, "text/plain", "Tab not found");
     });
 
+    // ── /api/channels — снимок всех каналов Bus (см. ТЗ п.3.3) ─
+    server.on("/api/channels", HTTP_GET, [](AsyncWebServerRequest* req) {
+        JsonDocument doc;
+        JsonArray arr = doc.to<JsonArray>();
+        Bus::ChannelInfo info;
+        for (size_t i = 0; Bus::infoAt(i, info); i++) {
+            JsonObject c = arr.add<JsonObject>();
+            c["id"]    = info.id;
+            c["value"] = info.value;
+            c["scale"] = info.scale;
+            c["valid"] = info.hasValue;
+        }
+        String out; serializeJson(doc, out);
+        req->send(200, "application/json", out);
+    });
+
+    // ── /api/channels/set — запись в Bus с веба (уставки и т.п.) ─
+    // Семантика значения — как в MQTT (см. MqttModule): "человеческие"
+    // единицы, домножаются на scale канала внутри. Например для
+    // pump1_setpoint (scale=1) {"id":"pump1_setpoint","value":45} — это 45%.
+    auto* setHandler = new AsyncCallbackJsonWebHandler("/api/channels/set",
+        [](AsyncWebServerRequest* req, JsonVariant& json) {
+            JsonObject o = json.as<JsonObject>();
+            String id = o["id"] | "";
+            if (id.length() == 0) { req->send(400, "application/json", "{\"error\":\"no id\"}"); return; }
+            double value = o["value"] | 0.0;
+            int32_t scale = Bus::scaleOf(id.c_str());
+            Bus::write(id.c_str(), (int64_t)llround(value * scale));
+            req->send(200, "application/json", "{\"status\":\"ok\"}");
+        }
+    );
+    server.addHandler(setHandler);
+
     // ── /api/status — состояние системы ──────────────────────
     server.on("/api/status", HTTP_GET, [](AsyncWebServerRequest* req) {
         JsonDocument doc;
         xSemaphoreTake(coreMutex, portMAX_DELAY);
-        doc["eth"]   = sysState.ethConnected;
+        doc["eth"]    = sysState.ethConnected;
         doc["eth_ip"] = sysState.ethConnected ? ETH.localIP().toString() : "";
-        doc["wifi"]  = sysState.wifiConnected;
-        doc["ap"]    = sysState.apMode;
-        doc["mqtt"]  = sysState.mqttConnected;
-        doc["tg"]    = sysState.tgConnected;
+        doc["wifi"]   = sysState.wifiConnected;
+        doc["ap"]     = sysState.apMode;
+        doc["mqtt"]   = sysState.mqttConnected;
         doc["uptime"] = millis() / 1000;
-        doc["build"] = BUILD_TIME;
+        doc["build"]  = BUILD_TIME;
         xSemaphoreGive(coreMutex);
-
-        // Флаги "модуль скомпилирован в прошивку" — статус-бар на фронтенде
-        // статический HTML и не знает, какие модули реально включены сборкой
-        // (-D MODULE_*). Без этих флагов он показывает точки MQTT/Telegram/
-        // Модем всегда, в том числе для прошивок без этих модулей.
-        #ifdef MODULE_MQTT
-        doc["mqtt_present"] = true;
-        #else
-        doc["mqtt_present"] = false;
-        #endif
-        #ifdef MODULE_TELEGRAM
-        doc["tg_present"] = true;
-        #else
-        doc["tg_present"] = false;
-        #endif
-        #ifdef MODULE_MODEM
-        doc["modem_present"] = true;
-        doc["modem_enabled"] = _modemEnabled;
-        doc["modem_creg"]    = _modemCreg;
-        #else
-        doc["modem_present"] = false;
-        #endif
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
     });
@@ -111,9 +101,6 @@ void WebHandler::init(AsyncWebServer& server) {
         doc["eth_connected"]  = sysState.ethConnected;
         doc["wifi_connected"] = sysState.wifiConnected;
         doc["ap_mode"]        = sysState.apMode;
-        doc["eth_driver_ok"]  = sysState.ethDriverOk;
-        doc["eth_init_restarts"] = sysState.ethInitRestarts;
-        doc["eth_upstream_lost"] = sysState.ethUpstreamLost;
         doc["eth_ip"]         = sysState.ethConnected ? ETH.localIP().toString() : "";
         doc["wifi_ip"]        = sysState.wifiConnected ? WiFi.localIP().toString() : "";
         doc["ap_ip"]          = sysState.apMode ? WiFi.softAPIP().toString() : "";
@@ -135,21 +122,6 @@ void WebHandler::init(AsyncWebServer& server) {
         WiFi.scanDelete();
         String out; serializeJson(doc, out);
         req->send(200, "application/json", out);
-    });
-
-    server.on("/api/syslog", HTTP_GET, [](AsyncWebServerRequest* req) {
-        JsonDocument doc;
-        if (LittleFS.exists("/syslog.txt")) {
-            File f = LittleFS.open("/syslog.txt", "r");
-            if (f) { doc["log"] = f.readString(); f.close(); }
-        } else { doc["log"] = ""; }
-        String out; serializeJson(doc, out);
-        req->send(200, "application/json", out);
-    });
-
-    server.on("/api/syslog/clear", HTTP_POST, [](AsyncWebServerRequest* req) {
-        LittleFS.remove("/syslog.txt");
-        req->send(200, "application/json", "{\"status\":\"ok\"}");
     });
 
     // ── /api/get-config — текущий base конфиг ────────────────
@@ -179,7 +151,8 @@ void WebHandler::init(AsyncWebServer& server) {
             strlcpy(baseCfg.wifi_pass,   obj["wifi_pass"]   | "", sizeof(baseCfg.wifi_pass));
             strlcpy(baseCfg.web_user,    obj["web_user"]    | "admin", sizeof(baseCfg.web_user));
             strlcpy(baseCfg.web_pass,    obj["web_pass"]    | "", sizeof(baseCfg.web_pass));
-            strlcpy(baseCfg.device_name, obj["device_name"] | "esp32-device", sizeof(baseCfg.device_name));
+            strlcpy(baseCfg.device_name, obj["device_name"] | "boiler-room", sizeof(baseCfg.device_name));
+            baseCfg.show_diagnostics = obj["show_diagnostics"] | false;
 
             if (ConfigManager::saveBase())
                 req->send(200, "application/json", "{\"status\":\"ok\"}");
@@ -204,9 +177,11 @@ void WebHandler::init(AsyncWebServer& server) {
     });
 
     // ── /api/backup — все конфиги в одном файле ───────────────
+    // Список файлов — под конфиги ЭТОГО проекта (base + boilerroom калибровки
+    // + counters текущие показания счётчиков + mqtt + rs485).
     server.on("/api/backup", HTTP_GET, [](AsyncWebServerRequest* req) {
         JsonDocument doc;
-        const char* files[] = {"base", "mqtt", "tg", "boiler", "device"};
+        const char* files[] = {"base", "boilerroom", "counters", "mqtt", "rs485"};
         for (auto name : files) {
             String path = String("/") + name + ".json";
             JsonDocument part;
@@ -221,7 +196,7 @@ void WebHandler::init(AsyncWebServer& server) {
     auto* restoreH = new AsyncCallbackJsonWebHandler("/api/restore",
         [](AsyncWebServerRequest* req, JsonVariant& json) {
             JsonObject obj = json.as<JsonObject>();
-            const char* files[] = {"base", "mqtt", "tg", "boiler", "device"};
+            const char* files[] = {"base", "boilerroom", "counters", "mqtt", "rs485"};
             for (auto name : files) {
                 if (obj[name].is<JsonObject>()) {
                     JsonDocument part;
@@ -229,7 +204,6 @@ void WebHandler::init(AsyncWebServer& server) {
                     ConfigManager::saveJson((String("/") + name + ".json").c_str(), part);
                 }
             }
-            // Перечитываем base сразу
             ConfigManager::loadBase();
             req->send(200, "application/json", "{\"status\":\"ok\"}");
             xSemaphoreTake(coreMutex, portMAX_DELAY);
@@ -263,7 +237,6 @@ void WebHandler::init(AsyncWebServer& server) {
     );
 #endif
 
-    // ── Captive portal 404 ────────────────────────────────────
     server.onNotFound([](AsyncWebServerRequest* req) {
         bool ap = false;
         xSemaphoreTake(coreMutex, portMAX_DELAY);
@@ -274,8 +247,8 @@ void WebHandler::init(AsyncWebServer& server) {
         else    req->send(404, "text/plain", "Not Found");
     });
 
-    // ── Статика (index.html + assets) ─────────────────────────
-    // Фильтр: отдаём статику только если путь НЕ начинается с /api/
+    // ── Статика (data/index.html + assets, LittleFS) ──────────
+    // Фронтенд — TODO: пока data/index.html не написан, см. SCAFFOLD.md.
     server.serveStatic("/", LittleFS, "/")
           .setDefaultFile("index.html")
           .setFilter([](AsyncWebServerRequest* req) {

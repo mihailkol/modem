@@ -1,32 +1,21 @@
 #ifdef MODULE_MQTT
-#include <vector>
-#include "MqttHandler.h"
-#include "../../core/ConfigManager.h"
-#include "../../core/WebHandler.h"
+#include "MqttModule.h"
+#include "ConfigManager.h"
+#include "WebHandler.h"
+#include "Bus.h"
 #include <AsyncJson.h>
 #include <ArduinoJson.h>
-#include <esp_task_wdt.h>
-
-#ifdef MODULE_TIME
-#include "../time/TimeManager.h"
-#endif
+#include <vector>
 
 MqttConfig mqttCfg;
 
-void (*MqttHandler::onMessage)(const char*, const char*, unsigned int) = nullptr;
-
-static WiFiClient    _espClient;
+static WiFiClient   _espClient;
 static PubSubClient  _client(_espClient);
 static uint32_t      _lastRetry = 0;
-static std::vector<String> _extraSubs;
 
-void MqttHandler::addSubscription(const char* topic) {
-    _extraSubs.push_back(String(topic));
-    // Если уже подключены — подписываемся сразу
-    if (_client.connected()) _client.subscribe(topic);
-}
+struct ExtraSub { String topic; MqttMessageCallback cb; };
+static std::vector<ExtraSub> _extraSubs;
 
-// HTML вкладки настроек MQTT (PROGMEM)
 static const char MQTT_TAB_HTML[] PROGMEM = R"html(
 <div class="settings-group">
   <label class="toggle-row">
@@ -34,7 +23,7 @@ static const char MQTT_TAB_HTML[] PROGMEM = R"html(
     <input type="checkbox" id="mqtt_enabled" onchange="mqttToggle()">
   </label>
   <div id="mqtt_fields">
-    <input type="text"     name="mqtt_server" placeholder="Broker (broker.emqx.io)">
+    <input type="text"     name="mqtt_server" placeholder="Broker (192.168.1.5)">
     <input type="number"   name="mqtt_port"   placeholder="Port" value="1883">
     <input type="text"     name="mqtt_user"   placeholder="User (опционально)">
     <input type="password" name="mqtt_pass"   placeholder="Password (опционально)">
@@ -72,7 +61,7 @@ loadMqtt();
 </script>
 )html";
 
-bool MqttHandler::loadConfig() {
+bool MqttModule::loadConfig() {
     JsonDocument doc;
     if (!ConfigManager::loadJson("/mqtt.json", doc)) return false;
     mqttCfg.enabled = doc["enabled"] | true;
@@ -83,7 +72,7 @@ bool MqttHandler::loadConfig() {
     return true;
 }
 
-bool MqttHandler::saveConfig() {
+bool MqttModule::saveConfig() {
     JsonDocument doc;
     doc["enabled"] = mqttCfg.enabled;
     doc["server"]  = mqttCfg.server;
@@ -93,14 +82,38 @@ bool MqttHandler::saveConfig() {
     return ConfigManager::saveJson("/mqtt.json", doc);
 }
 
-void MqttHandler::init() {
+void MqttModule::addSubscription(const char* topic, MqttMessageCallback cb) {
+    _extraSubs.push_back({ String(topic), cb });
+    if (_client.connected()) _client.subscribe(topic);
+}
+
+// Публикует одно значение канала, форматируя число по scale
+// (scale=100 -> 2 знака после запятой, scale=1 -> целое).
+static void _publishChannelValue(const char* id, int64_t value, int32_t scale) {
+    char topic[80];
+    snprintf(topic, sizeof(topic), "%s/state/%s", baseCfg.device_name, id);
+
+    char payload[32];
+    if (scale <= 1) {
+        snprintf(payload, sizeof(payload), "%lld", (long long)value);
+    } else {
+        double v = (double)value / (double)scale;
+        snprintf(payload, sizeof(payload), "%.4f", v);
+    }
+    _client.publish(topic, payload);
+}
+
+void MqttModule::_onBusWrite(const char* id, int64_t value) {
+    if (!_client.connected()) return;
+    _publishChannelValue(id, value, Bus::scaleOf(id));
+}
+
+void MqttModule::init() {
     loadConfig();
 
-    // Регистрируем вкладку настроек
-    WebHandler::registerTab({"mqtt", "MQTT", "📊", MQTT_TAB_HTML});
+    WebHandler::registerTab({"mqtt", "MQTT", "📊", MQTT_TAB_HTML, nullptr});
 
-    // API
-    extern AsyncWebServer server; // объявлен в main.cpp
+    extern AsyncWebServer server;
     server.on("/api/mqtt/config", HTTP_GET, [](AsyncWebServerRequest* req) {
         JsonDocument doc;
         doc["enabled"] = mqttCfg.enabled;
@@ -119,7 +132,7 @@ void MqttHandler::init() {
             mqttCfg.port = obj["port"] | 1883;
             strlcpy(mqttCfg.user, obj["user"] | "", sizeof(mqttCfg.user));
             strlcpy(mqttCfg.pass, obj["pass"] | "", sizeof(mqttCfg.pass));
-            MqttHandler::saveConfig();
+            MqttModule::saveConfig();
             req->send(200, "application/json", "{\"status\":\"ok\"}");
             xSemaphoreTake(coreMutex, portMAX_DELAY);
             sysState.pendingReboot = true;
@@ -131,26 +144,26 @@ void MqttHandler::init() {
 
     if (strlen(mqttCfg.server) > 0 && mqttCfg.enabled) {
         _client.setServer(mqttCfg.server, mqttCfg.port);
-        _client.setCallback(_defaultCallback);
+        _client.setCallback(_onMessage);
     }
+
+    // Публикуем наружу КАЖДОЕ изменение любого канала Bus.
+    // NB: публикация идёт синхронно внутри callback'а — PubSubClient::publish()
+    // сам по себе не блокирует надолго, но если каналов/частота записи вырастут
+    // и это станет заметно в loop-тайминге — вынести в очередь + отправку в loop().
+    Bus::subscribeAll(_onBusWrite);
 
     Serial.println("[MQTT] Init OK");
 }
 
-void MqttHandler::reconnect() {
+void MqttModule::_reconnect() {
     if (millis() - _lastRetry < 5000) return;
     _lastRetry = millis();
 
     String clientId = String(baseCfg.device_name) + "-" + String(WiFi.macAddress());
-    // _client.connect() блокирует на TCP-коннект (+ DNS-резолв, если сервер задан
-    // хостнеймом) — на плохой сети это может занять несколько секунд. Сбрасываем
-    // вотчдог прямо перед вызовом, чтобы отдать ему полный таймаут, а не остаток
-    // от того, что уже накопился за этот проход loop().
-    esp_task_wdt_reset();
     bool ok = (strlen(mqttCfg.user) > 0)
               ? _client.connect(clientId.c_str(), mqttCfg.user, mqttCfg.pass)
               : _client.connect(clientId.c_str());
-    esp_task_wdt_reset();
 
     xSemaphoreTake(coreMutex, portMAX_DELAY);
     sysState.mqttConnected = ok;
@@ -158,15 +171,15 @@ void MqttHandler::reconnect() {
 
     if (ok) {
         Serial.println("[MQTT] Connected");
-        String sub = String(baseCfg.device_name) + "/set/#";
-        _client.subscribe(sub.c_str());
-        for (auto& s : _extraSubs) _client.subscribe(s.c_str());
+        String setSub = String(baseCfg.device_name) + "/set/#";
+        _client.subscribe(setSub.c_str());
+        for (auto& s : _extraSubs) _client.subscribe(s.topic.c_str());
     } else {
         Serial.printf("[MQTT] Failed rc=%d\n", _client.state());
     }
 }
 
-void MqttHandler::loop() {
+void MqttModule::loop() {
     if (!mqttCfg.enabled || strlen(mqttCfg.server) == 0) return;
 
     bool hasNet = false;
@@ -179,27 +192,33 @@ void MqttHandler::loop() {
         xSemaphoreTake(coreMutex, portMAX_DELAY);
         sysState.mqttConnected = false;
         xSemaphoreGive(coreMutex);
-        reconnect();
+        _reconnect();
     } else {
         _client.loop();
     }
 }
 
-void MqttHandler::publish(const char* topic, const char* payload, bool retained) {
-    if (_client.connected()) _client.publish(topic, payload, retained);
-}
-
-void MqttHandler::_defaultCallback(char* topic, byte* payload, unsigned int length) {
+void MqttModule::_onMessage(char* topic, byte* payload, unsigned int length) {
     char buf[length + 1];
     memcpy(buf, payload, length);
     buf[length] = '\0';
 
-#ifdef MODULE_TIME
-    TimeManager::onMqttMessage(topic, buf);
-#endif
+    String t(topic);
 
-    if (onMessage) {
-        onMessage(topic, buf, length);
+    // <device_name>/set/<channel_id> -> Bus::write(channel_id, value * scale)
+    String setPrefix = String(baseCfg.device_name) + "/set/";
+    if (t.startsWith(setPrefix)) {
+        String id = t.substring(setPrefix.length());
+        double v = atof(buf);
+        int32_t scale = Bus::scaleOf(id.c_str());
+        int64_t scaled = (int64_t)llround(v * scale);
+        Bus::write(id.c_str(), scaled);
+        return;
+    }
+
+    // Прочие подписки (например TimeManager на топик времени)
+    for (auto& s : _extraSubs) {
+        if (s.topic == t) s.cb(topic, buf);
     }
 }
 

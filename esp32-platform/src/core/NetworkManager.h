@@ -1,8 +1,9 @@
 #pragma once
+// Порт из esp32-platform/src/core/NetworkManager.h, упрощён под одно
+// устройство (KC868-A16) — убрана ветка под другие платы.
 #include <WiFi.h>
 #include <ETH.h>
 #include <ESPmDNS.h>
-#include <DNSServer.h>
 #include "CoreTypes.h"
 #include "ConfigManager.h"
 
@@ -15,6 +16,5 @@ private:
     static void startAP();
     static void onWiFiEvent(WiFiEvent_t event);
     static void _ethPhyReset();
-    static DNSServer  _dns;
-    static uint32_t   _lastEthCheck;
+    static uint32_t _lastEthCheck;
 };

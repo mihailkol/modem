@@ -3,7 +3,8 @@
 #include <freertos/semphr.h>
 
 // ============================================================
-//  BASE CONFIG — сетевая часть, общая для всех устройств
+//  BASE CONFIG — сетевая часть, общая для всех модулей
+//  (порт из esp32-platform/src/core/CoreTypes.h, без изменений)
 // ============================================================
 struct BaseConfig {
     // Ethernet
@@ -13,7 +14,7 @@ struct BaseConfig {
     char eth_gw[16]     = "192.168.1.1";
     char eth_dns[16]    = "8.8.8.8";
 
-    // WiFi
+    // WiFi (резервный канал, если Ethernet недоступен)
     char wifi_ssid[32]  = "";
     char wifi_pass[32]  = "";
 
@@ -21,47 +22,53 @@ struct BaseConfig {
     char web_user[16]   = "admin";
     char web_pass[32]   = "";
 
-    // Device name (используется в mDNS, MQTT client ID, AP SSID)
-    char device_name[32] = "esp32-device";
+    // Device name (mDNS, MQTT client ID, AP SSID)
+    char device_name[32] = "boiler-room";
+
+    // Показывать вкладки диагностики (RS485-консоль, сырые ADC/DI/DO) в nav.
+    // По умолчанию выключено — не мозолит глаза при обычной эксплуатации,
+    // включается тумблером в Настройках без перезагрузки (см. WebHandler
+    // /api/nav — фильтрует по WebTab::visibleFlag).
+    bool show_diagnostics = false;
 };
 
 // ============================================================
 //  SYSTEM STATE — runtime, не сохраняется
 // ============================================================
 struct SystemState {
-    // Сеть
     bool ethConnected   = false;
     bool wifiConnected  = false;
     bool apMode         = false;
-    // false — ETH.begin() вернул ошибку (драйвер/PHY не поднялись), см. NetworkManager
-    bool    ethDriverOk      = true;
-    uint8_t ethInitRestarts  = 0;   // сколько перезапусков из-за этого уже было с последнего включения питания
-    // true — линк Ethernet есть, но шлюз перестал отвечать (watchdog связности)
-    bool    ethUpstreamLost  = false;
 
-    // Модули
     bool mqttConnected  = false;
-    bool tgConnected    = false;
 
-    // Управление
-    bool pendingReboot  = false;
-    uint32_t rebootAt   = 0;
+    bool     pendingReboot = false;
+    uint32_t rebootAt      = 0;
 };
 
 // ============================================================
-//  WEB TAB — регистрация вкладок модулями/устройствами
+//  WEB TAB — регистрация вкладок веб-интерфейса
 // ============================================================
 struct WebTab {
-    const char* id;       // "telegram", "boiler" — уникальный ID
-    const char* label;    // Отображаемое имя
-    const char* icon;     // Эмодзи или пусто
-    const char* html;     // HTML-контент (PROGMEM или статическая строка)
-    // API-маршруты регистрирует сам модуль в своём init()
+    const char* id;
+    const char* label;
+    const char* icon;
+    const char* html;
+    // nullptr = всегда видна в /api/nav. Если задан — вкладка попадает в
+    // список, только пока *visibleFlag == true (проверяется на каждый
+    // запрос nav, без перезагрузки платы). См. BaseConfig::show_diagnostics.
+    //
+    // ВАЖНО: без default member initializer намеренно — тулчейн собирает
+    // в режиме C++11, где структура с NSDMI перестаёт быть агрегатом и
+    // brace-init `{...}` на местах регистрации вкладок ломается (см. чат,
+    // ошибка сборки). Поэтому во всех registerTab({...}) без явного флага
+    // нужно передавать nullptr последним аргументом явно.
+    const bool* visibleFlag;
 };
 
 // ============================================================
 //  GLOBALS
 // ============================================================
-extern BaseConfig       baseCfg;
-extern SystemState      sysState;
+extern BaseConfig        baseCfg;
+extern SystemState       sysState;
 extern SemaphoreHandle_t coreMutex;

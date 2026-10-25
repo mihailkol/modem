@@ -1,24 +1,11 @@
 #pragma once
 #ifdef DEVICE_EKONOM
-
+// Порт из esp32-platform/src/devices/ekonom/EkoNomDevice.*.
+// Отличие: результат пишется прямо в Bus (t_supply, t_return, t_delta,
+// flow_m3h, power_kw, energy_kwh, volume_m3), а не в отдельную структуру
+// EkoNomData — её больше нет, читатели берут значения из Bus.
 #include <Arduino.h>
 
-// ── Данные теплосчётчика ─────────────────────────────────────────────────────
-struct EkoNomData {
-    float    energy_kwh  = 0;    // накопленная энергия, кВт·ч
-    float    t_supply    = 0;    // температура подачи, °C
-    float    t_return    = 0;    // температура обратки, °C
-    float    t_delta     = 0;    // разность температур, °C
-    float    volume_m3   = 0;    // объём, м³
-    float    flow_m3h    = 0;    // расход, м³/ч
-    float    power_kw    = 0;    // мощность, кВт
-    uint32_t updated_ms  = 0;    // millis() последнего успешного опроса
-    bool     valid       = false;
-};
-
-extern EkoNomData ekoNomData;
-
-// ── Драйвер ──────────────────────────────────────────────────────────────────
 class EkoNomDevice {
 public:
     static void init(uint8_t pollIntervalSec = 30);
@@ -31,11 +18,10 @@ private:
     static uint32_t _sentMs;
     static uint8_t  _pollInterval;
 
-    static void    _onFrame(const uint8_t* data, size_t len);
-    static bool    _parseR1(const uint8_t* data, size_t len);
-    static bool    _parseR2(const uint8_t* data, size_t len);
-    static bool    _parseR3(const uint8_t* data, size_t len);
+    static void     _onFrame(const uint8_t* data, size_t len);
+    static bool     _parseR1(const uint8_t* data, size_t len);
+    static bool     _parseR2(const uint8_t* data, size_t len);
+    static bool     _parseR3(const uint8_t* data, size_t len);
     static uint32_t _reg32(const uint8_t* d, int offset);
 };
-
 #endif // DEVICE_EKONOM

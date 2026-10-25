@@ -36,6 +36,8 @@ struct SystemState {
     // false — ETH.begin() вернул ошибку (драйвер/PHY не поднялись), см. NetworkManager
     bool    ethDriverOk      = true;
     uint8_t ethInitRestarts  = 0;   // сколько перезапусков из-за этого уже было с последнего включения питания
+    // true — линк Ethernet есть, но шлюз перестал отвечать (watchdog связности)
+    bool    ethUpstreamLost  = false;
 
     // Модули
     bool mqttConnected  = false;

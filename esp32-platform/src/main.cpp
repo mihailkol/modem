@@ -37,6 +37,9 @@
 #ifdef DEVICE_EKONOM
 #include "devices/ekonom/EkoNomDevice.h"
 #endif
+#ifdef DEVICE_MASTERGAS
+#include "devices/mastergas/MasterGasDevice.h"
+#endif
 
 #ifdef APP_BOILER_ROOM
 #include "apps/boiler-room/BoilerRoomApp.h"
@@ -59,6 +62,13 @@ void setup() {
 
     // 2. Сеть
     NetworkManager::begin();
+
+    // 2a. Устройство, у которого главная вкладка — управление им самим
+    //     (газовый котёл MasterGas), регистрируется до "Мониторинга": его
+    //     вкладка "Котёл" должна открываться первой.
+    #ifdef DEVICE_MASTERGAS
+    MasterGasDevice::init();
+    #endif
 
     // 2b. Вкладка "Мониторинг" — регистрируется первой, чтобы быть
     //     дефолтной активной вкладкой в nav (порядок = порядок регистрации)
@@ -171,6 +181,11 @@ void loop() {
     #ifdef APP_BOILER_ROOM
     CrashLog::mark(TAG_APP);
     BoilerRoomApp::loop();
+    #endif
+
+    #ifdef DEVICE_MASTERGAS
+    CrashLog::mark(TAG_MASTERGAS);
+    MasterGasDevice::loop();
     #endif
 
     #ifdef MODULE_MQTT

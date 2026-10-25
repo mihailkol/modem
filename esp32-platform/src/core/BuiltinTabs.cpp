@@ -41,6 +41,7 @@ const MON_SECTIONS = [
   {title:'♨️ Контур отопления 2',    ids:['pump2_setpoint','pump2_feedback','pump2_t_supply','pump2_t_return','pump2_t_delta']},
   {title:'🚰 ХВС',                   ids:['water_total_m3','water_rate','water_rate_lph','p_water']},
   {title:'🌡 Температуры',           ids:['t_indoor','t_outdoor']},
+  {title:'🔥 Газовый котёл (MasterGas)', ids:['mg_burner_on','mg_coolant_temp','mg_water_temp','mg_remote_power','mg_remote_target','mg_remote_air_temp','mg_passthrough','mg_override_power','mg_override_temp','mg_pkt_ok','mg_pkt_crc_err']},
   {title:'⚙️ Система',               ids:['uptime','free_heap','rssi','mqtt_status','ip_address','fw_version']},
 ];
 const MON_SECTION_OF = {};
@@ -87,6 +88,20 @@ const MON_META = {
 
   t_outdoor: {l:'Улица',  u:'°C', gauge:{min:-50,max:40}},
   t_indoor:  {l:'В доме', u:'°C', gauge:{min:10,max:40}},
+
+  // MasterGas (газовый котёл Daesung, DEVICE_MASTERGAS). Управление — на
+  // вкладке "Котёл"; здесь только быстрый просмотр/правка через Bus.
+  mg_burner_on:       {l:'Горелка',            fmt:'bool'},
+  mg_coolant_temp:    {l:'Теплоноситель',      u:'°C', gauge:{min:10,max:90}},
+  mg_water_temp:      {l:'ГВС',                u:'°C', gauge:{min:10,max:90}},
+  mg_remote_power:    {l:'Пульт: питание',     fmt:'bool'},
+  mg_remote_target:   {l:'Пульт: уставка',     u:'°C'},
+  mg_remote_air_temp: {l:'Пульт: в помещении', u:'°C', gauge:{min:10,max:40}},
+  mg_passthrough:     {l:'Режим passthrough (1) / override (0)', editable:true},
+  mg_override_power:  {l:'Override: питание (0/1)', editable:true},
+  mg_override_temp:   {l:'Override: уставка',  u:'°C', editable:true, gauge:{min:30,max:85}},
+  mg_pkt_ok:          {l:'Пакетов принято',    },
+  mg_pkt_crc_err:     {l:'Пакетов с CRC-ошибкой', },
 
   uptime:      {l:'Аптайм',     fmt:'uptime'},
   free_heap:   {l:'Free heap',  u:'байт'},

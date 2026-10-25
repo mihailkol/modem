@@ -27,6 +27,7 @@ enum CrashTag : uint16_t {
     TAG_PUMPSLAVE = 8,
     TAG_EVENTLOG  = 9,
     TAG_APP       = 10,
+    TAG_MASTERGAS = 11,
 };
 
 namespace CrashLog {

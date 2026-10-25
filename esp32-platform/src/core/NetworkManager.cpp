@@ -12,6 +12,138 @@ static bool     _ethWdArmed = true;
 static uint8_t  _ethWdPhySt = 0;      // 0=idle, 1=phy low, 2=phy high
 static uint32_t _ethWdTimer = 0;
 
+// Перезапуски из-за ETH.begin()==false. RTC_DATA_ATTR тут не годится: при
+// ESP.restart() он инициализируется заново, а RTC_NOINIT переживает программный
+// сброс. Счётчики обнуляем только при включении питания (или если в памяти мусор).
+#define ETH_INIT_MAGIC         0xE7E70001u
+#define ETH_INIT_MAX_RESTARTS  5
+RTC_NOINIT_ATTR static uint32_t _ethInitMagic;
+RTC_NOINIT_ATTR static uint8_t  _ethInitRestarts;
+static bool _ethDriverFailed = false;
+
+// ── Watchdog связности ───────────────────────────────────────────────────────
+// Линк до свитча/роутера может быть жив, а сеть за ним — нет (завис коммутатор,
+// пропал аплинк): событий ETH_DISCONNECTED при этом нет, и без проверки шлюза
+// плата сидит на мёртвом Ethernet. Раз в GW_PING_INTERVAL_MS пингуем шлюз по
+// Ethernet; сработает только если он хотя бы раз ответил после получения IP
+// (так не ловим ложные срабатывания на сетях, где шлюз не отвечает на ICMP).
+#include "esp_netif.h"
+#include "ping/ping_sock.h"
+
+#define GW_PING_INTERVAL_MS  15000
+#define GW_FAIL_LIMIT        4        // подряд без ответа (~1 мин) => шлюз потерян
+#define GW_RESTART_AFTER_MS  300000   // без Wi-Fi-запаса — перезапуск через 5 мин
+#define GW_MAX_RESTARTS      3        // за одно включение питания
+
+RTC_NOINIT_ATTR static uint8_t _gwRestarts;
+static esp_ping_handle_t _gwPing        = nullptr;
+static volatile uint32_t _gwFailStreak  = 0;
+static volatile uint32_t _gwOkCount     = 0;
+static bool     _gwArmed        = false;
+static bool     _gwLost         = false;
+static bool     _gwFallbackWifi = false;
+static uint32_t _gwLostSince    = 0;
+static uint32_t _gwTargetIp     = 0;
+
+static void _gwOnSuccess(esp_ping_handle_t, void*) { _gwFailStreak = 0; _gwOkCount = _gwOkCount + 1; }
+static void _gwOnTimeout(esp_ping_handle_t, void*) { _gwFailStreak = _gwFailStreak + 1; }
+
+static void _gwStop() {
+    if (_gwPing) {
+        esp_ping_stop(_gwPing);
+        esp_ping_delete_session(_gwPing);
+        _gwPing = nullptr;
+    }
+    _gwArmed = false;
+    _gwTargetIp = 0;
+}
+
+static void _gwStart(IPAddress gw) {
+    _gwFailStreak = 0;
+    _gwOkCount    = 0;
+    _gwArmed      = false;
+
+    esp_ping_config_t cfg = ESP_PING_DEFAULT_CONFIG();
+    cfg.count       = ESP_PING_COUNT_INFINITE;
+    cfg.interval_ms = GW_PING_INTERVAL_MS;
+    cfg.timeout_ms  = 2000;
+    cfg.data_size   = 32;
+    IP_ADDR4(&cfg.target_addr, gw[0], gw[1], gw[2], gw[3]);
+    esp_netif_t* eth = esp_netif_get_handle_from_ifkey("ETH_DEF");
+    cfg.interface = eth ? esp_netif_get_netif_impl_index(eth) : 0;
+
+    esp_ping_callbacks_t cbs = {};
+    cbs.on_ping_success = _gwOnSuccess;
+    cbs.on_ping_timeout = _gwOnTimeout;
+
+    if (esp_ping_new_session(&cfg, &cbs, &_gwPing) == ESP_OK) {
+        esp_ping_start(_gwPing);
+        _gwTargetIp = (uint32_t)gw;
+        Serial.printf("[NET] Gateway watchdog: pinging %s via ETH\n", gw.toString().c_str());
+    } else {
+        _gwPing = nullptr;
+    }
+}
+
+static void _gwTick() {
+    bool ethUp = sysState.ethConnected;
+    uint32_t gwRaw = (uint32_t)ETH.gatewayIP();
+
+    if (ethUp && gwRaw != 0 && (!_gwPing || gwRaw != _gwTargetIp)) {
+        _gwStop();
+        _gwStart(ETH.gatewayIP());
+    } else if (!ethUp && _gwPing) {
+        _gwStop();
+    }
+
+    if (!_gwPing) {
+        // Ethernet пропал сам (линк) — дальше работает штатная логика ETH_DISCONNECTED
+        _gwLost = false;
+        _gwFallbackWifi = false;
+        sysState.ethUpstreamLost = false;
+        return;
+    }
+
+    if (_gwOkCount > 0) {
+        _gwArmed = true;
+        _gwRestarts = 0;
+    }
+
+    bool dead = _gwArmed && _gwFailStreak >= GW_FAIL_LIMIT;
+
+    if (dead && !_gwLost) {
+        _gwLost = true;
+        _gwLostSince = millis();
+        sysState.ethUpstreamLost = true;
+        Serial.println("[NET] Gateway watchdog: gateway unreachable via ETH");
+        if (strlen(baseCfg.wifi_ssid) > 0) {
+            _gwFallbackWifi = true;
+            Serial.println("[NET] Gateway watchdog: bringing up WiFi as fallback");
+            WiFi.begin(baseCfg.wifi_ssid, baseCfg.wifi_pass);
+        }
+    } else if (!dead && _gwLost) {
+        _gwLost = false;
+        sysState.ethUpstreamLost = false;
+        Serial.println("[NET] Gateway watchdog: gateway reachable again");
+        if (_gwFallbackWifi) {
+            _gwFallbackWifi = false;
+            WiFi.disconnect(true);
+            xSemaphoreTake(coreMutex, portMAX_DELAY);
+            sysState.wifiConnected = false;
+            xSemaphoreGive(coreMutex);
+        }
+    }
+
+    if (_gwLost && !sysState.wifiConnected
+        && millis() - _gwLostSince > GW_RESTART_AFTER_MS
+        && _gwRestarts < GW_MAX_RESTARTS) {
+        _gwRestarts++;
+        Serial.printf("[NET] Gateway watchdog: restarting (%u/%d)\n", _gwRestarts, GW_MAX_RESTARTS);
+        Serial.flush();
+        ESP.restart();
+    }
+}
+
 void NetworkManager::begin() {
     WiFi.onEvent(onWiFiEvent);
 
@@ -25,8 +157,32 @@ void NetworkManager::begin() {
         }
     }
 
-    ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN,
-              ETH_PHY_LAN8720, ETH_CLK_MODE);
+    if (esp_reset_reason() == ESP_RST_POWERON || _ethInitMagic != ETH_INIT_MAGIC) {
+        _ethInitMagic    = ETH_INIT_MAGIC;
+        _ethInitRestarts = 0;
+        _gwRestarts      = 0;
+    }
+    sysState.ethInitRestarts = _ethInitRestarts;
+
+    // Если пин питания PHY одновременно включает внешний генератор такта
+    // (WT32-ETH01), его надо запустить заранее: драйвер инициализирует EMAC,
+    // которому нужен внешний такт, раньше, чем сам дёрнет этот пин.
+    #if ETH_POWER_PIN >= 0
+    pinMode(ETH_POWER_PIN, OUTPUT);
+    digitalWrite(ETH_POWER_PIN, HIGH);
+    delay(500);
+    #endif
+
+    bool ethOk = ETH.begin(ETH_ADDR, ETH_POWER_PIN, ETH_MDC_PIN, ETH_MDIO_PIN,
+                           ETH_PHY_LAN8720, ETH_CLK_MODE);
+    if (!ethOk) {
+        _ethDriverFailed = true;
+        sysState.ethDriverOk = false;
+        Serial.printf("[NET] ETH.begin() FAILED (restart attempts used: %u/%d)\n",
+                      _ethInitRestarts, ETH_INIT_MAX_RESTARTS);
+    } else {
+        Serial.println("[NET] ETH driver started");
+    }
 
     Serial.printf("[NET] Device name: %s\n", baseCfg.device_name);
 }
@@ -43,6 +199,22 @@ void NetworkManager::loop() {
     bool connected = sysState.ethConnected || sysState.wifiConnected;
     bool apActive  = sysState.apMode;
     xSemaphoreGive(coreMutex);
+
+    // Драйвер Ethernet не поднялся (PHY/генератор не успели после включения
+    // питания) — перезапускаемся с нарастающей паузой, до ETH_INIT_MAX_RESTARTS
+    // раз за одно включение питания. Дальше остаётся AP-fallback.
+    if (_ethDriverFailed && _ethInitRestarts < ETH_INIT_MAX_RESTARTS) {
+        uint32_t wait = 5000UL * (_ethInitRestarts + 1);
+        if (millis() > wait) {
+            _ethInitRestarts++;
+            Serial.printf("[NET] ETH init failed, restarting (%u/%d)\n",
+                          _ethInitRestarts, ETH_INIT_MAX_RESTARTS);
+            Serial.flush();
+            ESP.restart();
+        }
+    }
+
+    _gwTick();
 
     // ETH watchdog
     if (_ethWdArmed) {
